@@ -21,3 +21,15 @@ Resource Sharing
 All commercially purchased antibodies, reagents or kits will be clearly described in publications, including catalog or stock numbers. 
 This data will also be provided in the metadata assoicated with published data sets. Reagents, constructs, fruit fly, cell or mouse transgenic lines generated during these s udies will be maintained in the principal investigator’s laboratory and made available freely and without restriction to any scientists, providing sufficient amounts are availabe. 
 The only exception to this is if a reagent or line was provided with a restrictive materials transfer agreement, in which case the recipient investigator will be directed to the primary source of the reagent.
+
+Notes
+-----
+
+* **Version 0.1.0**
+* Updated on September 21, 2013 by Dave Bridges <dave.bridges@gmail.com>
+* The version numbering for this document is described in the `Lab Policies README`_.  See the `GitHub Repository`_ for more granular changes.
+
+.. _commit: https://github.com/davebridges/Lab-Documents/commits/master
+.. _Lab Policies README: https://github.com/BridgesLab/Lab-Documents/blob/master/Lab%20Policies/README.rst
+.. _GitHub Repository: 
+https://github.com/BridgesLab/Lab-Documents/blob/master/Lab%20Policies/data-resource-sharing.rst
