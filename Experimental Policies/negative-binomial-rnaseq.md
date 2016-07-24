@@ -6,7 +6,7 @@ This post is in reference to a workshop held at UTHSC about methodologies in RNA
 * [HTSeq](http://www-huber.embl.de/users/anders/HTSeq/doc/overview.html) to annotate reads to known genomic features
 * [DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) to perform differential expression analyses 
 
-If you want more specifics about our current (and evolving) approaches see our recent papers in [PLOS One](http://dx.doi.org/10.1371/journal.pone.0129359) and [JME](http://dx.doi.org/10.1530/JME-15-0119) or the associated repository with all the raw data and code at  http://bridgeslab.github.io/CushingAcromegalyStudy/.
+If you want more specifics about our current (and evolving) approaches see our recent papers in [PLOS One](http://dx.doi.org/10.1371/journal.pone.0129359) and [JME](http://dx.doi.org/10.1530/JME-15-0119) or the associated repository with all the raw data and code on [Github](http://bridgeslab.github.io/CushingAcromegalyStudy/).
 
 First of all, since reads are count based, they can't be normally distributed (you can't have -3 counts, or 12.2 counts). Two distributions for count based data are [poisson](https://en.wikipedia.org/wiki/Poisson_distribution) (which presumes the variance and mean [ie expression in our case] are equal) or [negative binomial](https://en.wikipedia.org/wiki/Negative_binomial_distribution) (which does not).  This is especially a problem when the number of biological replicates are low because it is hard to accurately model variance of count based data if you are looking at only that gene and making the assumptions of normally distributed continuous data (ie a *t*-test).  A good estimate of variance for each gene is essential to determine whether the changes are due to chance.
 

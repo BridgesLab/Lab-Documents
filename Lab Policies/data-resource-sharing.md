@@ -10,7 +10,7 @@ Data Sharing
 
 Publications arising from these studies will be published in journals
 meeting the gold open access standards of free availability, and a
-permissive re-use licence (CC-BY or the like). All published data will
+permissive re-use license (CC-BY or the like). All published data will
 be submitted to journals indexed by the major biomedical indexing sites
 including PubMed and PubMed Central. For all studies the raw data, as
 well as the relevant metadata and computational algorithms used to
@@ -39,7 +39,7 @@ All commercially purchased antibodies, reagents or kits will be clearly
 described in publications, including catalog or stock numbers. This data
 will also be provided in the metadata assoicated with published data
 sets. Reagents, constructs, fruit fly, cell or mouse transgenic lines
-generated during these s udies will be maintained in the principal
+generated during these studies will be maintained in the principal
 investigator’s laboratory and made available freely and without
 restriction to any scientists, providing sufficient amounts are
 availabe. The only exception to this is if a reagent or line was
@@ -50,8 +50,8 @@ reagent.
 Notes
 -----
 
-* **Version 1.2.0**
-* Updated on May 28, 2015 by Dave Bridges <<dave.bridges@gmail.com>>
+* **Version 1.2.1**
+* Updated on December 2, 2015 by Dave Bridges <<dave.bridges@gmail.com>>
 * The version numbering for this document is described in the [Lab
     Policies README](https://github.com/BridgesLab/Lab-Documents/blob/master/Lab%20Policies/README.rst).
     See the [GitHub Repository](https://github.com/BridgesLab/Lab-Documents/blob/master/Lab%20Policies/data-resource-sharing.rst)

@@ -65,9 +65,9 @@ though we will leave the decision to their discretion.
 
 ### Notes
 
--   **Version 1.1.0**
+-   **Version 1.1.1**
 -   Updated on September 13, 2015 by Dave Bridges
-    \<<dave.bridges@gmail.com>\>
+    <dave.bridges@gmail.com>
 -   The version numbering for this document is described in the [Lab
     Policies
     README](https://github.com/davebridges/Lab-Documents/blob/master/Lab%20Policies/README.rst).
