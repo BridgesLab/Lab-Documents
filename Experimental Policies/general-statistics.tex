@@ -1,0 +1,535 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={General Statistics},
+            pdfauthor={Dave Bridges},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\ImportTok}[1]{{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{{#1}}}}
+\newcommand{\BuiltInTok}[1]{{#1}}
+\newcommand{\ExtensionTok}[1]{{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{{#1}}}
+\newcommand{\RegionMarkerTok}[1]{{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{{#1}}}}
+\newcommand{\NormalTok}[1]{{#1}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{General Statistics}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{Dave Bridges}
+  \preauthor{\centering\large\emph}
+  \postauthor{\par}
+  \predate{\centering\large\emph}
+  \postdate{\par}
+  \date{May 9, 2014}
+
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\section{General Statistical Methods}\label{general-statistical-methods}
+
+There are several important concepts that we will adhere to in our
+group. These involve design considerations, execution considerations and
+analysis concerns.
+
+\subsection{Experimental Design}\label{experimental-design}
+
+Where possible, prior to performing an experiment or study perform a
+power analysis. This is mainly to determine the appropriate sample
+sizes. To do this, you need to know a few of things:
+
+\begin{itemize}
+\tightlist
+\item
+  Either the sample size or the difference. The difference is provided
+  in standard deviations. This means that you need to know the standard
+  deviation of your measurement in question. It is a good idea to keep a
+  log of these for your data, so that you can approximate what this is.
+  If you hope to detect a correlation you will need to know the expected
+  correlation coefficient.
+\item
+  The desired false positive rate (normally 0.05). This is the rate at
+  which you find a difference where there is none. This is also known as
+  the type I error rate.
+\item
+  The desired power (normally 0.8). This indicates that 80\% of the time
+  you will detect the effect if there is one. This is also known as 1
+  minus the false negative rate or 1 minus the Type II error rate.
+\end{itemize}
+
+We use the R package \textbf{pwr} to do a power analysis (Champely,
+2017). Here is an example:
+
+\subsubsection{Pairwise Comparasons}\label{pairwise-comparasons}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(pwr)}
+\NormalTok{false.negative.rate <-}\StringTok{ }\FloatTok{0.05}
+\NormalTok{statistical.power <-}\StringTok{ }\FloatTok{0.8}
+\NormalTok{sd <-}\StringTok{ }\FloatTok{3.5} \CommentTok{#this is calculated from known measurements}
+\NormalTok{difference <-}\StringTok{ }\DecValTok{3}  \CommentTok{#you hope to detect a difference }
+\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{d =} \NormalTok{difference, }\DataTypeTok{sig.level =} \NormalTok{false.negative.rate, }\DataTypeTok{power=}\NormalTok{statistical.power)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##      Two-sample t test power calculation 
+## 
+##               n = 3.07
+##               d = 3
+##       sig.level = 0.05
+##           power = 0.8
+##     alternative = two.sided
+## 
+## NOTE: n is number in *each* group
+\end{verbatim}
+
+This tells us that in order to see a difference of at least 3, with at
+standard devation of 3.5 we need at least \textbf{3} observations in
+each group.
+
+\subsubsection{Correlations}\label{correlations}
+
+The following is an example for detecting a correlation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{require}\NormalTok{(pwr)}
+\NormalTok{false.negative.rate <-}\StringTok{ }\FloatTok{0.05}
+\NormalTok{statistical.power <-}\StringTok{ }\FloatTok{0.8}
+\NormalTok{correlation.coefficient <-}\StringTok{ }\FloatTok{0.6} \CommentTok{#note that this is the r, to get the R2 value you will have to square this result.}
+\KeywordTok{pwr.r.test}\NormalTok{(}\DataTypeTok{r =} \NormalTok{correlation.coefficient, }\DataTypeTok{sig.level =} \NormalTok{false.negative.rate, }\DataTypeTok{power=}\NormalTok{statistical.power)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##      approximate correlation power calculation (arctangh transformation) 
+## 
+##               n = 18.6
+##               r = 0.6
+##       sig.level = 0.05
+##           power = 0.8
+##     alternative = two.sided
+\end{verbatim}
+
+This tells us that in order to detect a correlation coefficient of at
+least 0.6 (or an R\^{}2 of 0.36) you need more than \textbf{18}
+observations.
+
+\section{Pairwise Testing}\label{pairwise-testing}
+
+If you have two groups (and two groups only) that you want to know if
+they are different, you will normally want to do a pairwise test. This
+is \textbf{not} the case if you have paired data (before and after for
+example). The most common of these is something called a Student's
+\emph{t}-test, but this test has two key assumptions:
+
+\begin{itemize}
+\tightlist
+\item
+  The data are normally distributed
+\item
+  The two groups have equal variance
+\end{itemize}
+
+\subsection{Testing the Assumptions}\label{testing-the-assumptions}
+
+Best practice is to first test for normality, and if that test passes,
+to then test for equal variance
+
+\subsubsection{Testing Normality}\label{testing-normality}
+
+To test normality, we use a Shapiro-Wilk test (details on
+\href{https://en.wikipedia.org/wiki/Shapiro\%E2\%80\%93Wilk_test}{Wikipedia}
+on each of your two groups). Below is an example where there are two
+groups:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#create seed for reproducibility}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1265}\NormalTok{)}
+\NormalTok{test.data <-}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Treatment=}\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\StringTok{"Experiment"}\NormalTok{,}\DecValTok{6}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\StringTok{"Control"}\NormalTok{,}\DecValTok{6}\NormalTok{)),}
+           \DataTypeTok{Result =} \KeywordTok{rnorm}\NormalTok{(}\DataTypeTok{n=}\DecValTok{12}\NormalTok{, }\DataTypeTok{mean=}\DecValTok{10}\NormalTok{, }\DataTypeTok{sd=}\DecValTok{3}\NormalTok{))}
+\CommentTok{#test.data$Treatment <- as.factor(test.data$Treatment)}
+\KeywordTok{kable}\NormalTok{(test.data, }\DataTypeTok{caption=}\StringTok{"The test data used in the following examples"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{The test data used in the following examples}\tabularnewline
+\toprule
+Treatment & Result\tabularnewline
+\midrule
+\endfirsthead
+\toprule
+Treatment & Result\tabularnewline
+\midrule
+\endhead
+Experiment & 11.26\tabularnewline
+Experiment & 8.33\tabularnewline
+Experiment & 9.94\tabularnewline
+Experiment & 11.83\tabularnewline
+Experiment & 6.56\tabularnewline
+Experiment & 11.41\tabularnewline
+Control & 8.89\tabularnewline
+Control & 11.59\tabularnewline
+Control & 9.39\tabularnewline
+Control & 8.74\tabularnewline
+Control & 6.31\tabularnewline
+Control & 7.82\tabularnewline
+\bottomrule
+\end{longtable}
+
+Each of the two groups, in this case \textbf{Test} and \textbf{Control}
+must have Shapiro-Wilk tests done separately. Some sample code for this
+is below (requires dplyr to be loaded):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#filter only for the control data}
+\NormalTok{control.data <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(test.data, Treatment==}\StringTok{"Control"}\NormalTok{)}
+\CommentTok{#The broom package makes the results of the test appear in a table, with the tidy command}
+\KeywordTok{library}\NormalTok{(broom)}
+
+\CommentTok{#run the Shapiro-Wilk test on the values}
+\KeywordTok{shapiro.test}\NormalTok{(control.data$Result) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrl@{}}
+\toprule
+statistic & p.value & method\tabularnewline
+\midrule
+\endhead
+0.968 & 0.88 & Shapiro-Wilk normality test\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{experiment.data <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(test.data, Treatment==}\StringTok{"Experiment"}\NormalTok{)}
+\KeywordTok{shapiro.test}\NormalTok{(test.data$Result) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrl@{}}
+\toprule
+statistic & p.value & method\tabularnewline
+\midrule
+\endhead
+0.93 & 0.377 & Shapiro-Wilk normality test\tabularnewline
+\bottomrule
+\end{longtable}
+
+Based on these results, since both p-values are \textgreater{}0.05 we do
+not reject the presumption of normality and can go on. If one or more of
+the p-values were less than 0.05 we would then use a Mann-Whitney test
+(also known as a Wilcoxon rank sum test) will be done, see below for
+more details.
+
+\subsubsection{Testing for Equal
+Variance}\label{testing-for-equal-variance}
+
+We generally use the
+\href{https://cran.r-project.org/web/packages/car/index.html}{car}
+package which contains code for
+\href{https://en.wikipedia.org/wiki/Levene\%27s_test}{Levene's Test} to
+see if two groups can be assumed to have equal variance:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#load the car package}
+\KeywordTok{library}\NormalTok{(car)}
+
+\CommentTok{#runs the test, grouping by the Treatment variable}
+\KeywordTok{leveneTest}\NormalTok{(Result ~}\StringTok{ }\NormalTok{Treatment, }\DataTypeTok{data=}\NormalTok{test.data) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule
+term & df & statistic & p.value\tabularnewline
+\midrule
+\endhead
+group & 1 & 0.368 & 0.558\tabularnewline
+& 10 & NA & NA\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsection{Performing the Appropriate Pairwise
+Test}\label{performing-the-appropriate-pairwise-test}
+
+The logic to follow is:
+
+\begin{itemize}
+\tightlist
+\item
+  If the Shapiro-Wilk test passes, do Levene's test. If it fails for
+  either group, move on to a \textbf{Wilcoxon Rank Sum Test}.
+\item
+  If Levene's test \emph{passes}, do a Student's \emph{t} Test, which
+  assumes equal variance.
+\item
+  If Levene's test \emph{fails}, do a Welch's \emph{t} Test, which does
+  not assume equal variance.
+\end{itemize}
+
+\subsubsection{\texorpdfstring{Student's \emph{t}
+Test}{Student's t Test}}\label{students-t-test}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE}
+\KeywordTok{t.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data, }\DataTypeTok{var.equal=}\NormalTok{T) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrrrrrll@{}}
+\toprule
+estimate1 & estimate2 & statistic & p.value & parameter & conf.low &
+conf.high & method & alternative\tabularnewline
+\midrule
+\endhead
+8.79 & 9.89 & -0.992 & 0.345 & 10 & -3.56 & 1.37 & Two Sample t-test &
+two.sided\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{\texorpdfstring{Welch's \emph{t}
+Test}{Welch's t Test}}\label{welchs-t-test}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default}
+\KeywordTok{t.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data, }\DataTypeTok{var.equal=}\NormalTok{F) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrrrrrrrll@{}}
+\toprule
+estimate & estimate1 & estimate2 & statistic & p.value & parameter &
+conf.low & conf.high & method & alternative\tabularnewline
+\midrule
+\endhead
+-1.1 & 8.79 & 9.89 & -0.992 & 0.345 & 9.72 & -3.57 & 1.38 & Welch Two
+Sample t-test & two.sided\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Wilcoxon Rank Sum Test}\label{wilcoxon-rank-sum-test}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# no need to specify anything about variance}
+\KeywordTok{wilcox.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrll@{}}
+\toprule
+statistic & p.value & method & alternative\tabularnewline
+\midrule
+\endhead
+12 & 0.394 & Wilcoxon rank sum test & two.sided\tabularnewline
+\bottomrule
+\end{longtable}
+
+\section{Corrections for Multiple
+Observations}\label{corrections-for-multiple-observations}
+
+The best illustration I have seen for the need for multiple observation
+corrections is this cartoon from XKCD (see \url{http://xkcd.com/882/}):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://imgs.xkcd.com/comics/significant.png}
+\caption{Significance by XKCD. Image is from
+\url{http://imgs.xkcd.com/comics/significant.png}}
+\end{figure}
+
+Any conceptually coherent set of observations must therefore be
+corrected for multiple observations. In most cases, we will use the
+method of Benjamini and Hochberg since our p-values are not entirely
+independent. Some sample code for this is here:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p.values <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.023}\NormalTok{, }\FloatTok{0.043}\NormalTok{, }\FloatTok{0.056}\NormalTok{, }\FloatTok{0.421}\NormalTok{, }\FloatTok{0.012}\NormalTok{)}
+\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{unadjusted =} \NormalTok{p.values, }\DataTypeTok{adjusted=}\KeywordTok{p.adjust}\NormalTok{(p.values, }\DataTypeTok{method=}\StringTok{"BH"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   unadjusted adjusted
+## 1      0.023   0.0575
+## 2      0.043   0.0700
+## 3      0.056   0.0700
+## 4      0.421   0.4210
+## 5      0.012   0.0575
+\end{verbatim}
+
+\section{Session Information}\label{session-information}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sessionInfo}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## R version 3.4.2 (2017-09-28)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS High Sierra 10.13.1
+## 
+## Matrix products: default
+## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] car_2.1-6           broom_0.4.3         bindrcpp_0.2       
+## [4] pwr_1.2-1           knitcitations_1.0.9 dplyr_0.7.4        
+## [7] tidyr_0.7.2         knitr_1.17         
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_0.12.14       nloptr_1.0.4       compiler_3.4.2    
+##  [4] plyr_1.8.4         highr_0.6          bindr_0.1         
+##  [7] tools_3.4.2        lme4_1.1-14        digest_0.6.12     
+## [10] jsonlite_1.5       lubridate_1.7.1    evaluate_0.10.1   
+## [13] tibble_1.3.4       nlme_3.1-131       lattice_0.20-35   
+## [16] mgcv_1.8-22        pkgconfig_2.0.1    rlang_0.1.4       
+## [19] Matrix_1.2-12      psych_1.7.8        bibtex_0.4.2      
+## [22] yaml_2.1.15        parallel_3.4.2     SparseM_1.77      
+## [25] RefManageR_0.14.20 stringr_1.2.0      httr_1.3.1        
+## [28] xml2_1.1.1         MatrixModels_0.4-1 nnet_7.3-12       
+## [31] rprojroot_1.2      grid_3.4.2         glue_1.2.0        
+## [34] R6_2.2.2           foreign_0.8-69     rmarkdown_1.8     
+## [37] minqa_1.2.4        reshape2_1.4.2     purrr_0.2.4       
+## [40] magrittr_1.5       splines_3.4.2      MASS_7.3-47       
+## [43] backports_1.1.1    htmltools_0.3.6    pbkrtest_0.4-7    
+## [46] assertthat_0.2.0   mnormt_1.5-5       quantreg_5.34     
+## [49] stringi_1.1.6
+\end{verbatim}
+
+\section{References}\label{references}
+
+\protect\hyperlink{cite-pwr}{{[}1{]}} S. Champely. \emph{pwr: Basic
+Functions for Power Analysis}. R package version 1.2-1. 2017. URL:
+\url{https://CRAN.R-project.org/package=pwr}.
+
+
+\end{document}

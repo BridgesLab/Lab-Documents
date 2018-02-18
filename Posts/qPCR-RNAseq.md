@@ -48,7 +48,7 @@ This isn't to say qPCR isn't useful, we use it all the time in my lab.  Its a gr
 References</h3>
 </div>
 <div>
-Thanks to <a href="http://genomebio.org/">Matthew MacManes</a> (@<a href="http://twitter.com/peroMHC">peroMHC</a>) and Alejandro Montenegro (@<a href="http://twitter.com/aemonten">aemonten</a>) for spurring this discussion, and sending me towards a nice paper by <a href="http://hugheslab.ccbr.utoronto.ca/">Timothy Hughes</a> [6], which is a great summary of similar, more general issues.</div>
+Thanks to <a href="http://genomebio.org/">Matthew MacManes</a> (@<a href="http://twitter.com/macmanes">macmanes</a>) and Alejandro Montenegro (@<a href="http://twitter.com/aemonten">aemonten</a>) for spurring this discussion, and sending me towards a nice paper by <a href="http://hugheslab.ccbr.utoronto.ca/">Timothy Hughes</a> [6], which is a great summary of similar, more general issues.</div>
 <div>
 <ol>
 <li>Griffith M, Griffith OL, Mwenifumbo J, Goya R, Morrissy a S, et al. (2010) Alternative expression analysis by RNA sequencing. Nat Methods 7: 843–847. doi:<a href="http://dx.doi.org/10.1038/nmeth.1503">10.1038/nmeth.1503</a>.</li>

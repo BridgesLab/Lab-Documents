@@ -1,0 +1,142 @@
+
+---
+title: "Power Analysis Sample"
+author: "Dave Bridges"
+date: "February 18, 2018"
+output:
+  html_document:
+    highlight: tango
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    highlight: tango
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+#figures made will go to directory called figures, will make them as both png and pdf files 
+opts_chunk$set(fig.path='figures/',
+               echo=FALSE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
+options(scipen = 2, digits = 3)
+# set echo and message to TRUE if you want to display code blocks and code output respectively
+
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+
+
+superpose.eb <- function (x, y, ebl, ebu = ebl, length = 0.08, ...)
+  arrows(x, y + ebu, x, y - ebl, angle = 90, code = 3,
+  length = length, ...)
+
+  
+se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+#load these packages, nearly always needed
+library(tidyr)
+library(dplyr)
+
+# sets maize and blue color scheme
+color.scheme <- c('#00274c', '#ffcb05')
+
+library(ggplot2)
+#sets default theme
+theme_set(theme_bw())
+
+#to change colors use
+#scale_color_manual(values = color.scheme)
+#scale_fill_manual(values = color.scheme)
+```
+
+These data can be found in `r getwd()` and this script was most recently run on `r date()`.
+
+# Power Analysis
+
+```{r power-analysis}
+library(pwr)
+#desired effect size in standard deviations
+effect.size <- 5 # expected difference in absolute terms
+assay.sd <- 3 # the standard deviation of the assay, in the same units as the effect size
+effect.size.sd <- effect.size/assay.sd
+#desired false positive rate
+fpr <- 0.05
+#desired power (inverse of false negative rate)
+power <- 0.8
+#calculate required n
+required.animals <- pwr.t.test(d=effect.size.sd,
+                               power=power,
+                               sig.level=fpr,
+                               alternative="greater",
+                               type="two.sample")$n
+```
+
+The assumptions set in this analysis are:
+
+* The desired effect size is `r effect.size`.  This is what we want to power our analysis to be able to detect.
+* The standard deviation of the measurement is `r assay.sd`, in the same units as the effect size.
+* Therefore Cohen's *d* is `r effect.size.sd` or the number of standard deviations we want to be able to detect.
+* The acceptable false positive rate is `r fpr`.  This is the percent chance that we observe something that is not actually true.
+* The acceptable false negative rate is `r 1-power`.  This is the percent chance that we miss something that is actually true.
+* The power of our analysis is set at `r power`.
+
+## Calculate Number of Animals
+
+At a standard power of `r power` with a false positive rate of `r fpr` and a desired effect size of a `r effect.size` difference in percent fat mass we would need **`r required.animals`** animals in each group.
+
+## Calculate Effective Power
+
+The plot below shows how likely we are to detect a difference (the power) as we vary the number of animals (x-axis) and the desired effect size.
+
+```{r effect-size-plot}
+
+animals <- seq(1:20) #animal range to test
+effect.sizes <- seq(1,9,by=1) # effect size range to test
+power.table <- expand.grid(animals=animals,effect.sizes=effect.sizes)
+power.table$effect.sizes.sd <- power.table$effect.sizes/assay.sd
+
+for (effect.size.sd in power.table$effect.sizes.sd){
+for (n.test in power.table$animals){
+  power.table[power.table$animals==n.test&power.table$effect.sizes.sd==effect.size.sd,'power'] <- 
+    pwr.t.test(d=effect.size.sd,
+               n=n.test,
+               sig.level=fpr,
+               alternative="greater",
+               type="two.sample")$power
+}
+}
+
+# with(filter(power.table, effect.sizes==effect.sizes[1]),
+#      plot(animals,power,
+#           type="l",
+#           las=1,
+#           main="Desired Effect Sizes from 1-10",
+#           ylim=c(0,1)))
+# #draw lines for each sample effect size
+# for (effect.size in effect.sizes) {
+#   with(filter(power.table, effect.sizes==effect.size), lines(animals,power))
+# }
+# abline(h=0.8, lty=2)
+
+library(ggplot2)
+library(RColorBrewer)
+
+power.table$effect.sizes.sd <- as.factor(format(round(power.table$effect.sizes.sd,2),nsmall=2))
+p <- ggplot(power.table, aes(y=power,x=animals))
+p + geom_line(aes(col=effect.sizes.sd)) +
+  labs(y="Power",
+       x="Animals",
+       title="Effective power relative to animal numbers",
+       subtitle=paste("Assumes a standard deviation of", assay.sd)) +
+  geom_hline(yintercept=0.8, lty=2) + 
+  scale_colour_manual("Effect Sizes", values=brewer.pal(10,'Blues'))
+```
+
+# Session Information
+
+```{r session-info}
+sessionInfo()
+```

@@ -1,16 +1,59 @@
-General Statistical Methods
-=============================
+---
+title: "General Statistics"
+author: "Dave Bridges"
+date: "May 9, 2014"
+output:
+  pdf_document:
+    highlight: tango
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+  html_document:
+    highlight: tango
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+#figures makde will go to directory called figures, will make them as both png and pdf files 
+opts_chunk$set(fig.path='figures/',
+               echo=TRUE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
+options(scipen = 2, digits = 3)
+# set echo and message to TRUE if you want to display code blocks and code output respectively
+
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+
+
+superpose.eb <- function (x, y, ebl, ebu = ebl, length = 0.08, ...)
+  arrows(x, y + ebu, x, y - ebl, angle = 90, code = 3,
+  length = length, ...)
+
+  
+se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+#load these packages, nearly always needed
+library(tidyr)
+library(dplyr)
+
+# sets maize and blue color scheme
+color.scheme <- c('#00274c', '#ffcb05')
+```
+
+# General Statistical Methods
 
 There are several important concepts that we will adhere to in our group.  These involve design considerations, execution considerations and analysis concerns.
 
 ```{r intial-setup, echo=FALSE, message=FALSE}
-require(knitcitations)
+library(knitcitations)
 bib <- read.bibtex("references.bib")
 
 ```
 
-Experimental Design
---------------------
+## Experimental Design
 
 Where possible, prior to performing an experiment or study perform a power analysis.  This is mainly to determine the appropriate sample sizes.  To do this, you need to know a few of things:
 
@@ -18,7 +61,7 @@ Where possible, prior to performing an experiment or study perform a power analy
 * The desired false positive rate (normally 0.05).  This is the rate at which you find a difference where there is none.  This is also known as the type I error rate.
 * The desired power (normally 0.8).  This indicates that 80% of the time you will detect the effect if there is one.  This is also known as 1 minus the false negative rate or 1 minus the Type II error rate.
 
-We use the R package **pwr** to do a power analysis `r citet(bib['pwr'])`.  Here is an example:
+We use the R package **pwr** to do a power analysis `r citep(bib['pwr'])`.  Here is an example:
 
 ### Pairwise Comparasons
 
@@ -47,8 +90,90 @@ pwr.r.test(r = correlation.coefficient, sig.level = false.negative.rate, power=s
 
 This tells us that in order to detect a correlation coefficient of at least `r correlation.coefficient` (or an R^2 of `r correlation.coefficient^2`) you need more than **`r as.integer(pwr.r.test(r = correlation.coefficient, sig.level = false.negative.rate, power=statistical.power)$n)`** observations.
 
-Corrections for Multiple Observations
---------------------------------------
+# Pairwise Testing
+
+If you have two groups (and two groups only) that you want to know if they are different, you will normally want to do a pairwise test.  This is **not** the case if you have paired data (before and after for example).  The most common of these is something called a Student's *t*-test, but this test has two key assumptions:
+
+* The data are normally distributed
+* The two groups have equal variance
+
+## Testing the Assumptions
+
+Best practice is to first test for normality, and if that test passes, to then test for equal variance
+
+### Testing Normality
+
+To test normality, we use a Shapiro-Wilk test (details on [Wikipedia](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test) on each of your two groups).  Below is an example where there are two groups:
+
+```{r normality}
+#create seed for reproducibility
+set.seed(1265)
+test.data <- tibble(Treatment=c(rep("Experiment",6), rep("Control",6)),
+           Result = rnorm(n=12, mean=10, sd=3))
+#test.data$Treatment <- as.factor(test.data$Treatment)
+kable(test.data, caption="The test data used in the following examples")
+```
+
+Each of the two groups, in this case **Test** and **Control** must have Shapiro-Wilk tests done separately.  Some sample code for this is below (requires dplyr to be loaded):
+
+```{r normality-tests}
+#filter only for the control data
+control.data <- filter(test.data, Treatment=="Control")
+#The broom package makes the results of the test appear in a table, with the tidy command
+library(broom)
+
+#run the Shapiro-Wilk test on the values
+shapiro.test(control.data$Result) %>% tidy %>% kable
+
+experiment.data <- filter(test.data, Treatment=="Experiment")
+shapiro.test(test.data$Result) %>% tidy %>% kable
+```
+
+Based on these results, since both p-values are >0.05 we do not reject the presumption of normality and can go on.  If one or more of the p-values were less than 0.05 we would then use a Mann-Whitney test (also known as a Wilcoxon rank sum test) will be done, see below for more details.
+
+### Testing for Equal Variance
+
+We generally use the [car](https://cran.r-project.org/web/packages/car/index.html) package which contains code for [Levene's Test](https://en.wikipedia.org/wiki/Levene%27s_test) to see if two groups can be assumed to have equal variance:
+
+```{r levene-test}
+#load the car package
+library(car)
+
+#runs the test, grouping by the Treatment variable
+leveneTest(Result ~ Treatment, data=test.data) %>% tidy %>% kable
+```
+
+## Performing the Appropriate Pairwise Test
+
+The logic to follow is:
+
+* If the Shapiro-Wilk test passes, do Levene's test.  If it fails for either group, move on to a **Wilcoxon Rank Sum Test**.
+* If Levene's test *passes*, do a Student's *t* Test, which assumes equal variance.
+* If Levene's test *fails*, do a Welch's *t* Test, which does not assume equal variance.
+
+### Student's *t* Test
+
+```{r student}
+#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE
+t.test(Result~Treatment,data=test.data, var.equal=T) %>% tidy %>% kable
+```
+
+### Welch's *t* Test
+
+```{r welch}
+#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default
+t.test(Result~Treatment,data=test.data, var.equal=F) %>% tidy %>% kable
+```
+
+### Wilcoxon Rank Sum Test
+
+```{r wilcoxon}
+# no need to specify anything about variance
+wilcox.test(Result~Treatment,data=test.data) %>% tidy %>% kable
+```
+
+
+# Corrections for Multiple Observations
 
 The best illustration I have seen for the need for multiple observation corrections is this cartoon from XKCD (see http://xkcd.com/882/):
 
@@ -62,8 +187,13 @@ p.values <- c(0.023, 0.043, 0.056, 0.421, 0.012)
 data.frame(unadjusted = p.values, adjusted=p.adjust(p.values, method="BH"))
 ```
 
-References
------------
+# Session Information
+
+```{r session-information, echo=T}
+sessionInfo()
+```
+
+# References
 
 ```{r bibliography, results='asis', echo=FALSE, message=FALSE}
 require(bibtex)
