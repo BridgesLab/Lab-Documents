@@ -118,7 +118,16 @@ Now lets look at the results of those analyses comparasons.  The bayes factor fo
 
 
 ```{r anova-results}
-prior_summary(anova.fit) %>% kable(caption="Summary of priors for comparason between cylindar numbres on mpg")
+prior_summary(anova.fit) %>% kable(caption="Summary of priors for comparason between cylindar numbers on mpg")
+
+#model fitting parameters
+kable(data.frame(
+  Parameter = names(rhat(anova.fit)),
+  Rhat = format(rhat(anova.fit), nsmall = 5)),
+caption="Rhat values for model testing association between mpg and cylindars (should b between 0.99 and 1.01 for convergence",
+row.names = F)
+
+tidy(anova.fit, effects = "ran_pars", ess = TRUE) %>% kable(caption="Model random effects for mpg vs cylindars")
 
 #create a teable of the pairwise hypotheses
 rbind(hypothesis(anova.fit, "cylindars4>cylindars6")$hypothesis,

@@ -112,7 +112,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#some-common-analyses" id="toc-some-common-analyses" class="nav-link active" data-scroll-target="#some-common-analyses">Some Common Analyses</a></li>
-  <li><a href="#what-is-a-pairwise-testing-equivalent" id="toc-what-is-a-pairwise-testing-equivalent" class="nav-link" data-scroll-target="#what-is-a-pairwise-testing-equivalent">What is a Pairwise Testing Equivalent?</a></li>
+  <li><a href="#what-is-a-pairwise-testing-equivalent" id="toc-what-is-a-pairwise-testing-equivalent" class="nav-link" data-scroll-target="#what-is-a-pairwise-testing-equivalent">What is a Pairwise Testing Equivalent?</a>
+  <ul class="collapse">
+  <li><a href="#what-if-i-want-an-anova" id="toc-what-if-i-want-an-anova" class="nav-link" data-scroll-target="#what-if-i-want-an-anova">What if I Want an ANOVA</a></li>
+  </ul></li>
   <li><a href="#what-is-a-linear-regression-equivalent" id="toc-what-is-a-linear-regression-equivalent" class="nav-link" data-scroll-target="#what-is-a-linear-regression-equivalent">What is a Linear Regression Equivalent?</a>
   <ul class="collapse">
   <li><a href="#what-if-i-am-more-interested-in-the-r-squared" id="toc-what-if-i-am-more-interested-in-the-r-squared" class="nav-link" data-scroll-target="#what-if-i-am-more-interested-in-the-r-squared">What if I am more interested in the R-squared?</a></li>
@@ -202,26 +205,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">transmission =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(am<span class="sc">==</span><span class="dv">0</span><span class="sc">~</span><span class="st">"automatic"</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                           am<span class="sc">==</span><span class="dv">1</span><span class="sc">~</span><span class="st">"manual"</span>)),</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">engine=</span><span class="fu">factor</span>(<span class="fu">case_when</span>(vs<span class="sc">==</span><span class="dv">0</span><span class="sc">~</span><span class="st">"V-Shaped"</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                       vs<span class="sc">==</span><span class="dv">1</span><span class="sc">~</span><span class="st">"Straight"</span>)))</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mtcars.data,<span class="at">caption=</span><span class="st">"The mtcars dataset"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                       vs<span class="sc">==</span><span class="dv">1</span><span class="sc">~</span><span class="st">"Straight"</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">cylindars=</span><span class="fu">factor</span>(cyl))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(mtcars.data,<span class="at">caption=</span><span class="st">"The mtcars dataset"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>The mtcars dataset</caption>
 <colgroup>
-<col style="width: 21%">
-<col style="width: 5%">
+<col style="width: 19%">
 <col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 4%">
 <col style="width: 5%">
-<col style="width: 13%">
+<col style="width: 5%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 12%">
+<col style="width: 8%">
 <col style="width: 9%">
 </colgroup>
 <thead>
@@ -240,6 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <th style="text-align: right;">carb</th>
 <th style="text-align: left;">transmission</th>
 <th style="text-align: left;">engine</th>
+<th style="text-align: left;">cylindars</th>
 </tr>
 </thead>
 <tbody>
@@ -258,6 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Mazda RX4 Wag</td>
@@ -274,6 +281,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Datsun 710</td>
@@ -290,6 +298,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Hornet 4 Drive</td>
@@ -306,6 +315,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Hornet Sportabout</td>
@@ -322,6 +332,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Valiant</td>
@@ -338,6 +349,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Duster 360</td>
@@ -354,6 +366,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Merc 240D</td>
@@ -370,6 +383,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Merc 230</td>
@@ -386,6 +400,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Merc 280</td>
@@ -402,6 +417,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Merc 280C</td>
@@ -418,6 +434,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Merc 450SE</td>
@@ -434,6 +451,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Merc 450SL</td>
@@ -450,6 +468,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Merc 450SLC</td>
@@ -466,6 +485,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">3</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Cadillac Fleetwood</td>
@@ -482,6 +502,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Lincoln Continental</td>
@@ -498,6 +519,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Chrysler Imperial</td>
@@ -514,6 +536,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Fiat 128</td>
@@ -530,6 +553,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Honda Civic</td>
@@ -546,6 +570,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Toyota Corolla</td>
@@ -562,6 +587,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Toyota Corona</td>
@@ -578,6 +604,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Dodge Challenger</td>
@@ -594,6 +621,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">AMC Javelin</td>
@@ -610,6 +638,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Camaro Z28</td>
@@ -626,6 +655,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Pontiac Firebird</td>
@@ -642,6 +672,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">automatic</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Fiat X1-9</td>
@@ -658,6 +689,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Porsche 914-2</td>
@@ -674,6 +706,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Lotus Europa</td>
@@ -690,6 +723,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Ford Pantera L</td>
@@ -706,6 +740,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">4</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Ferrari Dino</td>
@@ -722,6 +757,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">6</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Maserati Bora</td>
@@ -738,6 +774,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">8</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">V-Shaped</td>
+<td style="text-align: left;">8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Volvo 142E</td>
@@ -754,6 +791,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: right;">2</td>
 <td style="text-align: left;">manual</td>
 <td style="text-align: left;">Straight</td>
+<td style="text-align: left;">4</td>
 </tr>
 </tbody>
 </table>
@@ -781,7 +819,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <col style="width: 31%">
 <col style="width: 10%">
 <col style="width: 10%">
-<col style="width: 11%">
+<col style="width: 10%">
 <col style="width: 10%">
 </colgroup>
 <thead>
@@ -802,40 +840,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">17.107053</td>
-<td style="text-align: right;">1.1560464</td>
-<td style="text-align: right;">14.8050209</td>
-<td style="text-align: right;">19.443110</td>
+<td style="text-align: right;">17.089490</td>
+<td style="text-align: right;">1.1440067</td>
+<td style="text-align: right;">14.874103</td>
+<td style="text-align: right;">19.262258</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">transmissionmanual</td>
-<td style="text-align: right;">7.255759</td>
-<td style="text-align: right;">1.8445568</td>
-<td style="text-align: right;">3.6563785</td>
-<td style="text-align: right;">10.889065</td>
+<td style="text-align: right;">7.277792</td>
+<td style="text-align: right;">1.8424683</td>
+<td style="text-align: right;">3.713655</td>
+<td style="text-align: right;">10.912369</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">sd__Observation</td>
-<td style="text-align: right;">5.031970</td>
-<td style="text-align: right;">0.6762649</td>
-<td style="text-align: right;">3.9167986</td>
-<td style="text-align: right;">6.576913</td>
+<td style="text-align: right;">5.010808</td>
+<td style="text-align: right;">0.6489197</td>
+<td style="text-align: right;">3.932789</td>
+<td style="text-align: right;">6.461536</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
-<td style="text-align: right;">5.715154</td>
-<td style="text-align: right;">6.5083347</td>
-<td style="text-align: right;">0.1814406</td>
-<td style="text-align: right;">21.649212</td>
+<td style="text-align: right;">5.893894</td>
+<td style="text-align: right;">6.9432256</td>
+<td style="text-align: right;">0.161323</td>
+<td style="text-align: right;">23.833297</td>
 </tr>
 </tbody>
 </table>
@@ -848,7 +886,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) &gt; 0     7.26      1.84     4.18    10.18        Inf
+1 (transmissionmanual) &gt; 0     7.28      1.84     4.23    10.32        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -858,25 +896,137 @@ for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
 </div>
-<p>As you can see, this analysis estimates that the manual transmission has a 7.255759 higher mpg (<span class="math inline">\(\pm\)</span> 1.8445568) with a very high Bayes Factor () and posterior probability (1).</p>
+<p>As you can see, this analysis estimates that the manual transmission has a 7.2777915 higher mpg (<span class="math inline">\(\pm\)</span> 1.8424683) with a very high Bayes Factor () and posterior probability (1).</p>
+<p>Looking at the model diagnostics three things are relevant:</p>
+<ul>
+<li>Was there convergence in the model. This is measured by Rhat (also known as potential scale reduction factor (PSRF), or the Gelman-Rubin statistic). It should be between 0.99 and 1.01.</li>
+<li>What was the ESS (effective sample size, not a great name, but a measure of the number of samples of the posterior distribution). Generally, an <span class="math inline">\(ESS &gt; 400\)</span> is considered good for reliable estimates. This is most important for the random effects rather than the fixed effects.</li>
+</ul>
+<p>Lets take a look at these:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">names</span>(<span class="fu">rhat</span>(pairwise.fit)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Rhat =</span> <span class="fu">format</span>(<span class="fu">rhat</span>(pairwise.fit), <span class="at">nsmall =</span> <span class="dv">5</span>)),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">caption=</span><span class="st">"Rhat values for model testing association between mpg and transmission (should b between 0.99 and 1.01 for convergence"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">row.names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Rhat values for model testing association between mpg and transmission (should b between 0.99 and 1.01 for convergence</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">b_Intercept</td>
+<td style="text-align: left;">1.000238</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">b_transmissionmanual</td>
+<td style="text-align: left;">1.000444</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sigma</td>
+<td style="text-align: left;">1.000516</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;">1.000369</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prior_Intercept</td>
+<td style="text-align: left;">1.000925</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">prior_sigma</td>
+<td style="text-align: left;">1.000403</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lprior</td>
+<td style="text-align: left;">1.000087</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lp__</td>
+<td style="text-align: left;">1.001772</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(pairwise.fit, <span class="at">effects =</span> <span class="st">"ran_pars"</span>, <span class="at">ess =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Model random effects for mpg vs transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Model random effects for mpg vs transmission</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 29%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: right;">ess</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">5.010808</td>
+<td style="text-align: right;">0.6489197</td>
+<td style="text-align: right;">3.932789</td>
+<td style="text-align: right;">6.461536</td>
+<td style="text-align: right;">3072.006</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">5.893894</td>
+<td style="text-align: right;">6.9432256</td>
+<td style="text-align: right;">0.161323</td>
+<td style="text-align: right;">23.833297</td>
+<td style="text-align: right;">3859.087</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The posterior distribution for the effect of a manual transmission is here:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(pairwise.fit) <span class="sc">%&gt;%</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_transmissionmanual)) <span class="sc">+</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Effect of manual transmission (mpg)"</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(pairwise.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_transmissionmanual)) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Effect of manual transmission (mpg)"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/pairwise-posterior-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>We didnt specify the model type (gausian is the default). We also used the default priors here, which were</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(pairwise.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Default priors for a pairwise analysis of mpg vs transmission in the mtcars data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(pairwise.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Default priors for a pairwise analysis of mpg vs transmission in the mtcars data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Default priors for a pairwise analysis of mpg vs transmission in the mtcars data</caption>
@@ -960,17 +1110,393 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </div>
 </div>
 <p>This includes flat priors for the beta coefficients, student’s <em>t</em> distributions for intercept (centered around the mean mpg) and residual error (centered around zero).</p>
+<section id="what-if-i-want-an-anova" class="level3">
+<h3 class="anchored" data-anchor-id="what-if-i-want-an-anova">What if I Want an ANOVA</h3>
+<p>Perhaps I only am interested in whether there is a difference between groups, but not pairwise differences (<em>i.e</em> an ANOVA). This can be done as well (again using default priors).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>anova.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(mpg<span class="sc">~</span><span class="dv">0</span><span class="sc">+</span>cylindars,<span class="at">data=</span>mtcars.data, <span class="at">sample_prior =</span> <span class="cn">TRUE</span>) <span class="co">#zero sets there to be no intercept, shows the mean for each group</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>anova.fit.null <span class="ot">&lt;-</span> <span class="fu">brm</span>(mpg<span class="sc">~</span><span class="dv">0</span>,<span class="at">data=</span>mtcars.data, <span class="at">sample_prior =</span> <span class="cn">TRUE</span>) <span class="co">#null model</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#estimate the bayes factor</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bayes_factor</span>(anova.fit,anova.fit.null) <span class="ot">-&gt;</span> anova.bf</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">post_prob</span>(anova.fit,anova.fit.null) <span class="ot">-&gt;</span> anova.pp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now lets look at the results of those analyses comparasons. The bayes factor for the ANOVA is 3.4898088^{28} which is very extreme evidence for a difference between groups. The posterior probabilities are 1 (very hight) for the fitted model and 2.8829788^{-29} (very low) for the null model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(anova.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of priors for comparason between cylindar numbers on mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Summary of priors for comparason between cylindar numbers on mpg</caption>
+<colgroup>
+<col style="width: 28%">
+<col style="width: 8%">
+<col style="width: 14%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">prior</th>
+<th style="text-align: left;">class</th>
+<th style="text-align: left;">coef</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">resp</th>
+<th style="text-align: left;">dpar</th>
+<th style="text-align: left;">nlpar</th>
+<th style="text-align: left;">lb</th>
+<th style="text-align: left;">ub</th>
+<th style="text-align: left;">source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">cylindars4</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">cylindars6</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">cylindars8</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">student_t(3, 0, 5.4)</td>
+<td style="text-align: left;">sigma</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#model fitting parameters</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">names</span>(<span class="fu">rhat</span>(anova.fit)),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Rhat =</span> <span class="fu">format</span>(<span class="fu">rhat</span>(anova.fit), <span class="at">nsmall =</span> <span class="dv">5</span>)),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="at">caption=</span><span class="st">"Rhat values for model testing association between mpg and cylindars (should b between 0.99 and 1.01 for convergence"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="at">row.names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Rhat values for model testing association between mpg and cylindars (should b between 0.99 and 1.01 for convergence</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">b_cylindars4</td>
+<td style="text-align: left;">0.9998450</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">b_cylindars6</td>
+<td style="text-align: left;">1.0016103</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">b_cylindars8</td>
+<td style="text-align: left;">1.0012933</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sigma</td>
+<td style="text-align: left;">0.9997617</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prior_sigma</td>
+<td style="text-align: left;">0.9997447</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lprior</td>
+<td style="text-align: left;">0.9997617</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lp__</td>
+<td style="text-align: left;">1.0007648</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(anova.fit, <span class="at">effects =</span> <span class="st">"ran_pars"</span>, <span class="at">ess =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Model random effects for mpg vs cylindars"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Model random effects for mpg vs cylindars</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 28%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: right;">ess</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">3.332159</td>
+<td style="text-align: right;">0.460378</td>
+<td style="text-align: right;">2.5931131</td>
+<td style="text-align: right;">4.377553</td>
+<td style="text-align: right;">3015.966</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">5.905686</td>
+<td style="text-align: right;">7.034321</td>
+<td style="text-align: right;">0.1814052</td>
+<td style="text-align: right;">22.768172</td>
+<td style="text-align: right;">3510.893</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create a teable of the pairwise hypotheses</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="fu">hypothesis</span>(anova.fit, <span class="st">"cylindars4&gt;cylindars6"</span>)<span class="sc">$</span>hypothesis,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">hypothesis</span>(anova.fit, <span class="st">"cylindars4&gt;cylindars8"</span>)<span class="sc">$</span>hypothesis,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">hypothesis</span>(anova.fit, <span class="st">"cylindars6&gt;cylindars8"</span>)<span class="sc">$</span>hypothesis) <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Pairwise hypothesis tests for cylindars on mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Pairwise hypothesis tests for cylindars on mpg</caption>
+<colgroup>
+<col style="width: 31%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hypothesis</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Est.Error</th>
+<th style="text-align: right;">CI.Lower</th>
+<th style="text-align: right;">CI.Upper</th>
+<th style="text-align: right;">Evid.Ratio</th>
+<th style="text-align: right;">Post.Prob</th>
+<th style="text-align: left;">Star</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(cylindars4)-(cylindars6) &gt; 0</td>
+<td style="text-align: right;">6.925078</td>
+<td style="text-align: right;">1.592501</td>
+<td style="text-align: right;">4.362640</td>
+<td style="text-align: right;">9.505415</td>
+<td style="text-align: right;">Inf</td>
+<td style="text-align: right;">1.00000</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(cylindars4)-(cylindars8) &gt; 0</td>
+<td style="text-align: right;">11.540329</td>
+<td style="text-align: right;">1.367975</td>
+<td style="text-align: right;">9.291548</td>
+<td style="text-align: right;">13.788081</td>
+<td style="text-align: right;">Inf</td>
+<td style="text-align: right;">1.00000</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(cylindars6)-(cylindars8) &gt; 0</td>
+<td style="text-align: right;">4.615250</td>
+<td style="text-align: right;">1.517746</td>
+<td style="text-align: right;">2.095993</td>
+<td style="text-align: right;">7.108223</td>
+<td style="text-align: right;">443.4444</td>
+<td style="text-align: right;">0.99775</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(anova.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for mpg versus cylindars"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Summary of model fit for mpg versus cylindars</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 31%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">cylindars4</td>
+<td style="text-align: right;">26.657990</td>
+<td style="text-align: right;">1.0052341</td>
+<td style="text-align: right;">24.6871426</td>
+<td style="text-align: right;">28.702840</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">cylindars6</td>
+<td style="text-align: right;">19.732912</td>
+<td style="text-align: right;">1.2643864</td>
+<td style="text-align: right;">17.1974290</td>
+<td style="text-align: right;">22.209185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">cylindars8</td>
+<td style="text-align: right;">15.117661</td>
+<td style="text-align: right;">0.8903373</td>
+<td style="text-align: right;">13.3453118</td>
+<td style="text-align: right;">16.901897</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">3.332159</td>
+<td style="text-align: right;">0.4603780</td>
+<td style="text-align: right;">2.5931131</td>
+<td style="text-align: right;">4.377553</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">5.905686</td>
+<td style="text-align: right;">7.0343208</td>
+<td style="text-align: right;">0.1814052</td>
+<td style="text-align: right;">22.768172</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(anova.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-examples_files/figure-html/anova-results-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr) <span class="co">#for pivot wider</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(anova.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">'b'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">names_to =</span> <span class="st">"term"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">values_to=</span><span class="st">"mpg"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>mpg,<span class="at">fill=</span>term)) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">x=</span><span class="st">"Miles Per Gallon"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(<span class="at">name=</span><span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-examples_files/figure-html/anova-results-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 </section>
 <section id="what-is-a-linear-regression-equivalent" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-a-linear-regression-equivalent">What is a Linear Regression Equivalent?</h2>
 <p>Lets start by testing if there is a relationship between two quantitative variables, the mpg (miles per gallon) and the weight (wt) using the default priors</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>linear.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(mpg<span class="sc">~</span>wt,<span class="at">data=</span>mtcars,</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>linear.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(mpg<span class="sc">~</span>wt,<span class="at">data=</span>mtcars,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Lets see what this looks like</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(linear.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of weight on mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(linear.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of weight on mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Prior summary for effects of weight on mpg</caption>
@@ -1052,7 +1578,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(linear.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for mpg versus weight"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(linear.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for mpg versus weight"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Summary of model fit for mpg versus weight</caption>
@@ -1063,7 +1589,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <col style="width: 31%">
 <col style="width: 10%">
 <col style="width: 10%">
-<col style="width: 11%">
+<col style="width: 10%">
 <col style="width: 10%">
 </colgroup>
 <thead>
@@ -1084,67 +1610,67 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">37.287331</td>
-<td style="text-align: right;">2.0140979</td>
-<td style="text-align: right;">33.2836252</td>
-<td style="text-align: right;">41.405638</td>
+<td style="text-align: right;">37.281958</td>
+<td style="text-align: right;">1.9944452</td>
+<td style="text-align: right;">33.329685</td>
+<td style="text-align: right;">41.141723</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">wt</td>
-<td style="text-align: right;">-5.347280</td>
-<td style="text-align: right;">0.6060485</td>
-<td style="text-align: right;">-6.5581258</td>
-<td style="text-align: right;">-4.142106</td>
+<td style="text-align: right;">-5.347938</td>
+<td style="text-align: right;">0.5933914</td>
+<td style="text-align: right;">-6.509334</td>
+<td style="text-align: right;">-4.197569</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">sd__Observation</td>
-<td style="text-align: right;">3.165251</td>
-<td style="text-align: right;">0.4348437</td>
-<td style="text-align: right;">2.4554711</td>
-<td style="text-align: right;">4.143873</td>
+<td style="text-align: right;">3.146442</td>
+<td style="text-align: right;">0.4190495</td>
+<td style="text-align: right;">2.454004</td>
+<td style="text-align: right;">4.105158</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
-<td style="text-align: right;">6.057855</td>
-<td style="text-align: right;">7.0023713</td>
-<td style="text-align: right;">0.1906595</td>
-<td style="text-align: right;">23.278513</td>
+<td style="text-align: right;">5.951883</td>
+<td style="text-align: right;">6.5251426</td>
+<td style="text-align: right;">0.193961</td>
+<td style="text-align: right;">22.365550</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(linear.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(linear.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/linear-analysis-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(linear.fit, <span class="st">"wt&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(linear.fit, <span class="st">"wt&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) &lt; 0    -5.35      0.61    -6.35    -4.38        Inf         1    *
+1   (wt) &lt; 0    -5.35      0.59    -6.32    -4.36        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
 for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(linear.fit) <span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_wt)) <span class="sc">+</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Effect of Weight (mpg/1000 kg)"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(linear.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_wt)) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Effect of Weight (mpg/1000 kg)"</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/linear-analysis-2.png" class="img-fluid" width="672"></p>
 </div>
@@ -1154,7 +1680,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <h3 class="anchored" data-anchor-id="what-if-i-am-more-interested-in-the-r-squared">What if I am more interested in the R-squared?</h3>
 <p>To do this we can use the <code>bayes_R2</code> function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">bayes_R2</span>(linear.fit),<span class="at">caption=</span><span class="st">"Estimates for R2 between weight and mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">bayes_R2</span>(linear.fit),<span class="at">caption=</span><span class="st">"Estimates for R2 between weight and mpg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Estimates for R2 between weight and mpg</caption>
@@ -1170,23 +1696,23 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">R2</td>
-<td style="text-align: right;">0.7411668</td>
-<td style="text-align: right;">0.0481992</td>
-<td style="text-align: right;">0.6131775</td>
-<td style="text-align: right;">0.7985366</td>
+<td style="text-align: right;">0.7416091</td>
+<td style="text-align: right;">0.0472108</td>
+<td style="text-align: right;">0.6223189</td>
+<td style="text-align: right;">0.7978628</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>r2.probs <span class="ot">&lt;-</span> <span class="fu">bayes_R2</span>(linear.fit, <span class="at">summary=</span>F) <span class="co">#summary false is to get the posterior probabilities</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>r2.probs, <span class="fu">aes</span>(<span class="at">x=</span>R2)) <span class="sc">+</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"R2"</span>,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>r2.probs <span class="ot">&lt;-</span> <span class="fu">bayes_R2</span>(linear.fit, <span class="at">summary=</span>F) <span class="co">#summary false is to get the posterior probabilities</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>r2.probs, <span class="fu">aes</span>(<span class="at">x=</span>R2)) <span class="sc">+</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"R2"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/r2-calculations-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1197,16 +1723,16 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <h2 class="anchored" data-anchor-id="what-is-a-chi-squared-equivalent">What is a Chi-Squared Equivalent</h2>
 <p>First lets do an example with a standard <span class="math inline">\(\chi^2\)</span> test (and a Fisher’s test since the counts are quite low) on whether there is a relationship bewteen engine type and transmission type.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr) <span class="co">#for pivot wider</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble) <span class="co">#for column to rowname</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>engine.trans.counts <span class="ot">&lt;-</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  mtcars.data <span class="sc">%&gt;%</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(engine,transmission) <span class="sc">%&gt;%</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from=</span>transmission,<span class="at">values_from=</span>n) <span class="sc">%&gt;%</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">'engine'</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(engine.trans.counts) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Chi-squared test for engine/transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr) <span class="co">#for pivot wider</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble) <span class="co">#for column to rowname</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>engine.trans.counts <span class="ot">&lt;-</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  mtcars.data <span class="sc">%&gt;%</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(engine,transmission) <span class="sc">%&gt;%</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from=</span>transmission,<span class="at">values_from=</span>n) <span class="sc">%&gt;%</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">'engine'</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(engine.trans.counts) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Chi-squared test for engine/transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Chi-squared test for engine/transmission</caption>
@@ -1234,7 +1760,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fisher.test</span>(engine.trans.counts) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Fisher's test for engine/transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fisher.test</span>(engine.trans.counts) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Fisher's test for engine/transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Fisher’s test for engine/transmission</caption>
@@ -1271,14 +1797,14 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </div>
 <p>Both agree, not much of a relationship here. For the brms modelling we need to make a few changes. First, we will use a bernoulli distribution since our data is only zeros and ones, again we will use all the default priors.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>counts.model <span class="ot">&lt;-</span> <span class="fu">brm</span>(engine <span class="sc">~</span> transmission, </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>counts.model <span class="ot">&lt;-</span> <span class="fu">brm</span>(engine <span class="sc">~</span> transmission, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Lets look at these results</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(counts.model) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of transmission on engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(counts.model) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of transmission on engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Prior summary for effects of transmission on engine type</caption>
@@ -1348,7 +1874,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(counts.model) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for transmission versus engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(counts.model) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for transmission versus engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Summary of model fit for transmission versus engine type</caption>
@@ -1380,33 +1906,33 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">0.5654667</td>
-<td style="text-align: right;">0.4951763</td>
-<td style="text-align: right;">-0.3726164</td>
-<td style="text-align: right;">1.5649741</td>
+<td style="text-align: right;">0.5564968</td>
+<td style="text-align: right;">0.4787228</td>
+<td style="text-align: right;">-0.3322844</td>
+<td style="text-align: right;">1.5439365</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">transmissionmanual</td>
-<td style="text-align: right;">-0.7332410</td>
-<td style="text-align: right;">0.7747972</td>
-<td style="text-align: right;">-2.2641375</td>
-<td style="text-align: right;">0.7654835</td>
+<td style="text-align: right;">-0.7260799</td>
+<td style="text-align: right;">0.7635121</td>
+<td style="text-align: right;">-2.2286394</td>
+<td style="text-align: right;">0.7678828</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(counts.model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(counts.model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/chisq-analysis-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(counts.model, <span class="st">"transmissionmanual&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(counts.model, <span class="st">"transmissionmanual&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) &lt; 0    -0.73      0.77    -2.01     0.54        4.8
+1 (transmissionmanual) &lt; 0    -0.73      0.76    -1.97     0.52       4.87
   Post.Prob Star
 1      0.83     
 ---
@@ -1415,31 +1941,31 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(counts.model) <span class="sc">%&gt;%</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_transmissionmanual)) <span class="sc">+</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Beta coefficient for manual transmission"</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(counts.model) <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_transmissionmanual)) <span class="sc">+</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Beta coefficient for manual transmission"</span>,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/chisq-analysis-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Now in this case there is moderate evidence for a negative relationship between transmnission and engine type (<span class="math inline">\(\beta\)</span>=-0.733241 <span class="math inline">\(\pm\)</span> 0.7747972) with a Bayes Factor of 4.7971014 and a Posterior Probability of 0.8275.</p>
+<p>Now in this case there is moderate evidence for a negative relationship between transmnission and engine type (<span class="math inline">\(\beta\)</span>=-0.7260799 <span class="math inline">\(\pm\)</span> 0.7635121) with a Bayes Factor of 4.8651026 and a Posterior Probability of 0.8295.</p>
 </section>
 <section id="what-is-a-binomial-regression-equivalent" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-a-binomial-regression-equivalent">What is a Binomial Regression Equivalent?</h2>
 <p>Lets now look at the relationsbip between transmission type (binomial variable) and weight (continuous variable). Again we will use a bernouli distribution (which will use, by default a logit link function)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>binomial.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(transmission <span class="sc">~</span> wt, </span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>binomial.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(transmission <span class="sc">~</span> wt, </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of transmission on engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of transmission on engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Prior summary for effects of transmission on engine type</caption>
@@ -1509,7 +2035,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for transmission versus engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for transmission versus engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
 <caption>Summary of model fit for transmission versus engine type</caption>
@@ -1541,47 +2067,47 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">14.672752</td>
-<td style="text-align: right;">5.152589</td>
-<td style="text-align: right;">6.393942</td>
-<td style="text-align: right;">26.641529</td>
+<td style="text-align: right;">14.516094</td>
+<td style="text-align: right;">5.252784</td>
+<td style="text-align: right;">6.173255</td>
+<td style="text-align: right;">26.369970</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">wt</td>
-<td style="text-align: right;">-4.856545</td>
-<td style="text-align: right;">1.632049</td>
-<td style="text-align: right;">-8.632320</td>
-<td style="text-align: right;">-2.209268</td>
+<td style="text-align: right;">-4.800125</td>
+<td style="text-align: right;">1.668465</td>
+<td style="text-align: right;">-8.550785</td>
+<td style="text-align: right;">-2.122508</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(binomial.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(binomial.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/binomial-analysis-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(binomial.fit, <span class="st">"wt&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(binomial.fit, <span class="st">"wt&lt;0"</span>) <span class="co"># testing for whether weight has a negative effect on mpg</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) &lt; 0    -4.86      1.63    -7.76    -2.56        Inf         1    *
+1   (wt) &lt; 0     -4.8      1.67    -7.78    -2.47        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
 for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(binomial.fit) <span class="sc">%&gt;%</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_wt)) <span class="sc">+</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Beta coefficient for weight on transmission"</span>,</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(binomial.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_wt)) <span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"red"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Beta coefficient for weight on transmission"</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-examples_files/figure-html/binomial-analysis-2.png" class="img-fluid" width="672"></p>
 </div>
@@ -1595,7 +2121,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <section id="session-info" class="level1">
 <h1>Session Info</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.1 (2024-06-14)
 Platform: x86_64-apple-darwin20
