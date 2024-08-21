@@ -61,6 +61,23 @@ hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tr
 
 As you can see, this analysis estimates that the manual transmission has a `r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Estimate` higher mpg ($\pm$ `r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Est.Error`) with a very high Bayes Factor (`r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Evid.Ratio`) and posterior probability (`r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Post.Prob`).
 
+Looking at the model diagnostics three things are relevant:
+
+* Was there convergence in the model.  This is measured by Rhat (also known as potential scale reduction factor (PSRF), or the Gelman-Rubin statistic).  It should be between 0.99 and 1.01.
+* What was the ESS (effective sample size, not a great name, but a measure of the number of samples of the posterior distribution).  Generally, an $ESS > 400$ is considered good for reliable estimates.  This is most important for the random effects rather than the fixed effects.
+
+Lets take a look at these:
+
+```{r pairwise-diagnostics}
+kable(data.frame(
+  Parameter = names(rhat(pairwise.fit)),
+  Rhat = format(rhat(pairwise.fit), nsmall = 5)),
+caption="Rhat values for model testing association between mpg and transmission (should b between 0.99 and 1.01 for convergence",
+row.names = F)
+
+tidy(pairwise.fit, effects = "ran_pars", ess = TRUE) %>% kable(caption="Model random effects for mpg vs transmission")
+```
+
 The posterior distribution for the effect of a manual transmission is here:
 
 ```{r pairwise-posterior}
