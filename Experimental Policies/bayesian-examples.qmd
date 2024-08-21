@@ -27,6 +27,7 @@ As a general rule we do four analyses fairly commonly in the Bridges Lab, summar
 Lets take a Bayesian approach to each of these using the Mtcars dataset, which looks like this after a bit of fiddling.
 
 ```{r mtcars}
+library(quarto)
 library(knitr)
 library(dplyr)
 mtcars.data <- 
