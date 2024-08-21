@@ -1,16 +1,16 @@
 ---
 title: "Informative title"
 author: "Authors"
-date: "Date script was first written"
+date: "2000-01-01"
 output:
-  pdf_document:
-    highlight: tango
-    keep_tex: yes
-    number_sections: yes
-    toc: yes
   html_document:
     highlight: tango
     keep_md: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    highlight: tango
+    keep_tex: yes
     number_sections: yes
     toc: yes
 ---
