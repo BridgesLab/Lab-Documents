@@ -9,6 +9,8 @@ execute:
   keep-md: true
 ---
 
+
+
 Commonly we want to know how to design our experiments (*a priori*), or how estimate how big of an effect we could have seen (*a posteriori*). We use two different methods for doing these kinds of analyses. One is using the [pwr package](https://github.com/heliosdrm/pwr) in R. Alternatively sometimes we use [G\*Power](https://www.psychologie.hhu.de/arbeitsgruppen/allgemeine-psychologie-und-arbeitspsychologie/gpower.html), a standalone software with somewhat more functionality. Here we will focus on pwr, which is sufficient for most of our needs.
 
 # Some Definitions
@@ -39,7 +41,10 @@ These four parameters are related to each other such that if you know three of t
 
 # Power Analysis
 
-```{r power-analysis}
+
+::: {.cell}
+
+```{.r .cell-code}
 library(pwr)
 #desired effect size in standard deviations
 effect.size <- 5 # expected difference in absolute terms
@@ -56,23 +61,28 @@ required.animals <- pwr.t.test(d=effect.size.sd,
                                alternative="greater",
                                type="two.sample")$n
 ```
+:::
+
 
 The assumptions set in this analysis are:
 
--   The desired effect size is `r effect.size`. This is what we want to power our analysis to be able to detect.
--   The standard deviation of the measurement is `r assay.sd`, in the same units as the effect size.
--   Therefore Cohen's *d* is `r effect.size.sd` or the number of standard deviations we want to be able to detect.
--   The acceptable false positive rate is `r fpr`. This is the percent chance that we observe something that is not actually true.
--   The acceptable false negative rate is `r 1-power`. This is the percent chance that we miss something that is actually true.
--   The power of our analysis is set at `r power`.
+-   The desired effect size is 5. This is what we want to power our analysis to be able to detect.
+-   The standard deviation of the measurement is 3, in the same units as the effect size.
+-   Therefore Cohen's *d* is 1.6666667 or the number of standard deviations we want to be able to detect.
+-   The acceptable false positive rate is 0.05. This is the percent chance that we observe something that is not actually true.
+-   The acceptable false negative rate is 0.2. This is the percent chance that we miss something that is actually true.
+-   The power of our analysis is set at 0.8.
 
 ## Calculate Number of Animals
 
-At a standard power of `r power` with a false positive rate of `r fpr` and a desired effect size of a `r effect.size` difference in percent fat mass we would need **`r required.animals`** animals in each group.
+At a standard power of 0.8 with a false positive rate of 0.05 and a desired effect size of a 5 difference in percent fat mass we would need **5.283492** animals in each group.
 
 ## Calculate Detectable Effect Size
 
-```{r calculate-effect}
+
+::: {.cell}
+
+```{.r .cell-code}
 required.animals.effect <- round(required.animals)
 effective.d <- pwr.t.test(power=power,
                                n=required.animals.effect,
@@ -80,12 +90,17 @@ effective.d <- pwr.t.test(power=power,
                                alternative="greater",
                                type="two.sample")$d
 ```
+:::
 
-Based on the design above we should expect to detect an effect size of `r effective.d` standard deviations with `r power` power, `r required.animals.effect` animals and a FPR of `r fpr`.
+
+Based on the design above we should expect to detect an effect size of 1.7245893 standard deviations with 0.8 power, 5 animals and a FPR of 0.05.
 
 ## Calculate Effective Power
 
-```{r calculate-power}
+
+::: {.cell}
+
+```{.r .cell-code}
 required.animals.power <- round(required.animals)
 effective.power <- pwr.t.test(d=effect.size.sd,
                                n=required.animals.power,
@@ -93,13 +108,17 @@ effective.power <- pwr.t.test(d=effect.size.sd,
                                alternative="greater",
                                type="two.sample")$power
 ```
+:::
 
-Based on the design above we have a `r effective.power*100`% chance of seeing a difference of `r effect.size.sd` with `r required.animals.power` animals and a FPR of `r fpr`.
+
+Based on the design above we have a 77.5993902% chance of seeing a difference of 1.6666667 with 5 animals and a FPR of 0.05.
 
 The plot below shows how likely we are to detect a difference (the power) as we vary the number of animals (x-axis) and the desired effect size.
 
-```{r effect-size-plot}
-#| warning: false
+
+::: {.cell}
+
+```{.r .cell-code}
 animals <- seq(1:20) #animal range to test
 effect.sizes <- seq(1,9,by=1) # effect size range to test
 power.table <- expand.grid(animals=animals,effect.sizes=effect.sizes)
@@ -131,8 +150,53 @@ p + geom_line(aes(col=effect.sizes.sd)) +
   scale_colour_manual("Effect Sizes \n(Number of SD)", values=brewer.pal(10,'Blues'))
 ```
 
+::: {.cell-output-display}
+![](power-analysis_files/figure-html/effect-size-plot-1.png){width=672}
+:::
+:::
+
+
 # Session Information
 
-```{r session-info}
+
+::: {.cell}
+
+```{.r .cell-code}
 sessionInfo()
 ```
+
+::: {.cell-output .cell-output-stdout}
+```
+R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Monterey 12.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] RColorBrewer_1.1-3 ggplot2_3.5.1      pwr_1.3-0         
+
+loaded via a namespace (and not attached):
+ [1] vctrs_0.6.5       cli_3.6.3         knitr_1.48        rlang_1.1.4      
+ [5] xfun_0.46         generics_0.1.3    jsonlite_1.8.8    labeling_0.4.3   
+ [9] glue_1.7.0        colorspace_2.1-1  htmltools_0.5.8.1 scales_1.3.0     
+[13] fansi_1.0.6       rmarkdown_2.27    grid_4.4.1        evaluate_0.24.0  
+[17] munsell_0.5.1     tibble_3.2.1      fastmap_1.2.0     yaml_2.3.10      
+[21] lifecycle_1.0.4   compiler_4.4.1    dplyr_1.1.4       pkgconfig_2.0.3  
+[25] farver_2.1.2      digest_0.6.36     R6_2.5.1          tidyselect_1.2.1 
+[29] utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3    withr_3.0.0      
+[33] tools_4.4.1       gtable_0.3.5     
+```
+:::
+:::
