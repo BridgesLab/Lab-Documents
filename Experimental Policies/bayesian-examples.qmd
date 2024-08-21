@@ -193,6 +193,7 @@ binomial.fit <- brm(transmission ~ wt,
 
 ```{r binomial-analysis}
 prior_summary(binomial.fit) %>% kable(caption="Prior summary for effects of transmission on engine type")
+
 tidy(binomial.fit) %>% kable(caption="Summary of model fit for transmission versus engine type")
 
 plot(binomial.fit)
