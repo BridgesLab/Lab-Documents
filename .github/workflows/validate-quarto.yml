@@ -19,11 +19,23 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install and activate renv
+      - name: Install required packages
         run: |
-          install.packages("renv")
-          renv::activate()
-          renv::restore()
+          # Function to extract library() calls from qmd files
+          extract_packages <- function(file) {
+            content <- readLines(file)
+            library_calls <- grep("^library\\(", content, value = TRUE)
+            gsub("library\\(([^)]+)\\)", "\\1", library_calls)
+          }
+          
+          # Get all qmd files
+          qmd_files <- list.files(pattern = "\\.qmd$", recursive = TRUE)
+          
+          # Extract unique packages from all qmd files
+          packages <- unique(unlist(lapply(qmd_files, extract_packages)))
+          
+          # Install packages
+          install.packages(packages)
         shell: Rscript {0}
 
       - name: Render Quarto Documents
