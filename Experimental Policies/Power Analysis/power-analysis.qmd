@@ -1,19 +1,11 @@
 
 ---
-title: "Power Analysis Sample"
+title: "Power Analysis Example"
 author: "Dave Bridges"
 date: "February 18, 2018"
-output:
-  html_document:
-    highlight: tango
-    keep_md: yes
-    number_sections: no
-    toc: yes
-  pdf_document:
-    highlight: tango
-    keep_tex: yes
-    number_sections: no
-    toc: yes
+format: 
+  html: default
+  pdf: default
 ---
 
 ```{r global_options, include=FALSE}
