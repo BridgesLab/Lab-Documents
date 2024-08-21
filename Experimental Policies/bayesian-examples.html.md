@@ -39,7 +39,8 @@ mtcars.data <-
   mutate(transmission = factor(case_when(am==0~"automatic",
                            am==1~"manual")),
          engine=factor(case_when(vs==0~"V-Shaped",
-                       vs==1~"Straight")))
+                       vs==1~"Straight")),
+         cylindars=factor(cyl))
   
 kable(mtcars.data,caption="The mtcars dataset")
 ```
@@ -49,40 +50,40 @@ kable(mtcars.data,caption="The mtcars dataset")
 
 Table: The mtcars dataset
 
-|                    |  mpg| cyl|  disp|  hp| drat|    wt|  qsec| vs| am| gear| carb|transmission |engine   |
-|:-------------------|----:|---:|-----:|---:|----:|-----:|-----:|--:|--:|----:|----:|:------------|:--------|
-|Mazda RX4           | 21.0|   6| 160.0| 110| 3.90| 2.620| 16.46|  0|  1|    4|    4|manual       |V-Shaped |
-|Mazda RX4 Wag       | 21.0|   6| 160.0| 110| 3.90| 2.875| 17.02|  0|  1|    4|    4|manual       |V-Shaped |
-|Datsun 710          | 22.8|   4| 108.0|  93| 3.85| 2.320| 18.61|  1|  1|    4|    1|manual       |Straight |
-|Hornet 4 Drive      | 21.4|   6| 258.0| 110| 3.08| 3.215| 19.44|  1|  0|    3|    1|automatic    |Straight |
-|Hornet Sportabout   | 18.7|   8| 360.0| 175| 3.15| 3.440| 17.02|  0|  0|    3|    2|automatic    |V-Shaped |
-|Valiant             | 18.1|   6| 225.0| 105| 2.76| 3.460| 20.22|  1|  0|    3|    1|automatic    |Straight |
-|Duster 360          | 14.3|   8| 360.0| 245| 3.21| 3.570| 15.84|  0|  0|    3|    4|automatic    |V-Shaped |
-|Merc 240D           | 24.4|   4| 146.7|  62| 3.69| 3.190| 20.00|  1|  0|    4|    2|automatic    |Straight |
-|Merc 230            | 22.8|   4| 140.8|  95| 3.92| 3.150| 22.90|  1|  0|    4|    2|automatic    |Straight |
-|Merc 280            | 19.2|   6| 167.6| 123| 3.92| 3.440| 18.30|  1|  0|    4|    4|automatic    |Straight |
-|Merc 280C           | 17.8|   6| 167.6| 123| 3.92| 3.440| 18.90|  1|  0|    4|    4|automatic    |Straight |
-|Merc 450SE          | 16.4|   8| 275.8| 180| 3.07| 4.070| 17.40|  0|  0|    3|    3|automatic    |V-Shaped |
-|Merc 450SL          | 17.3|   8| 275.8| 180| 3.07| 3.730| 17.60|  0|  0|    3|    3|automatic    |V-Shaped |
-|Merc 450SLC         | 15.2|   8| 275.8| 180| 3.07| 3.780| 18.00|  0|  0|    3|    3|automatic    |V-Shaped |
-|Cadillac Fleetwood  | 10.4|   8| 472.0| 205| 2.93| 5.250| 17.98|  0|  0|    3|    4|automatic    |V-Shaped |
-|Lincoln Continental | 10.4|   8| 460.0| 215| 3.00| 5.424| 17.82|  0|  0|    3|    4|automatic    |V-Shaped |
-|Chrysler Imperial   | 14.7|   8| 440.0| 230| 3.23| 5.345| 17.42|  0|  0|    3|    4|automatic    |V-Shaped |
-|Fiat 128            | 32.4|   4|  78.7|  66| 4.08| 2.200| 19.47|  1|  1|    4|    1|manual       |Straight |
-|Honda Civic         | 30.4|   4|  75.7|  52| 4.93| 1.615| 18.52|  1|  1|    4|    2|manual       |Straight |
-|Toyota Corolla      | 33.9|   4|  71.1|  65| 4.22| 1.835| 19.90|  1|  1|    4|    1|manual       |Straight |
-|Toyota Corona       | 21.5|   4| 120.1|  97| 3.70| 2.465| 20.01|  1|  0|    3|    1|automatic    |Straight |
-|Dodge Challenger    | 15.5|   8| 318.0| 150| 2.76| 3.520| 16.87|  0|  0|    3|    2|automatic    |V-Shaped |
-|AMC Javelin         | 15.2|   8| 304.0| 150| 3.15| 3.435| 17.30|  0|  0|    3|    2|automatic    |V-Shaped |
-|Camaro Z28          | 13.3|   8| 350.0| 245| 3.73| 3.840| 15.41|  0|  0|    3|    4|automatic    |V-Shaped |
-|Pontiac Firebird    | 19.2|   8| 400.0| 175| 3.08| 3.845| 17.05|  0|  0|    3|    2|automatic    |V-Shaped |
-|Fiat X1-9           | 27.3|   4|  79.0|  66| 4.08| 1.935| 18.90|  1|  1|    4|    1|manual       |Straight |
-|Porsche 914-2       | 26.0|   4| 120.3|  91| 4.43| 2.140| 16.70|  0|  1|    5|    2|manual       |V-Shaped |
-|Lotus Europa        | 30.4|   4|  95.1| 113| 3.77| 1.513| 16.90|  1|  1|    5|    2|manual       |Straight |
-|Ford Pantera L      | 15.8|   8| 351.0| 264| 4.22| 3.170| 14.50|  0|  1|    5|    4|manual       |V-Shaped |
-|Ferrari Dino        | 19.7|   6| 145.0| 175| 3.62| 2.770| 15.50|  0|  1|    5|    6|manual       |V-Shaped |
-|Maserati Bora       | 15.0|   8| 301.0| 335| 3.54| 3.570| 14.60|  0|  1|    5|    8|manual       |V-Shaped |
-|Volvo 142E          | 21.4|   4| 121.0| 109| 4.11| 2.780| 18.60|  1|  1|    4|    2|manual       |Straight |
+|                    |  mpg| cyl|  disp|  hp| drat|    wt|  qsec| vs| am| gear| carb|transmission |engine   |cylindars |
+|:-------------------|----:|---:|-----:|---:|----:|-----:|-----:|--:|--:|----:|----:|:------------|:--------|:---------|
+|Mazda RX4           | 21.0|   6| 160.0| 110| 3.90| 2.620| 16.46|  0|  1|    4|    4|manual       |V-Shaped |6         |
+|Mazda RX4 Wag       | 21.0|   6| 160.0| 110| 3.90| 2.875| 17.02|  0|  1|    4|    4|manual       |V-Shaped |6         |
+|Datsun 710          | 22.8|   4| 108.0|  93| 3.85| 2.320| 18.61|  1|  1|    4|    1|manual       |Straight |4         |
+|Hornet 4 Drive      | 21.4|   6| 258.0| 110| 3.08| 3.215| 19.44|  1|  0|    3|    1|automatic    |Straight |6         |
+|Hornet Sportabout   | 18.7|   8| 360.0| 175| 3.15| 3.440| 17.02|  0|  0|    3|    2|automatic    |V-Shaped |8         |
+|Valiant             | 18.1|   6| 225.0| 105| 2.76| 3.460| 20.22|  1|  0|    3|    1|automatic    |Straight |6         |
+|Duster 360          | 14.3|   8| 360.0| 245| 3.21| 3.570| 15.84|  0|  0|    3|    4|automatic    |V-Shaped |8         |
+|Merc 240D           | 24.4|   4| 146.7|  62| 3.69| 3.190| 20.00|  1|  0|    4|    2|automatic    |Straight |4         |
+|Merc 230            | 22.8|   4| 140.8|  95| 3.92| 3.150| 22.90|  1|  0|    4|    2|automatic    |Straight |4         |
+|Merc 280            | 19.2|   6| 167.6| 123| 3.92| 3.440| 18.30|  1|  0|    4|    4|automatic    |Straight |6         |
+|Merc 280C           | 17.8|   6| 167.6| 123| 3.92| 3.440| 18.90|  1|  0|    4|    4|automatic    |Straight |6         |
+|Merc 450SE          | 16.4|   8| 275.8| 180| 3.07| 4.070| 17.40|  0|  0|    3|    3|automatic    |V-Shaped |8         |
+|Merc 450SL          | 17.3|   8| 275.8| 180| 3.07| 3.730| 17.60|  0|  0|    3|    3|automatic    |V-Shaped |8         |
+|Merc 450SLC         | 15.2|   8| 275.8| 180| 3.07| 3.780| 18.00|  0|  0|    3|    3|automatic    |V-Shaped |8         |
+|Cadillac Fleetwood  | 10.4|   8| 472.0| 205| 2.93| 5.250| 17.98|  0|  0|    3|    4|automatic    |V-Shaped |8         |
+|Lincoln Continental | 10.4|   8| 460.0| 215| 3.00| 5.424| 17.82|  0|  0|    3|    4|automatic    |V-Shaped |8         |
+|Chrysler Imperial   | 14.7|   8| 440.0| 230| 3.23| 5.345| 17.42|  0|  0|    3|    4|automatic    |V-Shaped |8         |
+|Fiat 128            | 32.4|   4|  78.7|  66| 4.08| 2.200| 19.47|  1|  1|    4|    1|manual       |Straight |4         |
+|Honda Civic         | 30.4|   4|  75.7|  52| 4.93| 1.615| 18.52|  1|  1|    4|    2|manual       |Straight |4         |
+|Toyota Corolla      | 33.9|   4|  71.1|  65| 4.22| 1.835| 19.90|  1|  1|    4|    1|manual       |Straight |4         |
+|Toyota Corona       | 21.5|   4| 120.1|  97| 3.70| 2.465| 20.01|  1|  0|    3|    1|automatic    |Straight |4         |
+|Dodge Challenger    | 15.5|   8| 318.0| 150| 2.76| 3.520| 16.87|  0|  0|    3|    2|automatic    |V-Shaped |8         |
+|AMC Javelin         | 15.2|   8| 304.0| 150| 3.15| 3.435| 17.30|  0|  0|    3|    2|automatic    |V-Shaped |8         |
+|Camaro Z28          | 13.3|   8| 350.0| 245| 3.73| 3.840| 15.41|  0|  0|    3|    4|automatic    |V-Shaped |8         |
+|Pontiac Firebird    | 19.2|   8| 400.0| 175| 3.08| 3.845| 17.05|  0|  0|    3|    2|automatic    |V-Shaped |8         |
+|Fiat X1-9           | 27.3|   4|  79.0|  66| 4.08| 1.935| 18.90|  1|  1|    4|    1|manual       |Straight |4         |
+|Porsche 914-2       | 26.0|   4| 120.3|  91| 4.43| 2.140| 16.70|  0|  1|    5|    2|manual       |V-Shaped |4         |
+|Lotus Europa        | 30.4|   4|  95.1| 113| 3.77| 1.513| 16.90|  1|  1|    5|    2|manual       |Straight |4         |
+|Ford Pantera L      | 15.8|   8| 351.0| 264| 4.22| 3.170| 14.50|  0|  1|    5|    4|manual       |V-Shaped |8         |
+|Ferrari Dino        | 19.7|   6| 145.0| 175| 3.62| 2.770| 15.50|  0|  1|    5|    6|manual       |V-Shaped |6         |
+|Maserati Bora       | 15.0|   8| 301.0| 335| 3.54| 3.570| 14.60|  0|  1|    5|    8|manual       |V-Shaped |8         |
+|Volvo 142E          | 21.4|   4| 121.0| 109| 4.11| 2.780| 18.60|  1|  1|    4|    2|manual       |Straight |4         |
 
 
 :::
@@ -117,10 +118,10 @@ Table: Summary of model fit for mpg versus transmission
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 17.135479| 1.1354727| 14.9453879| 19.480708|
-|fixed    |cond      |NA       |transmissionmanual             |  7.183110| 1.8597032|  3.4236252| 10.849792|
-|ran_pars |cond      |Residual |sd__Observation                |  5.023279| 0.6491693|  3.9185180|  6.428996|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.857017| 6.1967046|  0.2162123| 21.879798|
+|fixed    |cond      |NA       |(Intercept)                    | 17.143421| 1.1519719| 14.8388381| 19.350500|
+|fixed    |cond      |NA       |transmissionmanual             |  7.225931| 1.8212300|  3.6337217| 10.812434|
+|ran_pars |cond      |Residual |sd__Observation                |  5.027552| 0.6589096|  3.9727225|  6.540039|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  6.036337| 7.1209665|  0.2056836| 21.753285|
 
 
 :::
@@ -142,7 +143,7 @@ hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tr
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) > 0     7.18      1.86     4.12    10.23        Inf
+1 (transmissionmanual) > 0     7.23      1.82     4.25    10.18        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -157,7 +158,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.
 :::
 
 
-As you can see, this analysis estimates that the manual transmission has a 7.1831104 higher mpg ($\pm$ 1.8597032) with a very high Bayes Factor (\infty{}) and posterior probability (1).
+As you can see, this analysis estimates that the manual transmission has a 7.2259306 higher mpg ($\pm$ 1.82123) with a very high Bayes Factor (\infty{}) and posterior probability (1).
 
 The posterior distribution for the effect of a manual transmission is here:
 
@@ -208,7 +209,125 @@ Table: Default priors for a pairwise analysis of mpg vs transmission in the mtca
 :::
 
 
-This includes flat priors for the beta coefficients, student's *t* distributions for intercept (centered around the mean mpg) and residual error (centered around zero).
+This includes flat priors for the beta coefficients, student's *t* distributions for intercept (centered around the mean mpg) and residual error (centered around zero).  
+
+### What if I Want an ANOVA
+
+Perhaps I only am interested in whether there is a difference between groups, but not pairwise differences (*i.e* an ANOVA).  This can be done as well (again using default priors).
+
+
+::: {.cell}
+
+```{.r .cell-code}
+anova.fit <- brm(mpg~0+cylindars,data=mtcars.data, sample_prior = TRUE) #zero sets there to be no intercept, shows the mean for each group
+anova.fit.null <- brm(mpg~0,data=mtcars.data, sample_prior = TRUE) #null model
+
+#estimate the bayes factor
+bayes_factor(anova.fit,anova.fit.null) -> anova.bf
+post_prob(anova.fit,anova.fit.null) -> anova.pp
+```
+:::
+
+
+Now lets look at the results of those analyses comparasons.  The bayes factor for the ANOVA is 3.480474\times 10^{28} which is very extreme evidence for a difference between groups.  The posterior probabilities are 1 (very hight) for the fitted model and 2.8951489\times 10^{-29} (very low) for the null model.
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+prior_summary(anova.fit) %>% kable(caption="Summary of priors for comparason between cylindar numbres on mpg")
+```
+
+::: {.cell-output-display}
+
+
+Table: Summary of priors for comparason between cylindar numbres on mpg
+
+|prior                |class |coef       |group |resp |dpar |nlpar |lb |ub |source  |
+|:--------------------|:-----|:----------|:-----|:----|:----|:-----|:--|:--|:-------|
+|                     |b     |           |      |     |     |      |   |   |default |
+|                     |b     |cylindars4 |      |     |     |      |   |   |default |
+|                     |b     |cylindars6 |      |     |     |      |   |   |default |
+|                     |b     |cylindars8 |      |     |     |      |   |   |default |
+|student_t(3, 0, 5.4) |sigma |           |      |     |     |      |0  |   |default |
+
+
+:::
+
+```{.r .cell-code}
+#create a teable of the pairwise hypotheses
+rbind(hypothesis(anova.fit, "cylindars4>cylindars6")$hypothesis,
+      hypothesis(anova.fit, "cylindars4>cylindars8")$hypothesis,
+      hypothesis(anova.fit, "cylindars6>cylindars8")$hypothesis) %>%
+  kable(caption="Pairwise hypothesis tests for cylindars on mpg")
+```
+
+::: {.cell-output-display}
+
+
+Table: Pairwise hypothesis tests for cylindars on mpg
+
+|Hypothesis                    |  Estimate| Est.Error| CI.Lower|  CI.Upper| Evid.Ratio| Post.Prob|Star |
+|:-----------------------------|---------:|---------:|--------:|---------:|----------:|---------:|:----|
+|(cylindars4)-(cylindars6) > 0 |  6.951115|  1.610548| 4.271252|  9.580710|        Inf|     1.000|*    |
+|(cylindars4)-(cylindars8) > 0 | 11.570649|  1.311123| 9.418828| 13.740806|        Inf|     1.000|*    |
+|(cylindars6)-(cylindars8) > 0 |  4.619534|  1.592882| 1.928073|  7.195892|        999|     0.999|*    |
+
+
+:::
+
+```{.r .cell-code}
+tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylindars")
+```
+
+::: {.cell-output-display}
+
+
+Table: Summary of model fit for mpg versus cylindars
+
+|effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
+|:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
+|fixed    |cond      |NA       |cylindars4                     | 26.674991| 0.9847944| 24.7509078| 28.614889|
+|fixed    |cond      |NA       |cylindars6                     | 19.723876| 1.2957542| 17.1683532| 22.195507|
+|fixed    |cond      |NA       |cylindars8                     | 15.104342| 0.8993668| 13.3434595| 16.874540|
+|ran_pars |cond      |Residual |sd__Observation                |  3.353738| 0.4562683|  2.5995379|  4.391616|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.815645| 6.6495139|  0.1943924| 21.192693|
+
+
+:::
+
+```{.r .cell-code}
+plot(anova.fit)
+```
+
+::: {.cell-output-display}
+![](bayesian-examples_files/figure-html/anova-results-1.png){width=672}
+:::
+
+```{.r .cell-code}
+library(tidyr) #for pivot wider
+as_draws_df(anova.fit) %>%
+  select(starts_with('b')) %>%
+  pivot_longer(cols=everything(),
+             names_to = "term",
+             values_to="mpg") %>%
+  ggplot(aes(x=mpg,fill=term)) +
+  geom_density() +
+  geom_vline(xintercept=0,color="red",lty=2) +
+  labs(y="",
+     x="Miles Per Gallon",
+     title="Posterior probabilities") +
+  scale_fill_discrete(name="") +
+  theme_classic(base_size=16) +
+  theme(legend.position="top")
+```
+
+::: {.cell-output-display}
+![](bayesian-examples_files/figure-html/anova-results-2.png){width=672}
+:::
+:::
+
 
 ## What is a Linear Regression Equivalent?
 
@@ -259,10 +378,10 @@ Table: Summary of model fit for mpg versus weight
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 37.236331| 1.9229581| 33.3493068| 40.984929|
-|fixed    |cond      |NA       |wt                             | -5.328484| 0.5731467| -6.4334073| -4.201899|
-|ran_pars |cond      |Residual |sd__Observation                |  3.151893| 0.4170208|  2.4545740|  4.095542|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.877886| 6.9135260|  0.1698878| 21.385994|
+|fixed    |cond      |NA       |(Intercept)                    | 37.277524| 1.9488644| 33.5630567| 41.047348|
+|fixed    |cond      |NA       |wt                             | -5.345703| 0.5808476| -6.4704002| -4.206927|
+|ran_pars |cond      |Residual |sd__Observation                |  3.141695| 0.4131310|  2.4504439|  4.060535|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.862912| 6.7138970|  0.2056104| 22.226963|
 
 
 :::
@@ -284,7 +403,7 @@ hypothesis(linear.fit, "wt<0") # testing for whether weight has a negative effec
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0    -5.33      0.57    -6.28    -4.38        Inf         1    *
+1   (wt) < 0    -5.35      0.58    -6.29    -4.39        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -332,7 +451,7 @@ Table: Estimates for R2 between weight and mpg
 
 |   |  Estimate| Est.Error|      Q2.5|     Q97.5|
 |:--|---------:|---------:|---------:|---------:|
-|R2 | 0.7408837|  0.046396| 0.6230213| 0.7966674|
+|R2 | 0.7419158| 0.0459144| 0.6238349| 0.7972728|
 
 
 :::
@@ -453,8 +572,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term               |   estimate| std.error|   conf.low| conf.high|
 |:------|:---------|:-----|:------------------|----------:|---------:|----------:|---------:|
-|fixed  |cond      |NA    |(Intercept)        |  0.5565302| 0.4734377| -0.3407164| 1.4931053|
-|fixed  |cond      |NA    |transmissionmanual | -0.7307908| 0.7315481| -2.1772932| 0.7098092|
+|fixed  |cond      |NA    |(Intercept)        |  0.5566786| 0.4742936| -0.3572361| 1.4948730|
+|fixed  |cond      |NA    |transmissionmanual | -0.7376952| 0.7618668| -2.2347186| 0.7104292|
 
 
 :::
@@ -476,9 +595,9 @@ hypothesis(counts.model, "transmissionmanual<0") # testing for whether weight ha
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) < 0    -0.73      0.73     -1.9     0.48       5.48
+1 (transmissionmanual) < 0    -0.74      0.76       -2     0.52       5.12
   Post.Prob Star
-1      0.85     
+1      0.84     
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -506,7 +625,7 @@ as_draws_df(counts.model) %>%
 :::
 
 
-Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=-0.7307908 $\pm$ 0.7315481) with a Bayes Factor of 5.4829822 and a Posterior Probability of 0.84575.
+Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=-0.7376952 $\pm$ 0.7618668) with a Bayes Factor of 5.116208 and a Posterior Probability of 0.8365.
 
 ## What is a Binomial Regression Equivalent?
 
@@ -554,8 +673,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term        |  estimate| std.error|  conf.low| conf.high|
 |:------|:---------|:-----|:-----------|---------:|---------:|---------:|---------:|
-|fixed  |cond      |NA    |(Intercept) | 14.540785|  5.185975|  6.338352|  26.62549|
-|fixed  |cond      |NA    |wt          | -4.815482|  1.642509| -8.643923|  -2.21153|
+|fixed  |cond      |NA    |(Intercept) | 14.427575|  5.020183|  6.492069| 25.823775|
+|fixed  |cond      |NA    |wt          | -4.766818|  1.588900| -8.336203| -2.202195|
 
 
 :::
@@ -577,7 +696,7 @@ hypothesis(binomial.fit, "wt<0") # testing for whether weight has a negative eff
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0    -4.82      1.64    -7.82    -2.51        Inf         1    *
+1   (wt) < 0    -4.77      1.59    -7.62    -2.49        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
