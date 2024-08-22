@@ -19,6 +19,9 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      - name: Set up Tex
+        uses: r-lib/actions/setup-tinytex@v2
+
       - name: Install required packages
         run: |
           # Function to extract library() calls from qmd files

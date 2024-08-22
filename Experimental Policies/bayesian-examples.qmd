@@ -28,6 +28,7 @@ Lets take a Bayesian approach to each of these using the Mtcars dataset, which l
 
 ```{r mtcars}
 library(quarto)
+library(tinytex)
 library(knitr)
 library(dplyr)
 mtcars.data <- 
