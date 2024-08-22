@@ -11,6 +11,8 @@ execute:
 editor: source
 ---
 
+
+
 While we most often use classical frequentist statistical approaches, the norm in the molecular physiology field, I have been thinking a lot about Bayesian approaches, especially from a public health and nutrition perspective. In these fields the data tend to be less clear and I find myself updating my opinions often based on new data.
 
 ### How Much Protein is Optimal Post-Exercise
@@ -54,7 +56,10 @@ $$P(H|E) = \frac{P(E|H)P(H)}{P(E)} = 0.07 \times 0.7=0.049$$ $$P(H|E) = \frac{P(
 
 There are several useful R packages to help with this, but i will focus on the [brms package](https://paul-buerkner.github.io/brms/) by Paul-Christian Bürkner. For comparason first lets look at a conventional analysis using the Iris dataset.
 
-```{r iris-standard}
+
+::: {.cell}
+
+```{.r .cell-code}
 library(knitr)
 library(broom)
 library(dplyr)
@@ -63,24 +68,51 @@ standard.fit %>%
   anova %>% 
   kable(caption="linear model for sepal length vs species",
         digits=c(2,2,2,2,99))
+```
 
+::: {.cell-output-display}
+Table: linear model for sepal length vs species
+
+|          |  Df| Sum Sq| Mean Sq| F value|       Pr(>F)|
+|:---------|---:|------:|-------:|-------:|------------:|
+|Species   |   2|  63.21|   31.61|  119.26| 1.669669e-31|
+|Residuals | 147|  38.96|    0.27|      NA|           NA|
+:::
+
+```{.r .cell-code}
 standard.fit %>% 
   tidy %>% 
   kable(caption="linear model for sepal length vs species",
         digits=c(2,2,2,2,99))
 ```
 
+::: {.cell-output-display}
+Table: linear model for sepal length vs species
+
+|term              | estimate| std.error| statistic|      p.value|
+|:-----------------|--------:|---------:|---------:|------------:|
+|(Intercept)       |     5.01|      0.07|     68.76| 0.000000e+00|
+|Speciesversicolor |     0.93|      0.10|      9.03| 8.770194e-16|
+|Speciesvirginica  |     1.58|      0.10|     15.37| 2.214821e-32|
+:::
+:::
+
+
 According to this model there is a significant association between species and sepal length, with veriscolor being slightly smaller and virginica being larger than the reference (setosa). Both of these are significiant differences.
 
 Using brms the model specification is the same, though it takes a few seconds longer to compute.
 
-```{r brm}
-#| output: false
+
+::: {.cell}
+
+```{.r .cell-code}
 library(brms)
 brms.fit <- brm(Sepal.Length~Species, data=iris,
                 family = gaussian(),
                 sample_prior = TRUE) #required for hypothesis testing
 ```
+:::
+
 
 Lets walk through this.  First the model call looks similar to before.  We expect the residual errors to be normally distributed so used a gaussian distribution (which is the same thing for this package).  The main difference is that we should set our priors probabilities.
 
@@ -88,11 +120,28 @@ Lets walk through this.  First the model call looks similar to before.  We expec
 
 We may not have noticed this but in the call above we just used the default priors.
 
-```{r default-priors}
+
+::: {.cell}
+
+```{.r .cell-code}
 prior_summary(brms.fit) %>% kable(caption="Default priors for a brms model of Sepal Length")
 ```
 
-This means that for the beta coefficients (b) teh priors were set as flat priors.  The intercept wsa set as Student's *t* distribution (three degrees of freedom, location 5.8, scale $\sigma$ of 2.5) and the sigma (error) was set to a similar distributiob but centered around zero.  Where did these defaults come from?  Well the mean sepal lenghti is `r mean(iris$Sepal.Length)` which is why the intercept was set to that, this seems reasonable.  But what about the distributions chosen
+::: {.cell-output-display}
+Table: Default priors for a brms model of Sepal Length
+
+|prior                  |class     |coef              |group |resp |dpar |nlpar |lb |ub |source  |
+|:----------------------|:---------|:-----------------|:-----|:----|:----|:-----|:--|:--|:-------|
+|                       |b         |                  |      |     |     |      |   |   |default |
+|                       |b         |Speciesversicolor |      |     |     |      |   |   |default |
+|                       |b         |Speciesvirginica  |      |     |     |      |   |   |default |
+|student_t(3, 5.8, 2.5) |Intercept |                  |      |     |     |      |   |   |default |
+|student_t(3, 0, 2.5)   |sigma     |                  |      |     |     |      |0  |   |default |
+:::
+:::
+
+
+This means that for the beta coefficients (b) teh priors were set as flat priors.  The intercept wsa set as Student's *t* distribution (three degrees of freedom, location 5.8, scale $\sigma$ of 2.5) and the sigma (error) was set to a similar distributiob but centered around zero.  Where did these defaults come from?  Well the mean sepal lenghti is 5.8433333 which is why the intercept was set to that, this seems reasonable.  But what about the distributions chosen
 
 * **Flat Prior** means the b coefficient is equally likely to be any value, this is a non-informative prior.
 * **Students' t** distributions have heavier tails than normal/gaussian distributions so allow for outliers more easily to be modelled.  Again,  for the Interecept it is centered around the mean for the data.  
@@ -103,13 +152,16 @@ There are three methods by which you could thinkg about your prior distributions
 
 Lets say we have some information about Iris because we have been working on this for a while, but havent investigated the effect of species.  We could therefore set our priors as follows:
 
-* Intercept is a value of `r mean(iris$Sepal.Length)` with a sd of `r sd(iris$Sepal.Length)`, fit to a normal distribution
+* Intercept is a value of 5.8433333 with a sd of 0.8280661, fit to a normal distribution
 * Beta coefficients are set to a value of zero with a sd of 0.5, also fit to a normal distribution.
 * Set the residual standard deviation (sigma) as mean zero, three degrees of freedom with a sd of 0.5 set to a Student's *t* distribution.
 
 Both of these are somewhat non-informative priors and presume we something but not a lot about the data.  We could also set lower or upper bounds for these distributions if needed (lb and ub) but we will skip that for now.
 
-```{r set-priors}
+
+::: {.cell}
+
+```{.r .cell-code}
 sepal_length_mean <- mean(iris$Sepal.Length)
 sepal_length_sd <- sd(iris$Sepal.Length)
 new.priors <- c(
@@ -121,27 +173,64 @@ new.priors <- c(
     set_prior("student_t(3, 0, 2.5)", class = "sigma")
 )
 ```
+:::
+
 
 Now lets re-run the analysis
 
-```{r brms-priors}
-#| output: false
+
+::: {.cell}
+
+```{.r .cell-code}
 brms.fit.new.priors <- brm(Sepal.Length~Species, data=iris,
                 family = gaussian(),
                 prior = new.priors,
                 sample_prior = TRUE) 
 ```
+:::
+
 
 #### Comparing the Results
 
-```{r brms-analysis}
+
+::: {.cell}
+
+```{.r .cell-code}
 fixef(brms.fit)  %>% kable(caption="Fixed effects from default priors")
+```
+
+::: {.cell-output-display}
+Table: Fixed effects from default priors
+
+|                  |  Estimate| Est.Error|      Q2.5|    Q97.5|
+|:-----------------|---------:|---------:|---------:|--------:|
+|Intercept         | 5.0073343| 0.0734555| 4.8630832| 5.147791|
+|Speciesversicolor | 0.9279994| 0.1061252| 0.7145567| 1.133175|
+|Speciesvirginica  | 1.5819728| 0.1063900| 1.3768127| 1.786016|
+:::
+
+```{.r .cell-code}
 fixef(brms.fit.new.priors) %>% kable(caption="Fixed effects from new priors")
 ```
 
+::: {.cell-output-display}
+Table: Fixed effects from new priors
+
+|                  |  Estimate| Est.Error|      Q2.5|    Q97.5|
+|:-----------------|---------:|---------:|---------:|--------:|
+|Intercept         | 5.0591374| 0.0726093| 4.9213330| 5.205445|
+|Speciesversicolor | 0.8580635| 0.1019478| 0.6505632| 1.048390|
+|Speciesvirginica  | 1.4976483| 0.1024866| 1.2957980| 1.695655|
+:::
+:::
+
+
 You will notice that they give us similar (but not identical) regression coefficients, demonstrating that while the choice of priors does affect the results, the analysis is still relatively robust.  This is represented graphically:
 
-```{r plot-comparing-priors}
+
+::: {.cell}
+
+```{.r .cell-code}
 #first extract the priors for each model
 library(tibble)
 library(tidyr)
@@ -172,6 +261,12 @@ combined.posteriors %>%
   theme(legend.position=c(0.75,0.9))
 ```
 
+::: {.cell-output-display}
+![](bayesian-analyses_files/figure-html/plot-comparing-priors-1.png){width=672}
+:::
+:::
+
+
 
 Nowhere in these results are no p-values, so how do we get a sense of confidence around a parameter?
 
@@ -179,21 +274,64 @@ Nowhere in these results are no p-values, so how do we get a sense of confidence
 
 How do we get Bayes Factors and posterior probabilities. Lets say we want to test the hypothesis that `Speciesvirginica` was greater than the reference (setosa), that would mean the estimate would have to be greater than zero for this term
 
-```{r hypothesis}
+
+::: {.cell}
+
+```{.r .cell-code}
 hypothesis(brms.fit.new.priors, "Speciesvirginica > 0") 
 ```
 
+::: {.cell-output .cell-output-stdout}
+```
+Hypothesis Tests for class b:
+              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (Speciesvirginica) > 0      1.5       0.1     1.33     1.67        Inf
+  Post.Prob Star
+1         1    *
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+:::
+:::
+
+
 This tabel shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:
 
-```{r hypothesis-2}
+
+::: {.cell}
+
+```{.r .cell-code}
 hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5") 
 ```
+
+::: {.cell-output .cell-output-stdout}
+```
+Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (Speciesvirginica... > 0        0       0.1    -0.17     0.17       0.99
+  Post.Prob Star
+1       0.5     
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+:::
+:::
+
 
 As you can see while the estimate is still positive (1.58-1.5=0.08), the Bayes Factor is less confident (3.8, so moderate confidence), and the posterior probability is 79%.
 
 Lets visualize this a bit further:
 
-```{r brms-results}
+
+::: {.cell}
+
+```{.r .cell-code}
 posterior_samples <- as_draws_df(brms.fit) #sample from the posteriors
 posterior_samples.new.priors <- as_draws_df(brms.fit.new.priors) #sample from the posteriors
 library(ggplot2)
@@ -205,7 +343,13 @@ ggplot(posterior_samples, aes(x = b_Speciesvirginica)) +
    subtitle="Difference Between Virginica and Setosa",
        x = "Difference between groups",
        y = "Density") 
+```
 
+::: {.cell-output-display}
+![](bayesian-analyses_files/figure-html/brms-results-1.png){width=672}
+:::
+
+```{.r .cell-code}
 library(bayesplot)
 
 mcmc_areas(posterior_samples, pars = c("b_Speciesvirginica","b_Speciesversicolor"),
@@ -214,13 +358,73 @@ mcmc_areas(posterior_samples, pars = c("b_Speciesvirginica","b_Speciesversicolor
   lims(x=c(-0.5,3)) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "red") 
 ```
+
+::: {.cell-output-display}
+![](bayesian-analyses_files/figure-html/brms-results-2.png){width=672}
+:::
+:::
+
 Hopefully this gives you a sense on how a Bayesian approach can be applied in general.  Next we will look at how to do some standard analyses commonly done with null hypothesis significance testing using brms.
 
 Note this script used some examples generated by [perplexity.ai](https://www.perplexity.ai/) and then modified further
 
 # Session Info
 
-```{r sessionInfo}
+
+::: {.cell}
+
+```{.r .cell-code}
 sessionInfo()
 ```
 
+::: {.cell-output .cell-output-stdout}
+```
+R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Monterey 12.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] bayesplot_1.11.1 ggplot2_3.5.1    tidyr_1.3.1      tibble_3.2.1    
+[5] brms_2.21.0      Rcpp_1.0.13      dplyr_1.1.4      broom_1.0.6     
+[9] knitr_1.48      
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.5         tensorA_0.36.2.1     xfun_0.46           
+ [4] QuickJSR_1.3.1       processx_3.8.4       inline_0.3.19       
+ [7] lattice_0.22-6       callr_3.7.6          vctrs_0.6.5         
+[10] tools_4.4.1          ps_1.7.7             generics_0.1.3      
+[13] stats4_4.4.1         parallel_4.4.1       fansi_1.0.6         
+[16] pkgconfig_2.0.3      Matrix_1.7-0         checkmate_2.3.2     
+[19] ggridges_0.5.6       distributional_0.4.0 RcppParallel_5.1.8  
+[22] lifecycle_1.0.4      compiler_4.4.1       farver_2.1.2        
+[25] stringr_1.5.1        Brobdingnag_1.2-9    munsell_0.5.1       
+[28] codetools_0.2-20     htmltools_0.5.8.1    yaml_2.3.10         
+[31] pillar_1.9.0         StanHeaders_2.32.10  bridgesampling_1.1-2
+[34] abind_1.4-5          nlme_3.1-164         posterior_1.6.0     
+[37] rstan_2.32.6         tidyselect_1.2.1     digest_0.6.36       
+[40] mvtnorm_1.2-5        stringi_1.8.4        reshape2_1.4.4      
+[43] purrr_1.0.2          labeling_0.4.3       fastmap_1.2.0       
+[46] grid_4.4.1           colorspace_2.1-1     cli_3.6.3           
+[49] magrittr_2.0.3       loo_2.8.0            pkgbuild_1.4.4      
+[52] utf8_1.2.4           withr_3.0.0          scales_1.3.0        
+[55] backports_1.5.0      rmarkdown_2.27       matrixStats_1.3.0   
+[58] gridExtra_2.3        coda_0.19-4.1        evaluate_0.24.0     
+[61] rstantools_2.4.0     rlang_1.1.4          glue_1.7.0          
+[64] rstudioapi_0.16.0    jsonlite_1.8.8       plyr_1.8.9          
+[67] R6_2.5.1            
+```
+:::
+:::
