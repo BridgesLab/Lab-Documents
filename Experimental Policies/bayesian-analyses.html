@@ -178,7 +178,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>standard.fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Sepal.Length<span class="sc">~</span>Species, <span class="at">data=</span>iris)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>standard.fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Sepal.Length<span class="sc">~</span><span class="dv">0</span><span class="sc">+</span>Species, <span class="at">data=</span>iris)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>standard.fit <span class="sc">%&gt;%</span> </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  anova <span class="sc">%&gt;%</span> </span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"linear model for sepal length vs species"</span>,</span>
@@ -199,11 +199,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Species</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">63.21</td>
-<td style="text-align: right;">31.61</td>
-<td style="text-align: right;">119.26</td>
-<td style="text-align: right;">1.669669e-31</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5184.89</td>
+<td style="text-align: right;">1728.30</td>
+<td style="text-align: right;">6521.68</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Residuals</td>
@@ -234,25 +234,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: left;">Speciessetosa</td>
 <td style="text-align: right;">5.01</td>
 <td style="text-align: right;">0.07</td>
 <td style="text-align: right;">68.76</td>
-<td style="text-align: right;">0.000000e+00</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Speciesversicolor</td>
-<td style="text-align: right;">0.93</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: right;">9.03</td>
-<td style="text-align: right;">8.770194e-16</td>
+<td style="text-align: right;">5.94</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">81.54</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Speciesvirginica</td>
-<td style="text-align: right;">1.58</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: right;">15.37</td>
-<td style="text-align: right;">2.214821e-32</td>
+<td style="text-align: right;">6.59</td>
+<td style="text-align: right;">0.07</td>
+<td style="text-align: right;">90.49</td>
+<td style="text-align: right;">0</td>
 </tr>
 </tbody>
 </table>
@@ -262,7 +262,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Using brms the model specification is the same, though it takes a few seconds longer to compute.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>brms.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(Sepal.Length<span class="sc">~</span>Species, <span class="at">data=</span>iris,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>brms.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(Sepal.Length<span class="sc">~</span><span class="dv">0</span><span class="sc">+</span>Species, <span class="at">data=</span>iris,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">sample_prior =</span> <span class="cn">TRUE</span>) <span class="co">#required for hypothesis testing</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -276,13 +276,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <table class="table table-sm table-striped">
 <caption>Default priors for a brms model of Sepal Length</caption>
 <colgroup>
-<col style="width: 26%">
-<col style="width: 11%">
-<col style="width: 20%">
+<col style="width: 25%">
+<col style="width: 7%">
+<col style="width: 22%">
+<col style="width: 7%">
 <col style="width: 6%">
-<col style="width: 5%">
-<col style="width: 5%">
 <col style="width: 6%">
+<col style="width: 7%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 9%">
@@ -317,7 +317,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tr class="even">
 <td style="text-align: left;"></td>
 <td style="text-align: left;">b</td>
-<td style="text-align: left;">Speciesversicolor</td>
+<td style="text-align: left;">Speciessetosa</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
@@ -329,7 +329,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tr class="odd">
 <td style="text-align: left;"></td>
 <td style="text-align: left;">b</td>
-<td style="text-align: left;">Speciesvirginica</td>
+<td style="text-align: left;">Speciesversicolor</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
@@ -339,9 +339,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td style="text-align: left;">default</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">student_t(3, 5.8, 2.5)</td>
-<td style="text-align: left;">Intercept</td>
 <td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">Speciesvirginica</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
@@ -385,16 +385,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sepal_length_sd <span class="ot">&lt;-</span> <span class="fu">sd</span>(iris<span class="sc">$</span>Sepal.Length)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>new.priors <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prior for the Intercept</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="fu">paste0</span>(<span class="st">"normal("</span>, sepal_length_mean, <span class="st">", "</span>, sepal_length_sd, <span class="st">")"</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>),</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prior for all beta coefficients</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"normal(0, 0.5)"</span>, <span class="at">class =</span> <span class="st">"b"</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="fu">paste0</span>(<span class="st">"normal("</span>, sepal_length_mean, <span class="st">", "</span>, sepal_length_sd, <span class="st">")"</span>), <span class="at">class =</span> <span class="st">"b"</span>,<span class="at">coef=</span><span class="fu">paste0</span>(<span class="st">"Species"</span>,<span class="fu">levels</span>(iris<span class="sc">$</span>Species)[<span class="dv">1</span>])),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="fu">paste0</span>(<span class="st">"normal("</span>, sepal_length_mean, <span class="st">", "</span>, sepal_length_sd, <span class="st">")"</span>), <span class="at">class =</span> <span class="st">"b"</span>,<span class="at">coef=</span><span class="fu">paste0</span>(<span class="st">"Species"</span>,<span class="fu">levels</span>(iris<span class="sc">$</span>Species)[<span class="dv">2</span>])),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="fu">paste0</span>(<span class="st">"normal("</span>, sepal_length_mean, <span class="st">", "</span>, sepal_length_sd, <span class="st">")"</span>), <span class="at">class =</span> <span class="st">"b"</span>,<span class="at">coef=</span><span class="fu">paste0</span>(<span class="st">"Species"</span>,<span class="fu">levels</span>(iris<span class="sc">$</span>Species)[<span class="dv">3</span>])),</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prior for the residual standard deviation (sigma)</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"student_t(3, 0, 2.5)"</span>, <span class="at">class =</span> <span class="st">"sigma"</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_prior</span>(<span class="st">"student_t(3, 0, 2.5)"</span>, <span class="at">class =</span> <span class="st">"sigma"</span>,<span class="at">lb=</span><span class="dv">0</span>)) <span class="co">#lower bound of zero (cant have a negative error)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now lets re-run the analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>brms.fit.new.priors <span class="ot">&lt;-</span> <span class="fu">brm</span>(Sepal.Length<span class="sc">~</span>Species, <span class="at">data=</span>iris,</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>brms.fit.new.priors <span class="ot">&lt;-</span> <span class="fu">brm</span>(Sepal.Length<span class="sc">~</span><span class="dv">0</span><span class="sc">+</span>Species, <span class="at">data=</span>iris,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">family =</span> <span class="fu">gaussian</span>(),</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">prior =</span> new.priors,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">sample_prior =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -417,25 +416,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Intercept</td>
-<td style="text-align: right;">5.0073343</td>
-<td style="text-align: right;">0.0734555</td>
-<td style="text-align: right;">4.8630832</td>
-<td style="text-align: right;">5.147791</td>
+<td style="text-align: left;">Speciessetosa</td>
+<td style="text-align: right;">5.005856</td>
+<td style="text-align: right;">0.0728926</td>
+<td style="text-align: right;">4.862518</td>
+<td style="text-align: right;">5.148428</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Speciesversicolor</td>
-<td style="text-align: right;">0.9279994</td>
-<td style="text-align: right;">0.1061252</td>
-<td style="text-align: right;">0.7145567</td>
-<td style="text-align: right;">1.133175</td>
+<td style="text-align: right;">5.937283</td>
+<td style="text-align: right;">0.0754744</td>
+<td style="text-align: right;">5.789114</td>
+<td style="text-align: right;">6.086525</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Speciesvirginica</td>
-<td style="text-align: right;">1.5819728</td>
-<td style="text-align: right;">0.1063900</td>
-<td style="text-align: right;">1.3768127</td>
-<td style="text-align: right;">1.786016</td>
+<td style="text-align: right;">6.588169</td>
+<td style="text-align: right;">0.0730452</td>
+<td style="text-align: right;">6.441595</td>
+<td style="text-align: right;">6.731928</td>
 </tr>
 </tbody>
 </table>
@@ -455,25 +454,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Intercept</td>
-<td style="text-align: right;">5.0591374</td>
-<td style="text-align: right;">0.0726093</td>
-<td style="text-align: right;">4.9213330</td>
-<td style="text-align: right;">5.205445</td>
+<td style="text-align: left;">Speciessetosa</td>
+<td style="text-align: right;">5.012527</td>
+<td style="text-align: right;">0.0732397</td>
+<td style="text-align: right;">4.866816</td>
+<td style="text-align: right;">5.155837</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Speciesversicolor</td>
-<td style="text-align: right;">0.8580635</td>
-<td style="text-align: right;">0.1019478</td>
-<td style="text-align: right;">0.6505632</td>
-<td style="text-align: right;">1.048390</td>
+<td style="text-align: right;">5.934792</td>
+<td style="text-align: right;">0.0727237</td>
+<td style="text-align: right;">5.791952</td>
+<td style="text-align: right;">6.073577</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Speciesvirginica</td>
-<td style="text-align: right;">1.4976483</td>
-<td style="text-align: right;">0.1024866</td>
-<td style="text-align: right;">1.2957980</td>
-<td style="text-align: right;">1.695655</td>
+<td style="text-align: right;">6.580854</td>
+<td style="text-align: right;">0.0715400</td>
+<td style="text-align: right;">6.438002</td>
+<td style="text-align: right;">6.718459</td>
 </tr>
 </tbody>
 </table>
@@ -494,21 +493,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">'Speciesversicolor_default'</span><span class="ot">=</span><span class="st">'b_Speciesversicolor_default'</span>,</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Speciesversicolor_new'</span><span class="ot">=</span><span class="st">'b_Speciesversicolor_new'</span>,</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Speciesvirginica_default'</span><span class="ot">=</span><span class="st">'b_Speciesvirginica_default'</span>,</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Speciesvirginica_new'</span><span class="ot">=</span><span class="st">'b_Speciesvirginica_new'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep=</span><span class="st">"_"</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"Factor"</span>,<span class="st">"Model.Priors"</span>)) </span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>combined.posteriors <span class="sc">%&gt;%</span>  </span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value,</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill=</span>Model.Priors)) <span class="sc">+</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(Factor<span class="sc">~</span>.) <span class="sc">+</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Density"</span>,</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Sepal Length"</span>,</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Comparason of Model Priors"</span>) <span class="sc">+</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.75</span>,<span class="fl">0.9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Speciesvirginica_new'</span><span class="ot">=</span><span class="st">'b_Speciesvirginica_new'</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>          <span class="st">'Speciessetosa_default'</span><span class="ot">=</span><span class="st">'b_Speciessetosa_default'</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">'Speciessetosa_new'</span><span class="ot">=</span><span class="st">'b_Speciessetosa_new'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>(),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep=</span><span class="st">"_"</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"Factor"</span>,<span class="st">"Model.Priors"</span>)) </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>combined.posteriors <span class="sc">%&gt;%</span>  </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>value,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">col=</span>Model.Priors)) <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(Factor<span class="sc">~</span>.) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Density"</span>,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Sepal Length"</span>,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Comparason of Model Priors"</span>) <span class="sc">+</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.75</span>,<span class="fl">0.9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bayesian-analyses_files/figure-html/plot-comparing-priors-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -520,11 +521,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 class="anchored" data-anchor-id="hypothesis-testing-with-brms">Hypothesis Testing with BRMS</h3>
 <p>How do we get Bayes Factors and posterior probabilities. Lets say we want to test the hypothesis that <code>Speciesvirginica</code> was greater than the reference (setosa), that would mean the estimate would have to be greater than zero for this term</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brms.fit.new.priors, <span class="st">"Speciesvirginica &gt; 0"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brms.fit.new.priors, <span class="st">"Speciesvirginica &gt; Speciessetosa"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
-              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (Speciesvirginica) &gt; 0      1.5       0.1     1.33     1.67        Inf
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (Speciesvirginica... &gt; 0     1.57       0.1      1.4     1.74        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -534,15 +535,15 @@ for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
 </div>
-<p>This tabel shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:</p>
+<p>This table shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brms.fit.new.priors, <span class="st">"Speciesvirginica &gt; 1.5"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brms.fit.new.priors, <span class="st">"Speciesvirginica &gt; 1.5+Speciessetosa"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (Speciesvirginica... &gt; 0        0       0.1    -0.17     0.17       0.99
+1 (Speciesvirginica... &gt; 0     0.07       0.1     -0.1     0.24       2.99
   Post.Prob Star
-1       0.5     
+1      0.75     
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -550,34 +551,7 @@ for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
 </div>
-<p>As you can see while the estimate is still positive (1.58-1.5=0.08), the Bayes Factor is less confident (3.8, so moderate confidence), and the posterior probability is 79%.</p>
-<p>Lets visualize this a bit further:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>posterior_samples <span class="ot">&lt;-</span> <span class="fu">as_draws_df</span>(brms.fit) <span class="co">#sample from the posteriors</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>posterior_samples.new.priors <span class="ot">&lt;-</span> <span class="fu">as_draws_df</span>(brms.fit.new.priors) <span class="co">#sample from the posteriors</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(posterior_samples, <span class="fu">aes</span>(<span class="at">x =</span> b_Speciesvirginica)) <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Posterior Distributions"</span>,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>   <span class="at">subtitle=</span><span class="st">"Difference Between Virginica and Setosa"</span>,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Difference between groups"</span>,</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Density"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="bayesian-analyses_files/figure-html/brms-results-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bayesplot)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc_areas</span>(posterior_samples, <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"b_Speciesvirginica"</span>,<span class="st">"b_Speciesversicolor"</span>),</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">prob =</span> <span class="fl">0.95</span>) <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Difference Between Virginica or Versicolor and Setosa"</span>) <span class="sc">+</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x=</span><span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>,<span class="dv">3</span>)) <span class="sc">+</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="bayesian-analyses_files/figure-html/brms-results-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
+<p>As you can see while the estimate is still positive (<span class="math inline">\(1.57-1.5=0.07\)</span>), the Bayes Factor is less confident (2.84, so moderate confidence), and the posterior probability is 74%.</p>
 <p>Hopefully this gives you a sense on how a Bayesian approach can be applied in general. Next we will look at how to do some standard analyses commonly done with null hypothesis significance testing using brms.</p>
 <p>Note this script used some examples generated by <a href="https://www.perplexity.ai/">perplexity.ai</a> and then modified further</p>
 </section>
@@ -585,7 +559,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <section id="session-info" class="level1">
 <h1>Session Info</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.1 (2024-06-14)
 Platform: x86_64-apple-darwin20
@@ -605,9 +579,8 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] bayesplot_1.11.1 ggplot2_3.5.1    tidyr_1.3.1      tibble_3.2.1    
-[5] brms_2.21.0      Rcpp_1.0.13      dplyr_1.1.4      broom_1.0.6     
-[9] knitr_1.48      
+[1] ggplot2_3.5.1 tidyr_1.3.1   tibble_3.2.1  brms_2.21.0   Rcpp_1.0.13  
+[6] dplyr_1.1.4   broom_1.0.6   knitr_1.48   
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.5         tensorA_0.36.2.1     xfun_0.46           
@@ -616,23 +589,22 @@ loaded via a namespace (and not attached):
 [10] tools_4.4.1          ps_1.7.7             generics_0.1.3      
 [13] stats4_4.4.1         parallel_4.4.1       fansi_1.0.6         
 [16] pkgconfig_2.0.3      Matrix_1.7-0         checkmate_2.3.2     
-[19] ggridges_0.5.6       distributional_0.4.0 RcppParallel_5.1.8  
-[22] lifecycle_1.0.4      compiler_4.4.1       farver_2.1.2        
-[25] stringr_1.5.1        Brobdingnag_1.2-9    munsell_0.5.1       
-[28] codetools_0.2-20     htmltools_0.5.8.1    yaml_2.3.10         
+[19] distributional_0.4.0 RcppParallel_5.1.8   lifecycle_1.0.4     
+[22] compiler_4.4.1       farver_2.1.2         stringr_1.5.1       
+[25] Brobdingnag_1.2-9    munsell_0.5.1        codetools_0.2-20    
+[28] htmltools_0.5.8.1    bayesplot_1.11.1     yaml_2.3.10         
 [31] pillar_1.9.0         StanHeaders_2.32.10  bridgesampling_1.1-2
 [34] abind_1.4-5          nlme_3.1-164         posterior_1.6.0     
 [37] rstan_2.32.6         tidyselect_1.2.1     digest_0.6.36       
-[40] mvtnorm_1.2-5        stringi_1.8.4        reshape2_1.4.4      
-[43] purrr_1.0.2          labeling_0.4.3       fastmap_1.2.0       
-[46] grid_4.4.1           colorspace_2.1-1     cli_3.6.3           
-[49] magrittr_2.0.3       loo_2.8.0            pkgbuild_1.4.4      
-[52] utf8_1.2.4           withr_3.0.0          scales_1.3.0        
-[55] backports_1.5.0      rmarkdown_2.27       matrixStats_1.3.0   
-[58] gridExtra_2.3        coda_0.19-4.1        evaluate_0.24.0     
-[61] rstantools_2.4.0     rlang_1.1.4          glue_1.7.0          
-[64] rstudioapi_0.16.0    jsonlite_1.8.8       plyr_1.8.9          
-[67] R6_2.5.1            </code></pre>
+[40] mvtnorm_1.2-5        stringi_1.8.4        purrr_1.0.2         
+[43] labeling_0.4.3       fastmap_1.2.0        grid_4.4.1          
+[46] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
+[49] loo_2.8.0            pkgbuild_1.4.4       utf8_1.2.4          
+[52] withr_3.0.0          scales_1.3.0         backports_1.5.0     
+[55] rmarkdown_2.27       matrixStats_1.3.0    gridExtra_2.3       
+[58] coda_0.19-4.1        evaluate_0.24.0      rstantools_2.4.0    
+[61] rlang_1.1.4          glue_1.7.0           rstudioapi_0.16.0   
+[64] jsonlite_1.8.8       R6_2.5.1            </code></pre>
 </div>
 </div>
 </section>

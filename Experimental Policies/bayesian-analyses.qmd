@@ -58,7 +58,7 @@ There are several useful R packages to help with this, but i will focus on the [
 library(knitr)
 library(broom)
 library(dplyr)
-standard.fit <- lm(Sepal.Length~Species, data=iris)
+standard.fit <- lm(Sepal.Length~0+Species, data=iris)
 standard.fit %>% 
   anova %>% 
   kable(caption="linear model for sepal length vs species",
@@ -77,7 +77,7 @@ Using brms the model specification is the same, though it takes a few seconds lo
 ```{r brm}
 #| output: false
 library(brms)
-brms.fit <- brm(Sepal.Length~Species, data=iris,
+brms.fit <- brm(Sepal.Length~0+Species, data=iris,
                 family = gaussian(),
                 sample_prior = TRUE) #required for hypothesis testing
 ```
@@ -114,19 +114,18 @@ sepal_length_mean <- mean(iris$Sepal.Length)
 sepal_length_sd <- sd(iris$Sepal.Length)
 new.priors <- c(
     # Prior for the Intercept
-    set_prior(paste0("normal(", sepal_length_mean, ", ", sepal_length_sd, ")"), class = "Intercept"),
-    # Prior for all beta coefficients
-    set_prior("normal(0, 0.5)", class = "b"),
+    set_prior(paste0("normal(", sepal_length_mean, ", ", sepal_length_sd, ")"), class = "b",coef=paste0("Species",levels(iris$Species)[1])),
+    set_prior(paste0("normal(", sepal_length_mean, ", ", sepal_length_sd, ")"), class = "b",coef=paste0("Species",levels(iris$Species)[2])),
+    set_prior(paste0("normal(", sepal_length_mean, ", ", sepal_length_sd, ")"), class = "b",coef=paste0("Species",levels(iris$Species)[3])),
     # Prior for the residual standard deviation (sigma)
-    set_prior("student_t(3, 0, 2.5)", class = "sigma")
-)
+    set_prior("student_t(3, 0, 2.5)", class = "sigma",lb=0)) #lower bound of zero (cant have a negative error)
 ```
 
 Now lets re-run the analysis
 
 ```{r brms-priors}
 #| output: false
-brms.fit.new.priors <- brm(Sepal.Length~Species, data=iris,
+brms.fit.new.priors <- brm(Sepal.Length~0+Species, data=iris,
                 family = gaussian(),
                 prior = new.priors,
                 sample_prior = TRUE) 
@@ -155,14 +154,16 @@ combined.posteriors <-
   rename('Speciesversicolor_default'='b_Speciesversicolor_default',
          'Speciesversicolor_new'='b_Speciesversicolor_new',
          'Speciesvirginica_default'='b_Speciesvirginica_default',
-         'Speciesvirginica_new'='b_Speciesvirginica_new') %>%
+         'Speciesvirginica_new'='b_Speciesvirginica_new',
+          'Speciessetosa_default'='b_Speciessetosa_default',
+         'Speciessetosa_new'='b_Speciessetosa_new') %>%
   pivot_longer(cols=everything(),
                names_sep="_",
                names_to = c("Factor","Model.Priors")) 
 
 combined.posteriors %>%  
   ggplot(aes(x=value,
-             fill=Model.Priors)) +
+             col=Model.Priors)) +
   geom_density(alpha=0.5) +
   facet_grid(Factor~.) +
   labs(y="Density",
@@ -180,40 +181,17 @@ Nowhere in these results are no p-values, so how do we get a sense of confidence
 How do we get Bayes Factors and posterior probabilities. Lets say we want to test the hypothesis that `Speciesvirginica` was greater than the reference (setosa), that would mean the estimate would have to be greater than zero for this term
 
 ```{r hypothesis}
-hypothesis(brms.fit.new.priors, "Speciesvirginica > 0") 
+hypothesis(brms.fit.new.priors, "Speciesvirginica > Speciessetosa") 
 ```
 
-This tabel shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:
+This table shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:
 
 ```{r hypothesis-2}
-hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5") 
+hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5+Speciessetosa") 
 ```
 
-As you can see while the estimate is still positive (1.58-1.5=0.08), the Bayes Factor is less confident (3.8, so moderate confidence), and the posterior probability is 79%.
+As you can see while the estimate is still positive ($1.57-1.5=0.07$), the Bayes Factor is less confident (2.84, so moderate confidence), and the posterior probability is 74%.
 
-Lets visualize this a bit further:
-
-```{r brms-results}
-posterior_samples <- as_draws_df(brms.fit) #sample from the posteriors
-posterior_samples.new.priors <- as_draws_df(brms.fit.new.priors) #sample from the posteriors
-library(ggplot2)
-
-ggplot(posterior_samples, aes(x = b_Speciesvirginica)) +
-  geom_density(fill="blue") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
-  labs(title = "Posterior Distributions",
-   subtitle="Difference Between Virginica and Setosa",
-       x = "Difference between groups",
-       y = "Density") 
-
-library(bayesplot)
-
-mcmc_areas(posterior_samples, pars = c("b_Speciesvirginica","b_Speciesversicolor"),
-           prob = 0.95) +
-  labs(title = "Difference Between Virginica or Versicolor and Setosa") +
-  lims(x=c(-0.5,3)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "red") 
-```
 Hopefully this gives you a sense on how a Bayesian approach can be applied in general.  Next we will look at how to do some standard analyses commonly done with null hypothesis significance testing using brms.
 
 Note this script used some examples generated by [perplexity.ai](https://www.perplexity.ai/) and then modified further
