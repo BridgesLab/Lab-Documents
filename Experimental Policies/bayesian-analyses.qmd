@@ -9,18 +9,21 @@ execute:
   message: false
   warning: false
 editor: source
+bibliography: bayesian-references.bib
+code-fold: true 
+code-tools: true
 ---
 
 While we most often use classical frequentist statistical approaches, the norm in the molecular physiology field, I have been thinking a lot about Bayesian approaches, especially from a public health and nutrition perspective. In these fields the data tend to be less clear and I find myself updating my opinions often based on new data.
 
 ### How Much Protein is Optimal Post-Exercise
 
-One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there wsa no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words by prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likliehood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is this (from https://en.wikipedia.org/wiki/Bayesian_inference):
+One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there wsa no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper [@trommelenAnabolicResponseProtein2023] came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words by prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likliehood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is found on this  [Wikipedia Article on Bayesian Inference](https://en.wikipedia.org/wiki/Bayesian_inference):
 
--   $P(H|E)$ is the probability of hypothesis A given that data B was obtained. Also known as the *posterior probability*.
--   $P(E|H)$ is the probability of observing E given this hypothesis
--   $P(H)$ is the probability of the hypothesis before hte data (the *prior probability*)
--   $P(E)$ is the probability of the evidence, or the *marginal liklihood*
+-   $P(H|E)$ is the probability of hypothesis given that the evidence (E) was obtained. Also known as the *posterior probability*.
+-   $P(E|H)$ is the probability of observing the evidence given this hypothesis.  This is also known as the *likelihood*.
+-   $P(H)$ is the probability of the hypothesis before the data is observed (the *prior probability*).  Think of this as how likely you think the result is before you see the data.
+-   $P(E)$ is the probability of the evidence, or the *marginal liklihood*.  This is true for all hypotheses being tested.
 
 Together these are connected by Bayes' rule
 
@@ -38,17 +41,47 @@ $$
 
 After this kind of analysis, there are two things we coould report. A *poster probability* ($P(H|E)$; or its distribution) or a Bayes Factor. In one case we are saying that based on our prior probability and our baysian factor we report the posterior probability that a hypothesis is true given the evidence. This means that we use both the Bayes Factor and our prior probability (which could vary among investigators). If we report a Bayes Factor we are reporting how much we expect that these data should modify any prior probability ($P(H)$). This is an important distinction because a Bayes Factor does not make any claims about what the scientist initially thought about how likely a hypothesis was, so is more generalizable. Maybe I had some reason to think that the probability that protein intake max was 20-30g was 70% but another scientist thought it was closer to 90%, we would get different posterior probabilities but the same BF (0.07):
 
-$$P(H|E) = \frac{P(E|H)P(H)}{P(E)} = 0.07 \times 0.7=0.049$$ $$P(H|E) = \frac{P(E|H)P(H)}{P(E)} = 0.07 \times 0.9=0.063$$ There is no p-value in either case. Here we are reporting either a Bayes Factor or a posterior probability. For standardization, Bayes Factors are grouped by Lee and Wagenmakers (https://doi.org/10.1017/CBO9781139087759) as:
+There is no p-value in either case. Here we are reporting either a Bayes Factor or a posterior probability (or both). For standardization, Bayes Factors are classified in several ways, for example by [@leeBayesianCognitiveModeling2014] as:
 
--   \<1-3 anecdoctal or barely worth mentioning
+-   $<1-3$ anecdoctal or barely worth mentioning
 
--   3-10 moderate evidence
+-   $3-10$ moderate evidence
 
--   10-30 strong evidence
+-   $10-30$ strong evidence
 
--   30-100 extremely strong evidence
+-   $30-100$ extremely strong evidence
 
--    > 100 extreme evidence
+-   $>100$ extreme evidence
+
+### How Does a Bayes Factor Affect Posterior Probability
+
+Lets take a look at how these two results relate to each other.  We can calculate a posterior probability from a prior probability and a bayes factor using the formula rearranged from above.
+
+$P(H|E) = \frac{BF \times P(H)}{BF \times P(H) + (1-P(H))}$
+
+```{r bf-posterior}
+#| echo: false
+#| fig-cap: "Relationship between prior and posterior probabilities and a series of Bayes Factors"
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+sample.data <- data.frame(Prior=seq(0,0.99, by =0.01)) %>% #range of potential prior probabilities 
+  expand_grid(BF=c(1,3,10,30,100,1/3,1/10,1/30,1/100)) %>% # BF examples
+  mutate(Posterior=Prior*BF/(BF*Prior + (1-Prior))) %>%
+  mutate(BF=factor(signif(BF,1)))
+
+ggplot(sample.data,
+       aes(y=Posterior,x=Prior,col=BF)) +
+  geom_line() +
+  labs(y="Posterior Probability",
+       x="Prior Probability") +
+  scale_color_brewer(name="Bayes Factor") +
+  theme_classic(base_size=18)
+
+```
+
+As you can see, in all cases as your prior probability ($P(H)$) increases so does the posterior probability ($P(H|E)$).  As your data (the Bayes factor) come in, if its positive it will incresae the posterior probability.  In other words, the more plausible a hypothesis is before and the higher the evidence (as measured by the Bayes Factor) the more likely it is true.
 
 ## How to perform Bayesian Analyses
 
@@ -57,7 +90,6 @@ There are several useful R packages to help with this, but i will focus on the [
 ```{r iris-standard}
 library(knitr)
 library(broom)
-library(dplyr)
 standard.fit <- lm(Sepal.Length~0+Species, data=iris)
 standard.fit %>% 
   anova %>% 
@@ -143,8 +175,6 @@ You will notice that they give us similar (but not identical) regression coeffic
 ```{r plot-comparing-priors}
 #first extract the priors for each model
 library(tibble)
-library(tidyr)
-library(ggplot2)
 combined.posteriors <-
   full_join(as_draws_df(brms.fit) %>% rownames_to_column("rowid"),
             as_draws_df(brms.fit.new.priors) %>% rownames_to_column("rowid"),
@@ -187,14 +217,21 @@ hypothesis(brms.fit.new.priors, "Speciesvirginica > Speciessetosa")
 This table shows the estimate, error and confidence intervals. The Evid.Ratio (infinity) is the Bayes Factor and the Post.Prob is the posterior probability. This suggests very high (extreme) confidence in that hypothesis being true. But now lets say we only care if virginica is 1.5 units greater than setosa. Those results look like this:
 
 ```{r hypothesis-2}
-hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5+Speciessetosa") 
+hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5+Speciessetosa") -> new.priors.ht
+
+new.priors.ht
 ```
 
-As you can see while the estimate is still positive ($1.57-1.5=0.07$), the Bayes Factor is less confident (2.84, so moderate confidence), and the posterior probability is 74%.
+As you can see while the estimate is still positive ($1.57-1.5=0.07$), the Bayes Factor is less confident (`r round(new.priors.ht$hypothesis$Evid.Ratio,2)`), and the posterior probability is now `r round(new.priors.ht$hypothesis$Post.Prob,2)*100`%.
 
 Hopefully this gives you a sense on how a Bayesian approach can be applied in general.  Next we will look at how to do some standard analyses commonly done with null hypothesis significance testing using brms.
 
 Note this script used some examples generated by [perplexity.ai](https://www.perplexity.ai/) and then modified further
+
+### References
+
+::: {#refs}
+:::
 
 # Session Info
 

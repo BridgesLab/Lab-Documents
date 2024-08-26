@@ -9,6 +9,9 @@ execute:
   message: false
   warning: false
 editor: source
+bibliography: bayesian-references.bib
+code-fold: true 
+code-tools: true
 ---
 
 
@@ -17,12 +20,12 @@ While we most often use classical frequentist statistical approaches, the norm i
 
 ### How Much Protein is Optimal Post-Exercise
 
-One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there wsa no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words by prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likliehood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is this (from https://en.wikipedia.org/wiki/Bayesian_inference):
+One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there wsa no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper [@trommelenAnabolicResponseProtein2023] came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words by prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likliehood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is found on this  [Wikipedia Article on Bayesian Inference](https://en.wikipedia.org/wiki/Bayesian_inference):
 
--   $P(H|E)$ is the probability of hypothesis A given that data B was obtained. Also known as the *posterior probability*.
--   $P(E|H)$ is the probability of observing E given this hypothesis
--   $P(H)$ is the probability of the hypothesis before hte data (the *prior probability*)
--   $P(E)$ is the probability of the evidence, or the *marginal liklihood*
+-   $P(H|E)$ is the probability of hypothesis given that the evidence (E) was obtained. Also known as the *posterior probability*.
+-   $P(E|H)$ is the probability of observing the evidence given this hypothesis.  This is also known as the *likelihood*.
+-   $P(H)$ is the probability of the hypothesis before the data is observed (the *prior probability*).  Think of this as how likely you think the result is before you see the data.
+-   $P(E)$ is the probability of the evidence, or the *marginal liklihood*.  This is true for all hypotheses being tested.
 
 Together these are connected by Bayes' rule
 
@@ -40,17 +43,33 @@ $$
 
 After this kind of analysis, there are two things we coould report. A *poster probability* ($P(H|E)$; or its distribution) or a Bayes Factor. In one case we are saying that based on our prior probability and our baysian factor we report the posterior probability that a hypothesis is true given the evidence. This means that we use both the Bayes Factor and our prior probability (which could vary among investigators). If we report a Bayes Factor we are reporting how much we expect that these data should modify any prior probability ($P(H)$). This is an important distinction because a Bayes Factor does not make any claims about what the scientist initially thought about how likely a hypothesis was, so is more generalizable. Maybe I had some reason to think that the probability that protein intake max was 20-30g was 70% but another scientist thought it was closer to 90%, we would get different posterior probabilities but the same BF (0.07):
 
-$$P(H|E) = \frac{P(E|H)P(H)}{P(E)} = 0.07 \times 0.7=0.049$$ $$P(H|E) = \frac{P(E|H)P(H)}{P(E)} = 0.07 \times 0.9=0.063$$ There is no p-value in either case. Here we are reporting either a Bayes Factor or a posterior probability. For standardization, Bayes Factors are grouped by Lee and Wagenmakers (https://doi.org/10.1017/CBO9781139087759) as:
+There is no p-value in either case. Here we are reporting either a Bayes Factor or a posterior probability (or both). For standardization, Bayes Factors are classified in several ways, for example by [@leeBayesianCognitiveModeling2014] as:
 
--   \<1-3 anecdoctal or barely worth mentioning
+-   $<1-3$ anecdoctal or barely worth mentioning
 
--   3-10 moderate evidence
+-   $3-10$ moderate evidence
 
--   10-30 strong evidence
+-   $10-30$ strong evidence
 
--   30-100 extremely strong evidence
+-   $30-100$ extremely strong evidence
 
--    > 100 extreme evidence
+-   $>100$ extreme evidence
+
+### How Does a Bayes Factor Affect Posterior Probability
+
+Lets take a look at how these two results relate to each other.  We can calculate a posterior probability from a prior probability and a bayes factor using the formula rearranged from above.
+
+$P(H|E) = \frac{BF \times P(H)}{BF \times P(H) + (1-P(H))}$
+
+
+::: {.cell}
+::: {.cell-output-display}
+![Relationship between prior and posterior probabilities and a series of Bayes Factors](bayesian-analyses_files/figure-html/bf-posterior-1.png){width=672}
+:::
+:::
+
+
+As you can see, in all cases as your prior probability ($P(H)$) increases so does the posterior probability ($P(H|E)$).  As your data (the Bayes factor) come in, if its positive it will incresae the posterior probability.  In other words, the more plausible a hypothesis is before and the higher the evidence (as measured by the Bayes Factor) the more likely it is true.
 
 ## How to perform Bayesian Analyses
 
@@ -62,7 +81,6 @@ There are several useful R packages to help with this, but i will focus on the [
 ```{.r .cell-code}
 library(knitr)
 library(broom)
-library(dplyr)
 standard.fit <- lm(Sepal.Length~0+Species, data=iris)
 standard.fit %>% 
   anova %>% 
@@ -203,9 +221,9 @@ Table: Fixed effects from default priors
 
 |                  | Estimate| Est.Error|     Q2.5|    Q97.5|
 |:-----------------|--------:|---------:|--------:|--------:|
-|Speciessetosa     | 5.005856| 0.0728926| 4.862518| 5.148428|
-|Speciesversicolor | 5.937283| 0.0754744| 5.789114| 6.086525|
-|Speciesvirginica  | 6.588169| 0.0730452| 6.441595| 6.731928|
+|Speciessetosa     | 5.004552| 0.0716169| 4.863133| 5.147820|
+|Speciesversicolor | 5.935025| 0.0727019| 5.796505| 6.080253|
+|Speciesvirginica  | 6.589070| 0.0726162| 6.453320| 6.732487|
 :::
 
 ```{.r .cell-code}
@@ -217,9 +235,9 @@ Table: Fixed effects from new priors
 
 |                  | Estimate| Est.Error|     Q2.5|    Q97.5|
 |:-----------------|--------:|---------:|--------:|--------:|
-|Speciessetosa     | 5.012527| 0.0732397| 4.866816| 5.155837|
-|Speciesversicolor | 5.934792| 0.0727237| 5.791952| 6.073577|
-|Speciesvirginica  | 6.580854| 0.0715400| 6.438002| 6.718459|
+|Speciessetosa     | 5.014446| 0.0748329| 4.868229| 5.161032|
+|Speciesversicolor | 5.937639| 0.0743950| 5.791444| 6.079245|
+|Speciesvirginica  | 6.582515| 0.0740688| 6.440759| 6.726932|
 :::
 :::
 
@@ -232,8 +250,6 @@ You will notice that they give us similar (but not identical) regression coeffic
 ```{.r .cell-code}
 #first extract the priors for each model
 library(tibble)
-library(tidyr)
-library(ggplot2)
 combined.posteriors <-
   full_join(as_draws_df(brms.fit) %>% rownames_to_column("rowid"),
             as_draws_df(brms.fit.new.priors) %>% rownames_to_column("rowid"),
@@ -286,7 +302,7 @@ hypothesis(brms.fit.new.priors, "Speciesvirginica > Speciessetosa")
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (Speciesvirginica... > 0     1.57       0.1      1.4     1.74        Inf
+1 (Speciesvirginica... > 0     1.57      0.11     1.39     1.74        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -305,16 +321,18 @@ This table shows the estimate, error and confidence intervals. The Evid.Ratio (i
 ::: {.cell}
 
 ```{.r .cell-code}
-hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5+Speciessetosa") 
+hypothesis(brms.fit.new.priors, "Speciesvirginica > 1.5+Speciessetosa") -> new.priors.ht
+
+new.priors.ht
 ```
 
 ::: {.cell-output .cell-output-stdout}
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (Speciesvirginica... > 0     0.07       0.1     -0.1     0.24       2.99
+1 (Speciesvirginica... > 0     0.07      0.11    -0.11     0.24       2.76
   Post.Prob Star
-1      0.75     
+1      0.73     
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -325,11 +343,16 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.
 :::
 
 
-As you can see while the estimate is still positive ($1.57-1.5=0.07$), the Bayes Factor is less confident (2.84, so moderate confidence), and the posterior probability is 74%.
+As you can see while the estimate is still positive ($1.57-1.5=0.07$), the Bayes Factor is less confident (2.76), and the posterior probability is now 73%.
 
 Hopefully this gives you a sense on how a Bayesian approach can be applied in general.  Next we will look at how to do some standard analyses commonly done with null hypothesis significance testing using brms.
 
 Note this script used some examples generated by [perplexity.ai](https://www.perplexity.ai/) and then modified further
+
+### References
+
+::: {#refs}
+:::
 
 # Session Info
 
@@ -360,32 +383,32 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_3.5.1 tidyr_1.3.1   tibble_3.2.1  brms_2.21.0   Rcpp_1.0.13  
-[6] dplyr_1.1.4   broom_1.0.6   knitr_1.48   
+[1] tibble_3.2.1  brms_2.21.0   Rcpp_1.0.13   broom_1.0.6   knitr_1.48   
+[6] tidyr_1.3.1   dplyr_1.1.4   ggplot2_3.5.1
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.5         tensorA_0.36.2.1     xfun_0.46           
- [4] QuickJSR_1.3.1       processx_3.8.4       inline_0.3.19       
- [7] lattice_0.22-6       callr_3.7.6          vctrs_0.6.5         
-[10] tools_4.4.1          ps_1.7.7             generics_0.1.3      
-[13] stats4_4.4.1         parallel_4.4.1       fansi_1.0.6         
-[16] pkgconfig_2.0.3      Matrix_1.7-0         checkmate_2.3.2     
-[19] distributional_0.4.0 RcppParallel_5.1.8   lifecycle_1.0.4     
-[22] compiler_4.4.1       farver_2.1.2         stringr_1.5.1       
-[25] Brobdingnag_1.2-9    munsell_0.5.1        codetools_0.2-20    
-[28] htmltools_0.5.8.1    bayesplot_1.11.1     yaml_2.3.10         
-[31] pillar_1.9.0         StanHeaders_2.32.10  bridgesampling_1.1-2
-[34] abind_1.4-5          nlme_3.1-164         posterior_1.6.0     
-[37] rstan_2.32.6         tidyselect_1.2.1     digest_0.6.36       
-[40] mvtnorm_1.2-5        stringi_1.8.4        purrr_1.0.2         
-[43] labeling_0.4.3       fastmap_1.2.0        grid_4.4.1          
-[46] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
-[49] loo_2.8.0            pkgbuild_1.4.4       utf8_1.2.4          
-[52] withr_3.0.0          scales_1.3.0         backports_1.5.0     
-[55] rmarkdown_2.27       matrixStats_1.3.0    gridExtra_2.3       
-[58] coda_0.19-4.1        evaluate_0.24.0      rstantools_2.4.0    
-[61] rlang_1.1.4          glue_1.7.0           rstudioapi_0.16.0   
-[64] jsonlite_1.8.8       R6_2.5.1            
+ [1] tensorA_0.36.2.1     bridgesampling_1.1-2 utf8_1.2.4          
+ [4] generics_0.1.3       stringi_1.8.4        lattice_0.22-6      
+ [7] digest_0.6.36        magrittr_2.0.3       evaluate_0.24.0     
+[10] grid_4.4.1           RColorBrewer_1.1-3   mvtnorm_1.2-5       
+[13] fastmap_1.2.0        jsonlite_1.8.8       Matrix_1.7-0        
+[16] processx_3.8.4       pkgbuild_1.4.4       backports_1.5.0     
+[19] ps_1.7.7             gridExtra_2.3        Brobdingnag_1.2-9   
+[22] purrr_1.0.2          fansi_1.0.6          QuickJSR_1.3.1      
+[25] scales_1.3.0         codetools_0.2-20     abind_1.4-5         
+[28] cli_3.6.3            rlang_1.1.4          munsell_0.5.1       
+[31] withr_3.0.0          yaml_2.3.10          StanHeaders_2.32.10 
+[34] inline_0.3.19        rstan_2.32.6         tools_4.4.1         
+[37] parallel_4.4.1       rstantools_2.4.0     checkmate_2.3.2     
+[40] coda_0.19-4.1        colorspace_2.1-1     posterior_1.6.0     
+[43] vctrs_0.6.5          R6_2.5.1             stats4_4.4.1        
+[46] matrixStats_1.3.0    lifecycle_1.0.4      stringr_1.5.1       
+[49] callr_3.7.6          pkgconfig_2.0.3      RcppParallel_5.1.8  
+[52] pillar_1.9.0         gtable_0.3.5         loo_2.8.0           
+[55] glue_1.7.0           xfun_0.46            tidyselect_1.2.1    
+[58] rstudioapi_0.16.0    farver_2.1.2         bayesplot_1.11.1    
+[61] nlme_3.1-164         htmltools_0.5.8.1    rmarkdown_2.27      
+[64] labeling_0.4.3       compiler_4.4.1       distributional_0.4.0
 ```
 :::
 :::
