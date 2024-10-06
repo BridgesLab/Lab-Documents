@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dave Bridges">
+<meta name="dcterms.date" content="2017-05-15">
+
+<title>Data Storage and Management</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="Data-management_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Data-management_files/libs/quarto-html/quarto.js"></script>
+<script src="Data-management_files/libs/quarto-html/popper.min.js"></script>
+<script src="Data-management_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Data-management_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Data-management_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Data-management_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Data-management_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Data-management_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Data-management_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#raw-data" id="toc-raw-data" class="nav-link active" data-scroll-target="#raw-data">Raw Data</a>
+  <ul class="collapse">
+  <li><a href="#what-should-data-look-like" id="toc-what-should-data-look-like" class="nav-link" data-scroll-target="#what-should-data-look-like">What Should Data Look Like?</a></li>
+  <li><a href="#what-format-should-i-save-raw-data-in" id="toc-what-format-should-i-save-raw-data-in" class="nav-link" data-scroll-target="#what-format-should-i-save-raw-data-in">What Format Should I Save Raw Data In?</a></li>
+  <li><a href="#where-do-i-store-data" id="toc-where-do-i-store-data" class="nav-link" data-scroll-target="#where-do-i-store-data">Where Do I Store Data?</a>
+  <ul class="collapse">
+  <li><a href="#what-about-other-experimental-details" id="toc-what-about-other-experimental-details" class="nav-link" data-scroll-target="#what-about-other-experimental-details">What About Other Experimental Details?</a></li>
+  </ul></li>
+  <li><a href="#how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" id="toc-how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" class="nav-link" data-scroll-target="#how-do-we-convert-raw-data-into-graphs-or-statistical-outputs">How Do We Convert Raw Data into Graphs or Statistical Outputs?</a></li>
+  </ul></li>
+  <li><a href="#processed-data" id="toc-processed-data" class="nav-link" data-scroll-target="#processed-data">Processed Data</a>
+  <ul class="collapse">
+  <li><a href="#what-sections-should-my-rmarkdownquarto-files-contain" id="toc-what-sections-should-my-rmarkdownquarto-files-contain" class="nav-link" data-scroll-target="#what-sections-should-my-rmarkdownquarto-files-contain">What Sections Should My Rmarkdown/Quarto Files Contain?</a>
+  <ul class="collapse">
+  <li><a href="#how-do-i-load-raw-data-into-r" id="toc-how-do-i-load-raw-data-into-r" class="nav-link" data-scroll-target="#how-do-i-load-raw-data-into-r">How Do I Load Raw Data into R</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Storage and Management</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dave Bridges </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 15, 2017</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Most of the data we generate in the lab is numeric data, so it is very important that we are consistent in the way we record and structure our saved data. Below are some best practices on how to save and store your data in our group. This was last updated on Sun Oct 6 19:17:49 2024.</p>
+<section id="raw-data" class="level1">
+<h1>Raw Data</h1>
+<p>Data can be <em>raw</em> or <em>processed</em>. It is the best practice to save files in the most raw format possible, preferably a <strong>csv file</strong>. As an example, a datafile might contain absorbance readings, that are converted by a standard curve into protein amounts. The raw data is the absorbances, the protein amounds would be processed data. Raw data is the most valuable and should be saved in that form. Sometimes you may have data that you know you are going to exclude. Include this in the raw data, and exclude it during the analysis with a note describing why.</p>
+<section id="what-should-data-look-like" class="level2">
+<h2 class="anchored" data-anchor-id="what-should-data-look-like">What Should Data Look Like?</h2>
+<p>Data shoiuld be <strong>tidy</strong>. This means that there should be continuous rows which contain columns that describe the conditions related to that data. If there are missing values, leave them as blank and do not enter as zero. For more details about tidy data read this paper: <span class="citation" data-cites="wickhamTidyData2014">Wickham (<a href="#ref-wickhamTidyData2014" role="doc-biblioref">2014</a>)</span>.</p>
+</section>
+<section id="what-format-should-i-save-raw-data-in" class="level2">
+<h2 class="anchored" data-anchor-id="what-format-should-i-save-raw-data-in">What Format Should I Save Raw Data In?</h2>
+<p>The preferred format is a CSV file. This is a <em>non-proprietary</em> open format. This is important because it is the smallest file size and allows anyone to view/open your data without needing any proprietary software like Microsoft Excel. This may seem like a minor concern, but 20 years from now someone may want to open your data and Excel may be difficult to find. You can still use Excel if you prefer to record raw data, but make sure you Save it as a CSV file. To make a CSV file from Microsoft Excel click on File -&gt; Save As… then under File Format select CSV UTF-8 from the dropdown list. UTF-8 is the character encoding. Excel may prompt you to see if you are sure. It is also a good practice to make raw data files <strong>read only</strong>. To do this on an Apple computer, right click on it, go to Get Info then check the “Locked” checkbox. This prevents you from inadvertently changing raw data.</p>
+</section>
+<section id="where-do-i-store-data" class="level2">
+<h2 class="anchored" data-anchor-id="where-do-i-store-data">Where Do I Store Data?</h2>
+<p><strong>All data</strong> needs to be stored on our shared drives. Most of this data should be on the U-drive (except for human data, see <a href="#sec-human">Section&nbsp;1.3.0.1</a>, or data on GreatLakes). These folders are secure, and backed up. You can’t forget it on the bus, or drop it in the sewer by accident. Data should only be on USB sticks when you are moving between computers and should only be on your laptop when you do not have internet connectivity. You can organize your folder anyway you like, but some good subfolders might be:</p>
+<ul>
+<li>Data</li>
+<li>Writing</li>
+<li>Diagrams</li>
+</ul>
+<p>Keep experimental results in the Data folder, which you should organize into subfolders as appropriate. When you do an experiment, create a folder describing that experiment (for example Effects of Rapamycin on Glycolysis). Inside that folder create a new subfolder for each replicate of that experiment. Everything about that replicate should be in the subfolder(s) including raw and processed data and analysis files.</p>
+<section id="sec-human" class="level4">
+<h4 class="anchored" data-anchor-id="sec-human">Human data</h4>
+<p>Human data must be stored in HIPAA compliant folders. These are restricted to those individuals with IRB access to those folders. For data from Michigan Precision Health, this data is on Armis2, the secure storage system.</p>
+</section>
+<section id="what-about-other-experimental-details" class="level3">
+<h3 class="anchored" data-anchor-id="what-about-other-experimental-details">What About Other Experimental Details?</h3>
+<p>Oftentimes a csv file is insufficient to totally describe what was done, and other details about the experiment. For each experiment create a file that describes the raw data. This should be contained in the Rmd file that analyses the data, but if this is not possible, create a README.md file that describes the files and their contents. Think of this as an online version of your experimental notes and should describe what datafiles were generated, what the columns indicate and anything you may need to know about analysing the data. There are more details about how to structure your Rmarkdown files below.</p>
+</section>
+</section>
+<section id="how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-convert-raw-data-into-graphs-or-statistical-outputs">How Do We Convert Raw Data into Graphs or Statistical Outputs?</h2>
+<p>While it may seem convenient to have the raw data, and analysed data all in the same file, we prefer instead to have an analysis layer between raw data and the output. For our lab, this is done using Rmarkdown or <a href="https://quarto.org/docs/computations/r.html">Quarto</a> files (such as this one). This is a script file that will combine normal writing (in markdown format, see <a href="https://daringfireball.net/projects/markdown/syntax">article on markdown syntax</a> for syntax) and all the relevant analysis steps. This is useful for many reasons, the main one is reproducibility. By using a script, it is very clear how you get from raw data to your eventual outputs, and can be re-run if you want to add a new graph or test easily. Scripts can also be easily copied and modified to a similar experiment. For example if you are repeating an experiment the Rmarkdown file could be copied over to the new experiment folder (with new raw data). Think of the raw data as a chunk of steak, the script as a meat grinder and the processed data as a hamburger. Remember, its impossible to make a steak from a hamburger, but its easy to go the other direction.</p>
+</section>
+</section>
+<section id="processed-data" class="level1">
+<h1>Processed Data</h1>
+<p>Processed data could be calculated data, or figures. These are created by the Rmarkdown or Quarto file, and are over-written every time the analysis is re-run.</p>
+<section id="what-sections-should-my-rmarkdownquarto-files-contain" class="level2">
+<h2 class="anchored" data-anchor-id="what-sections-should-my-rmarkdownquarto-files-contain">What Sections Should My Rmarkdown/Quarto Files Contain?</h2>
+<p>There is a lot of details about the syntax of your Rmarkdown file here:</p>
+<p>Generally your Rmarkdown files should have these sections. If you want a template as a starting point try using this one https://raw.githubusercontent.com/BridgesLab/Lab-Documents/master/Experimental%20Policies/Rmarkdown-template.Rmd</p>
+<p><strong>Purpose</strong>: Make a brief description of why you did the experiment, ideally explicitly stating your hypothesis.</p>
+<p><strong>Experimental Details</strong>: Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis. This might include specifics not in the general protocol such as cell lines, treatment doses etc.</p>
+<p><strong>Raw Data</strong>: Describe your raw data files, including what the columns mean (and what units they are in).</p>
+<p><strong>Analysis</strong>: Describing the analysis as you intersperse code chunks</p>
+<p><strong>Interpretation</strong>: A brief summary of what the interpretation of these results were</p>
+<p><strong>Session Information</strong>: A block with the <code>sessionInfo()</code> command printing out the packages that were loaded and their versions.</p>
+<p><strong>References</strong>: If needed, using Rmarkdown citation tools (see this link for more information: https://quarto.org/docs/authoring/citations.html)</p>
+<section id="how-do-i-load-raw-data-into-r" class="level3">
+<h3 class="anchored" data-anchor-id="how-do-i-load-raw-data-into-r">How Do I Load Raw Data into R</h3>
+<p>The preferred package for reading csv files is called <strong>readr</strong>. This is a useful package that can read in a variety of formats including CSV. The syntax is fairly simple:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co">#loads the readr package</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>filename <span class="ot">&lt;-</span> <span class="st">'testfile.csv'</span> <span class="co">#make this a separate line, you can use any variable you want</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 60 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): supp
+dbl (2): len, dose
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<p>As shown above, readr tries to guess the datatype in each column as above. This can be over-ridden by explicitly stating column format in the read_csv command. Think carefully about whether data should be an integer, character or factor. For grouping factors, its best to explicitly state levels and reference values immediately after the data import. More details about loading data can be found here: http://r4ds.had.co.nz/data-import.html.</p>
+<p>Immediately after you load your data in the Rmarkdown file have a block of text such as this where you use the <code>getwd()</code>, <code>filename</code>, and <code>date</code> to show your specific details:</p>
+<blockquote class="blockquote">
+<p>These data can be found in /Users/davebrid/Documents/GitHub/Lab-Documents/Experimental Policies in a file named testfile.csv. This script was most recently updated on Sun Oct 6 19:17:51 2024.</p>
+</blockquote>
+<p>This clearly indicates where to find the file, and when it was most recently updated. This is helpful for when printing out your quatro files and finding the data again.</p>
+</section>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-wickhamTidyData2014" class="csl-entry" role="doc-biblioentry">
+Wickham, Hadley. 2014. <span>“Tidy <span>Data</span>.”</span> <em>Journal of Statistical Software</em> 59 (September): 1–23. <a href="https://doi.org/10.18637/jss.v059.i10">https://doi.org/10.18637/jss.v059.i10</a>.
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

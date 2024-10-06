@@ -11,4 +11,5 @@ This repository contains publicly available documents regarding the Bridges Labo
 
 ## Posts
 
+* [Data Management](Experimental Policies/data-management.html)
 * [Should I use qPCR to validate RNAseq?](https://bridgeslab.sph.umich.edu/posts/validation-of-rnaseq-experiments-by-qpcr)
