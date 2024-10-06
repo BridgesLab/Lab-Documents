@@ -46,11 +46,11 @@ This is important as it is likely most readers will be unfamiliar with this appr
 
 For each of these I will show some sample language
 
-**We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested**
+>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested
 
 ### Explain the goals of the analysis
 
-**To determine whether transmission has a relationship with the weight in the mtcars dataset.**
+>To determine whether transmission has a relationship with the weight in the mtcars dataset.
 
 ## Model Specification
 
@@ -58,7 +58,7 @@ For each of these I will show some sample language
 
 This should be done in the results section so it is clear what the comparason is.
 
-**We compared the weight with whether the vehicle had an automatic or manual transmission.**
+>We evaluated whether the vehicle had an automatic or manual transmission and how that related to the weight.
 
 ### Likelihood function and model parameters
 
@@ -138,13 +138,13 @@ Table: Prior summary for effects of weight on transmission type
 
 Using the bernouli family, the default is the logit link function.
 
-**The data were fit to a bernoulli distribution with a logit link function.**
+>The data were fit to a bernoulli distribution with a logit link function.
 
 ### Prior Distributions
 
 What was the prior probabilities set at.  As noted above we set our priors to be this, including some justification:
 
-**The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission ($\beta = 0.241$; based on worldwide automobile statistics), with a relatively wide standard deviation of 5.  For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.**
+>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission ($\beta = 0.241$; based on worldwide automobile statistics), with a relatively wide standard deviation of 5.  For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.
 
 ### Formal Specification of the Likelihood Function
 
@@ -185,7 +185,7 @@ pp_check(binomial.fit.pp.check, type = "dens_overlay", ndraws = 100)
 :::
 
 
-**We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.**
+>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.
 
 ## Reporting Details of the Computation
 
@@ -193,13 +193,13 @@ pp_check(binomial.fit.pp.check, type = "dens_overlay", ndraws = 100)
 
 It is good practice to cite the package and the version numbers for reproducibility.
 
-**We used the brms package version 2.21.0 [@brms;@brms-mlm] implemented in R version 4.4.1 [@r-core].**
+>We used the brms package version 2.21.0 [@brms;@brms-mlm] implemented in R version 4.4.1 [@r-core].
 
 ### MCMC Chain Convergence
 
 This is given by $\hat{R}$ or Rhat in brms, which is the same as as the PSRF (Position scale response factor) or the Gelman-Rubin convergence diagnostic [@Gelman1992].  We want this to be as close to 1 as possible (ideally between $0.99-1.01$).  You could report this for each model, or just give a range of values.
 
-**We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters**
+>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters
 
 
 ::: {.cell}
@@ -217,13 +217,13 @@ Table: Rhat values for model testing the association between weight and transmis
 
 |Parameter       |Rhat     |
 |:---------------|:--------|
-|b_Intercept     |1.000379 |
-|b_wt            |1.000349 |
-|Intercept       |1.002655 |
-|prior_Intercept |1.000141 |
-|prior_b_wt      |1.000162 |
-|lprior          |1.000209 |
-|lp__            |1.002488 |
+|b_Intercept     |1.002042 |
+|b_wt            |1.001543 |
+|Intercept       |1.002517 |
+|prior_Intercept |1.000273 |
+|prior_b_wt      |1.000092 |
+|lprior          |1.001200 |
+|lp__            |1.001149 |
 :::
 :::
 
@@ -245,14 +245,14 @@ Table: Model random effects for weight vs transmission
 
 |effect |component |group |term        |   estimate| std.error|  conf.low| conf.high|      ess|
 |:------|:---------|:-----|:-----------|----------:|---------:|---------:|---------:|--------:|
-|fixed  |cond      |NA    |(Intercept) | 13.0954357|  4.290268|  5.988832| 22.690417| 2159.453|
-|fixed  |cond      |NA    |wt          | -4.3667292|  1.360577| -7.346972| -2.098546| 2057.172|
-|fixed  |cond      |NA    |priorwt     |  0.0585263|  4.971631| -9.842979|  9.543683| 4139.192|
+|fixed  |cond      |NA    |(Intercept) | 13.0749075|  4.381090|  5.893250| 23.104665| 1877.921|
+|fixed  |cond      |NA    |wt          | -4.3543135|  1.389451| -7.430027| -2.050400| 1793.746|
+|fixed  |cond      |NA    |priorwt     |  0.0745448|  4.962379| -9.666938|  9.774055| 4029.507|
 :::
 :::
 
 
-**The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were >1500 samples for each parameter**
+>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were >1500 samples for each parameter.
 
 ## Posterior Distribution
 
@@ -275,7 +275,7 @@ pp_check(binomial.fit, type = "dens_overlay",ndraws=100)
 
 This looks great, with the modeled curve being in the middle of the posterior drawn lines.
 
-**A posterior predictive check indicates a good model fit.**
+>A posterior predictive check indicated a good model fit.
 
 ### Summarize Posterior of Variables
 
@@ -337,13 +337,13 @@ Table: Posterior estimates
 
 |          | Estimate| Est.Error|   Q2.5|  Q97.5|
 |:---------|--------:|---------:|------:|------:|
-|Intercept |   13.095|     4.290|  5.989| 22.690|
-|wt        |   -4.367|     1.361| -7.347| -2.099|
+|Intercept |   13.075|     4.381|  5.893| 23.105|
+|wt        |   -4.354|     1.389| -7.430| -2.050|
 :::
 :::
 
 
-**The beta coefficient for the effect of weight on transmission type is -4.367  with a 95% confidence interval of -7.347 to -2.099 (OR=0.013).**
+>The beta coefficient for the effect of weight on transmission type is -4.354  with a 95% confidence interval of -7.43 to -2.05 (OR=0.013).
 
 ### Bayes Factor and Posterior Probabilities
 
@@ -362,14 +362,14 @@ Table: Hypothesis test for effects of weight on automatic transmission
 
 |Hypothesis | Estimate| Est.Error| CI.Lower| CI.Upper| Evid.Ratio| Post.Prob|Star |
 |:----------|--------:|---------:|--------:|--------:|----------:|---------:|:----|
-|(wt) < 0   |   -4.367|     1.361|   -6.823|   -2.412|        Inf|         1|*    |
+|(wt) < 0   |   -4.354|     1.389|     -6.9|   -2.331|        Inf|         1|*    |
 :::
 :::
 
 
 In this case the values are off the scale high so its best to report as greater than a large number rather than infinity and zero.
 
-**The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is >1,000,000 with a posterior probability of >0.999.**
+>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
 
 
 ## Summary
