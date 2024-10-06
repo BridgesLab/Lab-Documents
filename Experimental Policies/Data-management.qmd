@@ -64,7 +64,7 @@ Processed data could be calculated data, or figures.  These are created by the R
 
 There is a lot of details about the syntax of your Rmarkdown file here: 
 
-Generally your Rmarkdown files should have these sections.  If you want a template as a starting point try using this one https://raw.githubusercontent.com/BridgesLab/Lab-Documents/master/Experimental%20Policies/Rmarkdown-template.Rmd
+Generally your Rmarkdown files should have these sections.  If you want a template as a starting point try using [this one](https://raw.githubusercontent.com/BridgesLab/Lab-Documents/master/Experimental%20Policies/Rmarkdown-template.Rmd).
 
 **Purpose**: Make a brief description of why you did the experiment, ideally explicitly stating your hypothesis.
 
