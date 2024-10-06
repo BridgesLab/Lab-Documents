@@ -214,11 +214,15 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="justify-why-you-are-using-a-bayesian-approach">Justify why you are using a Bayesian approach</h3>
 <p>This is important as it is likely most readers will be unfamiliar with this approach and will be hoping to see conventional p-values.</p>
 <p>For each of these I will show some sample language</p>
-<p><strong>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested</strong></p>
+<blockquote class="blockquote">
+<p>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested</p>
+</blockquote>
 </section>
 <section id="explain-the-goals-of-the-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="explain-the-goals-of-the-analysis">Explain the goals of the analysis</h3>
-<p><strong>To determine whether transmission has a relationship with the weight in the mtcars dataset.</strong></p>
+<blockquote class="blockquote">
+<p>To determine whether transmission has a relationship with the weight in the mtcars dataset.</p>
+</blockquote>
 </section>
 </section>
 <section id="model-specification" class="level2">
@@ -226,7 +230,9 @@ div.csl-indent {
 <section id="describe-dependent-and-independent-variables" class="level3">
 <h3 class="anchored" data-anchor-id="describe-dependent-and-independent-variables">Describe dependent and independent variables</h3>
 <p>This should be done in the results section so it is clear what the comparason is.</p>
-<p><strong>We compared the weight with whether the vehicle had an automatic or manual transmission.</strong></p>
+<blockquote class="blockquote">
+<p>We evaluated whether the vehicle had an automatic or manual transmission and how that related to the weight.</p>
+</blockquote>
 </section>
 <section id="likelihood-function-and-model-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="likelihood-function-and-model-parameters">Likelihood function and model parameters</h3>
@@ -396,12 +402,16 @@ div.csl-indent {
 </div>
 </div>
 <p>Using the bernouli family, the default is the logit link function.</p>
-<p><strong>The data were fit to a bernoulli distribution with a logit link function.</strong></p>
+<blockquote class="blockquote">
+<p>The data were fit to a bernoulli distribution with a logit link function.</p>
+</blockquote>
 </section>
 <section id="prior-distributions" class="level3">
 <h3 class="anchored" data-anchor-id="prior-distributions">Prior Distributions</h3>
 <p>What was the prior probabilities set at. As noted above we set our priors to be this, including some justification:</p>
-<p><strong>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission (<span class="math inline">\(\beta = 0.241\)</span>; based on worldwide automobile statistics), with a relatively wide standard deviation of 5. For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.</strong></p>
+<blockquote class="blockquote">
+<p>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission (<span class="math inline">\(\beta = 0.241\)</span>; based on worldwide automobile statistics), with a relatively wide standard deviation of 5. For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.</p>
+</blockquote>
 </section>
 <section id="formal-specification-of-the-likelihood-function" class="level3">
 <h3 class="anchored" data-anchor-id="formal-specification-of-the-likelihood-function">Formal Specification of the Likelihood Function</h3>
@@ -426,7 +436,9 @@ div.csl-indent {
 <p><img src="bayesian-barg_files/figure-html/pp_check_results-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p><strong>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.</strong></p>
+<blockquote class="blockquote">
+<p>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.</p>
+</blockquote>
 </section>
 </section>
 <section id="reporting-details-of-the-computation" class="level2">
@@ -434,12 +446,16 @@ div.csl-indent {
 <section id="software" class="level3">
 <h3 class="anchored" data-anchor-id="software">Software</h3>
 <p>It is good practice to cite the package and the version numbers for reproducibility.</p>
-<p><strong>We used the brms package version 2.21.0 <span class="citation" data-cites="brms brms-mlm">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2021</a>, <a href="#ref-brms-mlm" role="doc-biblioref">2017</a>)</span> implemented in R version 4.4.1 <span class="citation" data-cites="r-core">(<a href="#ref-r-core" role="doc-biblioref">R Core Team 2024</a>)</span>.</strong></p>
+<blockquote class="blockquote">
+<p>We used the brms package version 2.21.0 <span class="citation" data-cites="brms brms-mlm">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2021</a>, <a href="#ref-brms-mlm" role="doc-biblioref">2017</a>)</span> implemented in R version 4.4.1 <span class="citation" data-cites="r-core">(<a href="#ref-r-core" role="doc-biblioref">R Core Team 2024</a>)</span>.</p>
+</blockquote>
 </section>
 <section id="mcmc-chain-convergence" class="level3">
 <h3 class="anchored" data-anchor-id="mcmc-chain-convergence">MCMC Chain Convergence</h3>
 <p>This is given by <span class="math inline">\(\hat{R}\)</span> or Rhat in brms, which is the same as as the PSRF (Position scale response factor) or the Gelman-Rubin convergence diagnostic <span class="citation" data-cites="Gelman1992">(<a href="#ref-Gelman1992" role="doc-biblioref">Gelman and Rubin 1992</a>)</span>. We want this to be as close to 1 as possible (ideally between <span class="math inline">\(0.99-1.01\)</span>). You could report this for each model, or just give a range of values.</p>
-<p><strong>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters</strong></p>
+<blockquote class="blockquote">
+<p>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters</p>
+</blockquote>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">names</span>(<span class="fu">rhat</span>(binomial.fit)),</span>
@@ -458,31 +474,31 @@ div.csl-indent {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">b_Intercept</td>
-<td style="text-align: left;">1.000379</td>
+<td style="text-align: left;">1.002042</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">b_wt</td>
-<td style="text-align: left;">1.000349</td>
+<td style="text-align: left;">1.001543</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Intercept</td>
-<td style="text-align: left;">1.002655</td>
+<td style="text-align: left;">1.002517</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">prior_Intercept</td>
-<td style="text-align: left;">1.000141</td>
+<td style="text-align: left;">1.000273</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">prior_b_wt</td>
-<td style="text-align: left;">1.000162</td>
+<td style="text-align: left;">1.000092</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">lprior</td>
-<td style="text-align: left;">1.000209</td>
+<td style="text-align: left;">1.001200</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">lp__</td>
-<td style="text-align: left;">1.002488</td>
+<td style="text-align: left;">1.001149</td>
 </tr>
 </tbody>
 </table>
@@ -528,39 +544,41 @@ div.csl-indent {
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">13.0954357</td>
-<td style="text-align: right;">4.290268</td>
-<td style="text-align: right;">5.988832</td>
-<td style="text-align: right;">22.690417</td>
-<td style="text-align: right;">2159.453</td>
+<td style="text-align: right;">13.0749075</td>
+<td style="text-align: right;">4.381090</td>
+<td style="text-align: right;">5.893250</td>
+<td style="text-align: right;">23.104665</td>
+<td style="text-align: right;">1877.921</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">wt</td>
-<td style="text-align: right;">-4.3667292</td>
-<td style="text-align: right;">1.360577</td>
-<td style="text-align: right;">-7.346972</td>
-<td style="text-align: right;">-2.098546</td>
-<td style="text-align: right;">2057.172</td>
+<td style="text-align: right;">-4.3543135</td>
+<td style="text-align: right;">1.389451</td>
+<td style="text-align: right;">-7.430027</td>
+<td style="text-align: right;">-2.050400</td>
+<td style="text-align: right;">1793.746</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">priorwt</td>
-<td style="text-align: right;">0.0585263</td>
-<td style="text-align: right;">4.971631</td>
-<td style="text-align: right;">-9.842979</td>
-<td style="text-align: right;">9.543683</td>
-<td style="text-align: right;">4139.192</td>
+<td style="text-align: right;">0.0745448</td>
+<td style="text-align: right;">4.962379</td>
+<td style="text-align: right;">-9.666938</td>
+<td style="text-align: right;">9.774055</td>
+<td style="text-align: right;">4029.507</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were &gt;1500 samples for each parameter</strong></p>
+<blockquote class="blockquote">
+<p>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were &gt;1500 samples for each parameter.</p>
+</blockquote>
 </section>
 </section>
 <section id="posterior-distribution" class="level2">
@@ -575,7 +593,9 @@ div.csl-indent {
 </div>
 </div>
 <p>This looks great, with the modeled curve being in the middle of the posterior drawn lines.</p>
-<p><strong>A posterior predictive check indicates a good model fit.</strong></p>
+<blockquote class="blockquote">
+<p>A posterior predictive check indicated a good model fit.</p>
+</blockquote>
 </section>
 <section id="summarize-posterior-of-variables" class="level3">
 <h3 class="anchored" data-anchor-id="summarize-posterior-of-variables">Summarize Posterior of Variables</h3>
@@ -630,23 +650,25 @@ div.csl-indent {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Intercept</td>
-<td style="text-align: right;">13.095</td>
-<td style="text-align: right;">4.290</td>
-<td style="text-align: right;">5.989</td>
-<td style="text-align: right;">22.690</td>
+<td style="text-align: right;">13.075</td>
+<td style="text-align: right;">4.381</td>
+<td style="text-align: right;">5.893</td>
+<td style="text-align: right;">23.105</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">wt</td>
-<td style="text-align: right;">-4.367</td>
-<td style="text-align: right;">1.361</td>
-<td style="text-align: right;">-7.347</td>
-<td style="text-align: right;">-2.099</td>
+<td style="text-align: right;">-4.354</td>
+<td style="text-align: right;">1.389</td>
+<td style="text-align: right;">-7.430</td>
+<td style="text-align: right;">-2.050</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>The beta coefficient for the effect of weight on transmission type is -4.367 with a 95% confidence interval of -7.347 to -2.099 (OR=0.013).</strong></p>
+<blockquote class="blockquote">
+<p>The beta coefficient for the effect of weight on transmission type is -4.354 with a 95% confidence interval of -7.43 to -2.05 (OR=0.013).</p>
+</blockquote>
 </section>
 <section id="bayes-factor-and-posterior-probabilities" class="level3">
 <h3 class="anchored" data-anchor-id="bayes-factor-and-posterior-probabilities">Bayes Factor and Posterior Probabilities</h3>
@@ -682,10 +704,10 @@ div.csl-indent {
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(wt) &lt; 0</td>
-<td style="text-align: right;">-4.367</td>
-<td style="text-align: right;">1.361</td>
-<td style="text-align: right;">-6.823</td>
-<td style="text-align: right;">-2.412</td>
+<td style="text-align: right;">-4.354</td>
+<td style="text-align: right;">1.389</td>
+<td style="text-align: right;">-6.9</td>
+<td style="text-align: right;">-2.331</td>
 <td style="text-align: right;">Inf</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">*</td>
@@ -695,7 +717,9 @@ div.csl-indent {
 </div>
 </div>
 <p>In this case the values are off the scale high so its best to report as greater than a large number rather than infinity and zero.</p>
-<p><strong>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is &gt;1,000,000 with a posterior probability of &gt;0.999.</strong></p>
+<blockquote class="blockquote">
+<p>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is &gt;1,000,000 with a posterior probability of &gt;0.999.</p>
+</blockquote>
 </section>
 </section>
 <section id="summary" class="level2">

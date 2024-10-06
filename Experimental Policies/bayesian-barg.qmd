@@ -39,11 +39,11 @@ This is important as it is likely most readers will be unfamiliar with this appr
 
 For each of these I will show some sample language
 
-**We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested**
+>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested
 
 ### Explain the goals of the analysis
 
-**To determine whether transmission has a relationship with the weight in the mtcars dataset.**
+>To determine whether transmission has a relationship with the weight in the mtcars dataset.
 
 ## Model Specification
 
@@ -51,7 +51,7 @@ For each of these I will show some sample language
 
 This should be done in the results section so it is clear what the comparason is.
 
-**We compared the weight with whether the vehicle had an automatic or manual transmission.**
+>We evaluated whether the vehicle had an automatic or manual transmission and how that related to the weight.
 
 ### Likelihood function and model parameters
 
@@ -95,13 +95,13 @@ prior_summary(binomial.fit) %>% kable(caption="Prior summary for effects of weig
 
 Using the bernouli family, the default is the logit link function.
 
-**The data were fit to a bernoulli distribution with a logit link function.**
+>The data were fit to a bernoulli distribution with a logit link function.
 
 ### Prior Distributions
 
 What was the prior probabilities set at.  As noted above we set our priors to be this, including some justification:
 
-**The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission ($\beta = 0.241$; based on worldwide automobile statistics), with a relatively wide standard deviation of 5.  For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.**
+>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission ($\beta = 0.241$; based on worldwide automobile statistics), with a relatively wide standard deviation of 5.  For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.
 
 ### Formal Specification of the Likelihood Function
 
@@ -130,7 +130,7 @@ Lets visualize these the solid line is the observed data with the lighter lines 
 pp_check(binomial.fit.pp.check, type = "dens_overlay", ndraws = 100)
 ```
 
-**We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.**
+>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.
 
 ## Reporting Details of the Computation
 
@@ -138,13 +138,13 @@ pp_check(binomial.fit.pp.check, type = "dens_overlay", ndraws = 100)
 
 It is good practice to cite the package and the version numbers for reproducibility.
 
-**We used the brms package version `r packageVersion("brms")` [@brms;@brms-mlm] implemented in R version `r getRversion()` [@r-core].**
+>We used the brms package version `r packageVersion("brms")` [@brms;@brms-mlm] implemented in R version `r getRversion()` [@r-core].
 
 ### MCMC Chain Convergence
 
 This is given by $\hat{R}$ or Rhat in brms, which is the same as as the PSRF (Position scale response factor) or the Gelman-Rubin convergence diagnostic [@Gelman1992].  We want this to be as close to 1 as possible (ideally between $0.99-1.01$).  You could report this for each model, or just give a range of values.
 
-**We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters**
+>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters
 
 ```{r rhat}
 kable(data.frame(
@@ -163,7 +163,7 @@ library(broom.mixed)
 tidy(binomial.fit, ess = TRUE) %>% kable(caption="Model random effects for weight vs transmission")
 ```
 
-**The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were >1500 samples for each parameter**
+>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were >1500 samples for each parameter.
 
 ## Posterior Distribution
 
@@ -177,7 +177,7 @@ pp_check(binomial.fit, type = "dens_overlay",ndraws=100)
 
 This looks great, with the modeled curve being in the middle of the posterior drawn lines.
 
-**A posterior predictive check indicates a good model fit.**
+>A posterior predictive check indicated a good model fit.
 
 ### Summarize Posterior of Variables
 
@@ -215,7 +215,7 @@ These are both roughly unimodal distributions centered at:
 fixef(binomial.fit) %>% kable(caption="Posterior estimates", digits=3)
 ```
 
-**The beta coefficient for the effect of weight on transmission type is `r round(fixef(binomial.fit)['wt','Estimate'],3)`  with a 95% confidence interval of `r round(fixef(binomial.fit)['wt','Q2.5'],3)` to `r round(fixef(binomial.fit)['wt','Q97.5'],3)` (OR=`r round(exp(fixef(binomial.fit)['wt','Estimate']),3)`).**
+>The beta coefficient for the effect of weight on transmission type is `r round(fixef(binomial.fit)['wt','Estimate'],3)`  with a 95% confidence interval of `r round(fixef(binomial.fit)['wt','Q2.5'],3)` to `r round(fixef(binomial.fit)['wt','Q97.5'],3)` (OR=`r round(exp(fixef(binomial.fit)['wt','Estimate']),3)`).
 
 ### Bayes Factor and Posterior Probabilities
 
@@ -228,7 +228,7 @@ hypothesis(binomial.fit, "wt<0")$hypothesis %>%
 
 In this case the values are off the scale high so its best to report as greater than a large number rather than infinity and zero.
 
-**The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is >1,000,000 with a posterior probability of >0.999.**
+>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
 
 
 ## Summary
