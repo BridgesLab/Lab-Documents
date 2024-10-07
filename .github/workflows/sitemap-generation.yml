@@ -2,7 +2,7 @@ name: Generate xml sitemap
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   sitemap_job:
@@ -16,7 +16,7 @@ jobs:
     - name: Generate the sitemap
       uses: cicirello/generate-sitemap@v1
       with:
-        base-url-path: https://www.example.com/
+        base-url-path: https://https://bridgeslab.github.io/Lab-Documents/
     - name: Commit and push
       run: |
         if [[ `git status --porcelain sitemap.xml` ]]; then
@@ -26,4 +26,4 @@ jobs:
           git add sitemap.xml
           git commit -m "Automated sitemap update"
           git push
-        fiXy
+        fi
