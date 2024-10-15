@@ -12,15 +12,12 @@ bibliography: references.bib
 ---
 
 
-```{r global_options, include=FALSE}
-library(knitr)
-opts_chunk$set(fig.path='figures/',
-               echo=FALSE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
-options(scipen = 2, digits = 3)
-```
+
+
+
 
 Most of the data we generate in the lab is numeric data, so it is very important that we are consistent in the way we record and structure our saved data.
-Below are some best practices on how to save and store your data in our group.  This was last updated on `r date()`.
+Below are some best practices on how to save and store your data in our group.  This was last updated on Tue Oct 15 19:31:28 2024.
 
 # Raw Data
 
@@ -84,17 +81,40 @@ Generally your Rmarkdown files should have these sections.  If you want a templa
 
 The preferred package for reading csv files is called **readr**.  This is a useful package that can read in a variety of formats including CSV.  The syntax is fairly simple:
 
-```{r data-input, echo=TRUE, message=TRUE}
+
+
+::: {.cell}
+
+```{.r .cell-code}
 library(readr) #loads the readr package
 filename <- 'testfile.csv' #make this a separate line, you can use any variable you want
 data <- read_csv(filename)
 ```
 
+::: {.cell-output .cell-output-stderr}
+
+```
+Rows: 60 Columns: 3
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): supp
+dbl (2): len, dose
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+
+:::
+:::
+
+
+
 As shown above, readr tries to guess the datatype in each column as above.  This can be over-ridden by explicitly stating column format in the read_csv command.  Think carefully about whether data should be an integer, character or factor.  For grouping factors, its best to explicitly state levels and reference values immediately after the data import.  More details about loading data can be found here: http://r4ds.had.co.nz/data-import.html.
 
 Immediately after you load your data in the Rmarkdown file have a block of text such as this where you use the `getwd()`, `filename`, and `date` to show your specific details:
 
->These data can be found in `r getwd()` in a file named `r filename`.  This script was most recently updated on `r date()`.
+>These data can be found in /Users/davebrid/Documents/GitHub/Lab-Documents/Experimental Policies in a file named testfile.csv.  This script was most recently updated on Tue Oct 15 19:31:29 2024.
 
 This clearly indicates where to find the file, and when it was most recently updated.  This is helpful for when printing out your quatro files and finding the data again.
 

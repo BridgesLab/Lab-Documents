@@ -1,0 +1,79 @@
+---
+title: "Informative title"
+author: "Authors"
+date: "2000-01-01"
+format: 
+  html:
+    toc: true
+    toc-location: right
+    keep-md: true
+    code-fold: true
+    code-summary: "Show the code"
+theme: journal
+---
+
+```{r global_options}
+#hide this code chunk
+#| echo: false
+#| message: false
+
+library(knitr)
+#figures makde will go to directory called figures, will make them as both png and pdf files 
+opts_chunk$set(fig.path='figures/',
+               dev=c('png','pdf'))
+options(scipen = 2, digits = 3)
+
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+  
+se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+#load these packages, nearly always needed
+library(tidyverse)
+
+# sets maize and blue color scheme
+color.scheme <- c('#00274c', '#ffcb05')
+```
+
+# Purpose
+
+Succintly describe the purpose of the experiment
+
+# Experimental Details
+
+Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis.  This might include specifics not in the general protocol such as cell lines, treatment doses etc.
+
+# Raw Data
+
+Describe your raw data files, including what the columns mean (and what units they are in).
+
+```{r data-input}
+library(readr) #loads the readr package
+filename <- 'testfile.csv' #input file(s)
+
+#this loads whatever the file is into a dataframe called exp.data if it exists
+if(filename %in% dir()){
+  exp.data <- read_csv(filename)
+}
+```
+
+These data can be found in **`r getwd()`** in a file named **`r ifelse(filename %in% dir(), filename, "no file found")`**.  This script was most recently updated on **`r date()`**.
+
+# Analysis
+
+Describe the analysis as you intersperse code chunks
+
+# Interpretation
+
+A brief summary of what the interpretation of these results were
+
+# Session Information
+
+```{r session-information}
+sessionInfo()
+```
+
+# References
+
+If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>
