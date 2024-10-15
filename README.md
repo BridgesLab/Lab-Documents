@@ -3,7 +3,7 @@ This repository contains publicly available documents regarding the Bridges Labo
 ## Statistics
 
 * [General Statistics](Experimental%20%Policies/general-statistics.html)
-* [Power Analyses using pwr](Experimental%20%Policies/Power Analysis/power-analysis.html)
+* [Power Analyses using pwr](Experimental%20%Policies/Power%20%Analysis/power-analysis.html)
 * [Introduction to Bayesian Data Analysis](Experimental%20%Policies/bayesian-analyses.html)
 * [Sample Code for Bayesian Data Analyses](Experimental%20%olicies/bayesian-examples.html)
 * [Using BARG Principles for Bayesian Data Analyses](Experimental%20%Policies/bayesian-barg.html)
