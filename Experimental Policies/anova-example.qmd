@@ -1,0 +1,199 @@
+---
+title: "ANOVA/Linear Model Example"
+author: "Dave Bridges"
+date: "May 9, 2014"
+format: 
+  html:
+    toc: true
+    toc-location: right
+    keep-md: true
+    code-fold: true
+    code-summary: "Show the code"
+theme: journal
+bibliography: references.bib   
+execute: 
+  message: false
+---
+
+## Explanation of How to Do An ANOVA or Linear Model
+
+Here is some sample data we will use throughout.  In this case there are three colors, 2 shapes and some sizes.  This analysis presumes size is a *continuous independent variable* and shape/color is a *discrete dependent variable* 
+
+```{r data-creation}
+set.seed(45)
+balloon.data <- data.frame(color=as.factor(c(rep("green",6), rep("red",12), rep("blue",6))),
+                          shape = as.factor(rep(c("square", "circle"),12)),
+                          size = rpois(24, lambda=5)*abs(rnorm(24)))
+```
+
+
+## One Way ANOVA
+
+This is used when you have one variable, with either predictor.  That predictor could have several levels.  In this example you have three colors of balloons and are testing the hypothesis that size is affected by balloon color.
+
+I prefer to use the `broom` package to make nice visualizations of the summary tables.
+
+```{r one-way-anova}
+library(broom) #for tidy
+library(dplyr) #for chaining commands
+library(knitr) #for kables
+
+#one way anova (two types)
+aov(size~color, data=balloon.data) %>% tidy %>% kable(caption="ANOVA testing effects of shape on size")
+```
+
+### Interpreting a Univariable ANOVA
+
+This is what is konwn as an *omnibus* test, so it is not saying whether there are any specific between-group differences (not testing red vs blue), but instead is testing whether there is a general difference between groups (ballon color matters).  In this case the p-value is `r tidy(aov(size~color,data=balloon.data))$p.value[1]` so we would not consider this a significant effect of color on size.
+
+## Two-Way ANOVA
+
+This is used when you have two (or more) potential variables which affect your dependent variable.  This is also known as a *multivariable* regression.  Here are two ways to analyse this data, the first presumes **independence** between shape and color, the second is testing whether there is an **interaction** between shape and color (*e.g*. blue squares are different from what you would expect from something being blue + being a square).  For interactions you can write this as `color*shape` or `color + shape + color:shape`.
+
+```{r two-way-anova}
+#two way anova, with interaction
+aov(size~color+shape, data=balloon.data) %>% tidy %>% kable(caption="2x2 ANOVA testing for effects of color and shape on size")
+
+#two way anova, without interaction
+aov(size~color*shape, data=balloon.data) %>% tidy %>% kable(caption="2x2 ANOVA testing for effects of color and shape on size, including and interaction term")
+```
+
+### Interactions
+
+ Our typical practice is to first test for an interaction, then based on whether it is significant (generally $\alpha<0.05$).  If the interaction term is significant then the two main effects are not useful, so just report the interaction term then do a pairwise analysis of each of the groups. 
+
+For a more detailed discussion of interpreting interactions see @nieuwenhuisErroneousAnalysesInteractions2011
+
+### Looking at Individual Factor Contributions
+
+The omnibus ANOVA analysis just says there is some difference between groups but does not specify how the groups differ.  This can be done using the `lm` command.
+
+```{r anova-lm}
+lm(size~color, data=balloon.data) %>% 
+  tidy %>% 
+  kable(caption="2x2 linear model testing for effects of color and shape on size.  This does not include the reference value for color (blue), which instead is included in the intercept")
+
+lm(size~color+0, data=balloon.data) %>% 
+  tidy %>% 
+  kable(caption="2x2 linear model testing for effects of color and shape on size including the reference value")
+```
+
+### Assumptions of ANOVA Analyses
+
+Although when group sizes are equal, ANOVA is quite robust to non-normality and non-equal variance, you should test these assumptions.  
+
+#### Testing Normality 
+
+## Check Distribution of Your Data
+
+One way is to test the normality of each group of your data.  First it is best to do this visually, for example with a density plot:
+
+```{r anova-density}
+library(ggplot2)
+
+ggplot(balloon.data,aes(x=size,fill=color)) +
+  geom_density(alpha=0.5) +
+  scale_fill_manual(values=c('blue','green','red'))
+```
+Visually you are looking for a nice bell curve (such as blue but not red).
+
+Another useful plot is what is known as a qqplot
+
+```{r anova-qqplot}
+ggplot(balloon.data, aes(sample = size,color=color)) +
+  stat_qq() +
+  stat_qq_line() +
+  scale_color_manual(values=c('blue','green','red'))
+```
+
+A normal distribution (such as blue) would have the points near the line, but a non-normal distribution would have values that dont fit the line well (green or red).
+
+### Statistical Methods to Test for Normality
+
+```{r shapiro-test}
+balloon.data %>%
+  group_by(color) %>%
+  summarize(Shapiro.Wilk.Test = shapiro.test(size)$p.value) %>% #extracts the p-value from the shapiro wilk tests 
+  kable(caption="Shapiro-Wilk tests for normality when grouped by color")
+
+balloon.data %>%
+  group_by(color,shape) %>% #now with color and shape
+  summarize(Shapiro.Wilk.Test = shapiro.test(size)$p.value) %>% #extracts the p-value from the shapiro wilk tests 
+  kable(caption="Shapiro-Wilk tests for normality when grouped by color and shape")
+```
+
+We interpret this that if $p_{shapiro-wilk}<0.05$ then the data are not normally distributed, which is the case here.  If the data is not normal, you could transform your dependent variable (ie look at log(size) rather than size).  You could also use a non-parametric test such as a Kruskal-Wallis test (for groups) or Mann-Whitney test (for pairs).
+
+The second way to test for normality is to evaluate the residuals of your model for normality.  The residuals are the difference between the model-predicted value and the measured value.  These should be normally ditributed.
+
+```{r residuals-method}
+aov(size~color, data=balloon.data) %>% 
+  residuals %>% 
+  shapiro.test %>%
+  tidy %>%
+  kable(caption="Shapiro-Wilk test for the residuals of the model.")
+```
+
+## Post-Hoc Tests
+
+If you get a significant result from the omnibus ANOVA, you often will want to do further post-hoc testing to look at pairwise comparisons.  As a general rule, we test the omnibus test first prior to proceeding to pairwise analyses.  There are three main ways to do this:
+
+* Pairwise *t*-Tests (remember to check the assumptions of normality and equal variance when choosing a test)
+* Tukey's Honest Significant Difference -- Compares all combinations
+* Dunnett's Test -- Compares all values to a control
+
+```{r post-hoc-tests}
+#save an anova object
+balloon.aov <- aov(size~color,  data=balloon.data)
+#can run a Tukey's test on this
+TukeyHSD(balloon.aov) %>% 
+  tidy %>%
+  kable(caption="One method for performing a Tukey's HSD test.")
+#this is the same as:
+library(multcomp)
+glht(balloon.aov, linfct=mcp(color="Tukey")) %>% 
+  tidy %>% 
+  kable(caption="Tukey's HSD tests for baloon color, using glht")
+
+#Can also use glht for Dunnett's tests
+#define the control group to what you want to compare to
+balloon.data$color <- relevel(balloon.data$color, ref="blue")
+#run a dunnett's test
+glht(balloon.aov, linfct=mcp(color="Dunnett")) %>% 
+  tidy %>% 
+  kable(caption="Dunnett's test comparing to blue")
+
+#default is single-step but can manually set FDR adjustment methods
+glht(balloon.aov, linfct=mcp(color="Dunnett")) %>% 
+  summary(adjusted(type="BH")) %>% 
+  tidy %>% 
+  kable(caption="Benjamini-Hochberg adjusted dunnett's test for effect of color on size")
+
+
+glht(balloon.aov, linfct=mcp(color="Dunnett")) %>% 
+  summary(adjusted(type="bonferroni")) %>% 
+  tidy %>%
+  kable(caption="Bonferroni adjusted dunnett's test for effect of color on size")
+```
+
+### Pairwise *t*-tests
+
+As with `glht` your post-hoc tests may benefit from adjusting for multiple hypotheses.  Two common methods are Bonferroni (reference is @dunn1961multiple) or @Benjamini1995.
+
+```{r pairwise-t-tests}
+pairwise.t.test(balloon.data$size, balloon.data$color) %>% tidy %>% kable(caption="Pairwise tests usint color and size")
+#default is Holm but can set to whatever you want or none
+pairwise.t.test(balloon.data$size, balloon.data$color, p.adjust.method="BH")%>% tidy %>% kable(caption="Pairwise tests usint color and size, p-values adjusted by BH methods")
+pairwise.t.test(balloon.data$size, balloon.data$color, p.adjust.method="none") %>% tidy %>% kable(caption="Pairwise tests usint color and size, no p-value adjustments")
+```
+
+## Session Information
+
+```{r session-info, echo=FALSE}
+sessionInfo()
+```
+
+# References
+
+::: {#refs}
+:::
