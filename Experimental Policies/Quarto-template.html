@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Dave Bridges">
-<meta name="dcterms.date" content="2017-05-15">
+<meta name="author" content="Authors">
+<meta name="dcterms.date" content="2000-01-01">
 
-<title>Data Storage and Management</title>
+<title>Informative title</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -56,39 +56,19 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
-<script src="Data-management_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Data-management_files/libs/quarto-html/quarto.js"></script>
-<script src="Data-management_files/libs/quarto-html/popper.min.js"></script>
-<script src="Data-management_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Data-management_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Data-management_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Data-management_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Data-management_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Data-management_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Data-management_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Quarto-template_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Quarto-template_files/libs/quarto-html/quarto.js"></script>
+<script src="Quarto-template_files/libs/quarto-html/popper.min.js"></script>
+<script src="Quarto-template_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Quarto-template_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Quarto-template_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Quarto-template_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Quarto-template_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Quarto-template_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Quarto-template_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -101,23 +81,12 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#raw-data" id="toc-raw-data" class="nav-link active" data-scroll-target="#raw-data">Raw Data</a>
-  <ul class="collapse">
-  <li><a href="#what-should-data-look-like" id="toc-what-should-data-look-like" class="nav-link" data-scroll-target="#what-should-data-look-like">What Should Data Look Like?</a></li>
-  <li><a href="#what-format-should-i-save-raw-data-in" id="toc-what-format-should-i-save-raw-data-in" class="nav-link" data-scroll-target="#what-format-should-i-save-raw-data-in">What Format Should I Save Raw Data In?</a></li>
-  <li><a href="#where-do-i-store-data" id="toc-where-do-i-store-data" class="nav-link" data-scroll-target="#where-do-i-store-data">Where Do I Store Data?</a>
-  <ul class="collapse">
-  <li><a href="#what-about-other-experimental-details" id="toc-what-about-other-experimental-details" class="nav-link" data-scroll-target="#what-about-other-experimental-details">What About Other Experimental Details?</a></li>
-  </ul></li>
-  <li><a href="#how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" id="toc-how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" class="nav-link" data-scroll-target="#how-do-we-convert-raw-data-into-graphs-or-statistical-outputs">How Do We Convert Raw Data into Graphs or Statistical Outputs?</a></li>
-  </ul></li>
-  <li><a href="#processed-data" id="toc-processed-data" class="nav-link" data-scroll-target="#processed-data">Processed Data</a>
-  <ul class="collapse">
-  <li><a href="#what-sections-should-my-rmarkdownquarto-files-contain" id="toc-what-sections-should-my-rmarkdownquarto-files-contain" class="nav-link" data-scroll-target="#what-sections-should-my-rmarkdownquarto-files-contain">What Sections Should My Rmarkdown/Quarto Files Contain?</a>
-  <ul class="collapse">
-  <li><a href="#how-do-i-load-raw-data-into-r" id="toc-how-do-i-load-raw-data-into-r" class="nav-link" data-scroll-target="#how-do-i-load-raw-data-into-r">How Do I Load Raw Data into R</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a></li>
+  <li><a href="#experimental-details" id="toc-experimental-details" class="nav-link" data-scroll-target="#experimental-details">Experimental Details</a></li>
+  <li><a href="#raw-data" id="toc-raw-data" class="nav-link" data-scroll-target="#raw-data">Raw Data</a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
@@ -126,7 +95,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data Storage and Management</h1>
+<h1 class="title">Informative title</h1>
 </div>
 
 
@@ -136,14 +105,14 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Dave Bridges </p>
+             <p>Authors </p>
           </div>
   </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 15, 2017</p>
+      <p class="date">January 1, 2000</p>
     </div>
   </div>
   
@@ -155,62 +124,68 @@ div.csl-indent {
 </header>
 
 
-<p>Most of the data we generate in the lab is numeric data, so it is very important that we are consistent in the way we record and structure our saved data. Below are some best practices on how to save and store your data in our group. This was last updated on Tue Oct 15 19:31:28 2024.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#hide this code chunk</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#figures makde will go to directory called figures, will make them as both png and pdf files </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">fig.path=</span><span class="st">'figures/'</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">dev=</span><span class="fu">c</span>(<span class="st">'png'</span>,<span class="st">'pdf'</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">2</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>knit_hooks<span class="sc">$</span><span class="fu">set</span>(<span class="at">inline =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">:::</span><span class="fu">format_sci</span>(x, <span class="st">'md'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sd</span>(x, <span class="at">na.rm=</span>T)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">length</span>(x))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#load these packages, nearly always needed</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sets maize and blue color scheme</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>color.scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'#00274c'</span>, <span class="st">'#ffcb05'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="purpose" class="level1">
+<h1>Purpose</h1>
+<p>Succintly describe the purpose of the experiment</p>
+</section>
+<section id="experimental-details" class="level1">
+<h1>Experimental Details</h1>
+<p>Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis. This might include specifics not in the general protocol such as cell lines, treatment doses etc.</p>
+</section>
 <section id="raw-data" class="level1">
 <h1>Raw Data</h1>
-<p>Data can be <em>raw</em> or <em>processed</em>. It is the best practice to save files in the most raw format possible, preferably a <strong>csv file</strong>. As an example, a datafile might contain absorbance readings, that are converted by a standard curve into protein amounts. The raw data is the absorbances, the protein amounds would be processed data. Raw data is the most valuable and should be saved in that form. Sometimes you may have data that you know you are going to exclude. Include this in the raw data, and exclude it during the analysis with a note describing why.</p>
-<section id="what-should-data-look-like" class="level2">
-<h2 class="anchored" data-anchor-id="what-should-data-look-like">What Should Data Look Like?</h2>
-<p>Data shoiuld be <strong>tidy</strong>. This means that there should be continuous rows which contain columns that describe the conditions related to that data. If there are missing values, leave them as blank and do not enter as zero. For more details about tidy data read this paper: <span class="citation" data-cites="wickhamTidyData2014">Wickham (<a href="#ref-wickhamTidyData2014" role="doc-biblioref">2014</a>)</span>.</p>
-</section>
-<section id="what-format-should-i-save-raw-data-in" class="level2">
-<h2 class="anchored" data-anchor-id="what-format-should-i-save-raw-data-in">What Format Should I Save Raw Data In?</h2>
-<p>The preferred format is a CSV file. This is a <em>non-proprietary</em> open format. This is important because it is the smallest file size and allows anyone to view/open your data without needing any proprietary software like Microsoft Excel. This may seem like a minor concern, but 20 years from now someone may want to open your data and Excel may be difficult to find. You can still use Excel if you prefer to record raw data, but make sure you Save it as a CSV file. To make a CSV file from Microsoft Excel click on File -&gt; Save As… then under File Format select CSV UTF-8 from the dropdown list. UTF-8 is the character encoding. Excel may prompt you to see if you are sure. It is also a good practice to make raw data files <strong>read only</strong>. To do this on an Apple computer, right click on it, go to Get Info then check the “Locked” checkbox. This prevents you from inadvertently changing raw data.</p>
-</section>
-<section id="where-do-i-store-data" class="level2">
-<h2 class="anchored" data-anchor-id="where-do-i-store-data">Where Do I Store Data?</h2>
-<p><strong>All data</strong> needs to be stored on our shared drives. Most of this data should be on the U-drive (except for human data, see <a href="#sec-human" class="quarto-xref">Section&nbsp;1.3.0.1</a>, or data on GreatLakes). These folders are secure, and backed up. You can’t forget it on the bus, or drop it in the sewer by accident. Data should only be on USB sticks when you are moving between computers and should only be on your laptop when you do not have internet connectivity. You can organize your folder anyway you like, but some good subfolders might be:</p>
-<ul>
-<li>Data</li>
-<li>Writing</li>
-<li>Diagrams</li>
-</ul>
-<p>Keep experimental results in the Data folder, which you should organize into subfolders as appropriate. When you do an experiment, create a folder describing that experiment (for example Effects of Rapamycin on Glycolysis). Inside that folder create a new subfolder for each replicate of that experiment. Everything about that replicate should be in the subfolder(s) including raw and processed data and analysis files.</p>
-<section id="sec-human" class="level4">
-<h4 class="anchored" data-anchor-id="sec-human">Human data</h4>
-<p>Human data must be stored in HIPAA compliant folders. These are restricted to those individuals with IRB access to those folders. For data from Michigan Precision Health, this data is on Armis2, the secure storage system.</p>
-</section>
-<section id="what-about-other-experimental-details" class="level3">
-<h3 class="anchored" data-anchor-id="what-about-other-experimental-details">What About Other Experimental Details?</h3>
-<p>Oftentimes a csv file is insufficient to totally describe what was done, and other details about the experiment. For each experiment create a file that describes the raw data. This should be contained in the Rmd file that analyses the data, but if this is not possible, create a README.md file that describes the files and their contents. Think of this as an online version of your experimental notes and should describe what datafiles were generated, what the columns indicate and anything you may need to know about analysing the data. There are more details about how to structure your Rmarkdown files below.</p>
-</section>
-</section>
-<section id="how-do-we-convert-raw-data-into-graphs-or-statistical-outputs" class="level2">
-<h2 class="anchored" data-anchor-id="how-do-we-convert-raw-data-into-graphs-or-statistical-outputs">How Do We Convert Raw Data into Graphs or Statistical Outputs?</h2>
-<p>While it may seem convenient to have the raw data, and analysed data all in the same file, we prefer instead to have an analysis layer between raw data and the output. For our lab, this is done using Rmarkdown or <a href="https://quarto.org/docs/computations/r.html">Quarto</a> files (such as this one). This is a script file that will combine normal writing (in markdown format, see <a href="https://daringfireball.net/projects/markdown/syntax">article on markdown syntax</a> for syntax) and all the relevant analysis steps. This is useful for many reasons, the main one is reproducibility. By using a script, it is very clear how you get from raw data to your eventual outputs, and can be re-run if you want to add a new graph or test easily. Scripts can also be easily copied and modified to a similar experiment. For example if you are repeating an experiment the Rmarkdown file could be copied over to the new experiment folder (with new raw data). Think of the raw data as a chunk of steak, the script as a meat grinder and the processed data as a hamburger. Remember, its impossible to make a steak from a hamburger, but its easy to go the other direction.</p>
-</section>
-</section>
-<section id="processed-data" class="level1">
-<h1>Processed Data</h1>
-<p>Processed data could be calculated data, or figures. These are created by the Rmarkdown or Quarto file, and are over-written every time the analysis is re-run.</p>
-<section id="what-sections-should-my-rmarkdownquarto-files-contain" class="level2">
-<h2 class="anchored" data-anchor-id="what-sections-should-my-rmarkdownquarto-files-contain">What Sections Should My Rmarkdown/Quarto Files Contain?</h2>
-<p>There is a lot of details about the syntax of your Rmarkdown file here:</p>
-<p>Generally your Rmarkdown files should have these sections. If you want a template as a starting point try using <a href="https://raw.githubusercontent.com/BridgesLab/Lab-Documents/refs/heads/master/Experimental%20Policies/Rmarkdown-template.Rmd">RMarkdown</a> or <a href="https://raw.githubusercontent.com/BridgesLab/Lab-Documents/refs/heads/master/Experimental%20Policies/Experimental%20Policies/Quarto-template.qmd">Quarto</a> template file.</p>
-<p><strong>Purpose</strong>: Make a brief description of why you did the experiment, ideally explicitly stating your hypothesis.</p>
-<p><strong>Experimental Details</strong>: Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis. This might include specifics not in the general protocol such as cell lines, treatment doses etc.</p>
-<p><strong>Raw Data</strong>: Describe your raw data files, including what the columns mean (and what units they are in).</p>
-<p><strong>Analysis</strong>: Describing the analysis as you intersperse code chunks</p>
-<p><strong>Interpretation</strong>: A brief summary of what the interpretation of these results were</p>
-<p><strong>Session Information</strong>: A block with the <code>sessionInfo()</code> command printing out the packages that were loaded and their versions.</p>
-<p><strong>References</strong>: If needed, using Rmarkdown citation tools (see this link for more information: https://quarto.org/docs/authoring/citations.html)</p>
-<section id="how-do-i-load-raw-data-into-r" class="level3">
-<h3 class="anchored" data-anchor-id="how-do-i-load-raw-data-into-r">How Do I Load Raw Data into R</h3>
-<p>The preferred package for reading csv files is called <strong>readr</strong>. This is a useful package that can read in a variety of formats including CSV. The syntax is fairly simple:</p>
+<p>Describe your raw data files, including what the columns mean (and what units they are in).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co">#loads the readr package</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>filename <span class="ot">&lt;-</span> <span class="st">'testfile.csv'</span> <span class="co">#make this a separate line, you can use any variable you want</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co">#loads the readr package</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>filename <span class="ot">&lt;-</span> <span class="st">'testfile.csv'</span> <span class="co">#input file(s)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#this loads whatever the file is into a dataframe called exp.data if it exists</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(filename <span class="sc">%in%</span> <span class="fu">dir</span>()){</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  exp.data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(filename)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 60 Columns: 3
 ── Column specification ────────────────────────────────────────────────────────
@@ -222,22 +197,63 @@ dbl (2): len, dose
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 </div>
-<p>As shown above, readr tries to guess the datatype in each column as above. This can be over-ridden by explicitly stating column format in the read_csv command. Think carefully about whether data should be an integer, character or factor. For grouping factors, its best to explicitly state levels and reference values immediately after the data import. More details about loading data can be found here: http://r4ds.had.co.nz/data-import.html.</p>
-<p>Immediately after you load your data in the Rmarkdown file have a block of text such as this where you use the <code>getwd()</code>, <code>filename</code>, and <code>date</code> to show your specific details:</p>
-<blockquote class="blockquote">
-<p>These data can be found in /Users/davebrid/Documents/GitHub/Lab-Documents/Experimental Policies in a file named testfile.csv. This script was most recently updated on Tue Oct 15 19:31:29 2024.</p>
-</blockquote>
-<p>This clearly indicates where to find the file, and when it was most recently updated. This is helpful for when printing out your quatro files and finding the data again.</p>
+<p>These data can be found in <strong>/Users/davebrid/Documents/GitHub/Lab-Documents/Experimental Policies</strong> in a file named <strong>testfile.csv</strong>. This script was most recently updated on <strong>Tue Oct 15 19:26:43 2024</strong>.</p>
 </section>
+<section id="analysis" class="level1">
+<h1>Analysis</h1>
+<p>Describe the analysis as you intersperse code chunks</p>
 </section>
+<section id="interpretation" class="level1">
+<h1>Interpretation</h1>
+<p>A brief summary of what the interpretation of these results were</p>
+</section>
+<section id="session-information" class="level1">
+<h1>Session Information</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Sonoma 14.7
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
+ [5] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
+ [9] ggplot2_3.5.1   tidyverse_2.0.0 knitr_1.48     
+
+loaded via a namespace (and not attached):
+ [1] bit_4.0.5         gtable_0.3.5      jsonlite_1.8.8    crayon_1.5.3     
+ [5] compiler_4.4.1    tidyselect_1.2.1  parallel_4.4.1    scales_1.3.0     
+ [9] yaml_2.3.10       fastmap_1.2.0     R6_2.5.1          generics_0.1.3   
+[13] htmlwidgets_1.6.4 munsell_0.5.1     pillar_1.9.0      tzdb_0.4.0       
+[17] rlang_1.1.4       utf8_1.2.4        stringi_1.8.4     xfun_0.47        
+[21] bit64_4.0.5       timechange_0.3.0  cli_3.6.3         withr_3.0.1      
+[25] magrittr_2.0.3    digest_0.6.37     grid_4.4.1        vroom_1.6.5      
+[29] rstudioapi_0.16.0 hms_1.1.3         lifecycle_1.0.4   vctrs_0.6.5      
+[33] evaluate_0.24.0   glue_1.7.0        fansi_1.0.6       colorspace_2.1-1 
+[37] rmarkdown_2.28    tools_4.4.1       pkgconfig_2.0.3   htmltools_0.5.8.1</code></pre>
+</div>
+</div>
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-wickhamTidyData2014" class="csl-entry" role="listitem">
-Wickham, Hadley. 2014. <span>“Tidy <span>Data</span>.”</span> <em>Journal of Statistical Software</em> 59 (September): 1–23. <a href="https://doi.org/10.18637/jss.v059.i10">https://doi.org/10.18637/jss.v059.i10</a>.
-</div>
-</div>
+<p>If needed you will need a *.bib file. See the details at <a href="https://quarto.org/docs/authoring/citations.html" class="uri">https://quarto.org/docs/authoring/citations.html</a></p>
 </section>
 
 </main>
