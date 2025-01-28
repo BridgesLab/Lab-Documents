@@ -13,21 +13,26 @@ format:
   gfm:
     html-math-method: webtex
 theme: journal
-
+execute:
+  echo: true
+  warning: false
 ---
 
 ```{r global_options}
-#hide this code chunk
+# hide this code chunk
 #| echo: false
 #| message: false
-#| 
-se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+# defines the se function
+se <- function(x) {
+  sd(x, na.rm = TRUE) / sqrt(length(x))
+}
 
 #load these packages, nearly always needed
 library(tidyverse)
 
 # sets maize and blue color scheme
-color.scheme <- c('#00274c', '#ffcb05')
+color_scheme <- c("#00274c", "#ffcb05")
 ```
 
 ## Purpose
@@ -44,10 +49,10 @@ Describe your raw data files, including what the columns mean (and what units th
 
 ```{r data-input}
 library(readr) #loads the readr package
-filename <- 'testfile.csv' #input file(s)
+filename <- "testfile.csv" #input file(s)
 
 #this loads whatever the file is into a dataframe called exp.data if it exists
-if(filename %in% dir()){
+if (filename %in% dir()) {
   exp.data <- read_csv(filename)
 }
 ```

@@ -13,41 +13,29 @@ format:
   gfm:
     html-math-method: webtex
 theme: journal
-
+execute:
+  echo: true
+  warning: false
 ---
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-#hide this code chunk
+# hide this code chunk
 #| echo: false
 #| message: false
-#| 
-se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+# defines the se function
+se <- function(x) {
+  sd(x, na.rm = TRUE) / sqrt(length(x))
+}
 
 #load these packages, nearly always needed
 library(tidyverse)
-```
 
-::: {.cell-output .cell-output-stderr}
-```
-── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-```
-:::
-
-```{.r .cell-code}
 # sets maize and blue color scheme
-color.scheme <- c('#00274c', '#ffcb05')
+color_scheme <- c("#00274c", "#ffcb05")
 ```
 :::
 
@@ -69,30 +57,17 @@ Describe your raw data files, including what the columns mean (and what units th
 
 ```{.r .cell-code}
 library(readr) #loads the readr package
-filename <- 'testfile.csv' #input file(s)
+filename <- "testfile.csv" #input file(s)
 
 #this loads whatever the file is into a dataframe called exp.data if it exists
-if(filename %in% dir()){
+if (filename %in% dir()) {
   exp.data <- read_csv(filename)
 }
 ```
-
-::: {.cell-output .cell-output-stderr}
-```
-Rows: 60 Columns: 3
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr (1): supp
-dbl (2): len, dose
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-:::
 :::
 
 
-These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **testfile.csv**.  This script was most recently updated on **Mon Jan 27 19:33:31 2025**.
+These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **testfile.csv**.  This script was most recently updated on **Mon Jan 27 19:43:52 2025**.
 
 ## Analysis
 
