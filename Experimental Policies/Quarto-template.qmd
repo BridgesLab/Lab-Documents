@@ -30,15 +30,15 @@ library(tidyverse)
 color.scheme <- c('#00274c', '#ffcb05')
 ```
 
-# Purpose
+## Purpose
 
 Succintly describe the purpose of the experiment
 
-# Experimental Details
+## Experimental Details
 
 Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis.  This might include specifics not in the general protocol such as cell lines, treatment doses etc.
 
-# Raw Data
+## Raw Data
 
 Describe your raw data files, including what the columns mean (and what units they are in).
 
@@ -54,20 +54,20 @@ if(filename %in% dir()){
 
 These data can be found in **`r getwd()`** in a file named **`r ifelse(filename %in% dir(), filename, "no file found")`**.  This script was most recently updated on **`r date()`**.
 
-# Analysis
+## Analysis
 
 Describe the analysis as you intersperse code chunks
 
-# Interpretation
+## Interpretation
 
 A brief summary of what the interpretation of these results were
 
-# Session Information
+## References
+
+If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>
+
+## Session Information
 
 ```{r session-information}
 sessionInfo()
 ```
-
-# References
-
-If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>

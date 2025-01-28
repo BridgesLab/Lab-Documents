@@ -52,15 +52,15 @@ color.scheme <- c('#00274c', '#ffcb05')
 :::
 
 
-# Purpose
+## Purpose
 
 Succintly describe the purpose of the experiment
 
-# Experimental Details
+## Experimental Details
 
 Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis.  This might include specifics not in the general protocol such as cell lines, treatment doses etc.
 
-# Raw Data
+## Raw Data
 
 Describe your raw data files, including what the columns mean (and what units they are in).
 
@@ -92,17 +92,21 @@ dbl (2): len, dose
 :::
 
 
-These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **testfile.csv**.  This script was most recently updated on **Mon Jan 27 19:32:09 2025**.
+These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **testfile.csv**.  This script was most recently updated on **Mon Jan 27 19:33:31 2025**.
 
-# Analysis
+## Analysis
 
 Describe the analysis as you intersperse code chunks
 
-# Interpretation
+## Interpretation
 
 A brief summary of what the interpretation of these results were
 
-# Session Information
+## References
+
+If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>
+
+## Session Information
 
 
 ::: {.cell}
@@ -149,8 +153,3 @@ loaded via a namespace (and not attached):
 ```
 :::
 :::
-
-
-# References
-
-If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>
