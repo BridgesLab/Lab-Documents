@@ -67,7 +67,7 @@ if (filename %in% dir()) {
 :::
 
 
-These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **testfile.csv**.  This script was most recently updated on **Mon Jan 27 19:43:52 2025**.
+These data can be found in /Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies in a file named testfile.csv.  This input file was most recently updated on 2024-08-21.  This script was most recently updated on Mon Jan 27 19:54:26 2025.
 
 ## Analysis
 

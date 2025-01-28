@@ -57,7 +57,7 @@ if (filename %in% dir()) {
 }
 ```
 
-These data can be found in **`r getwd()`** in a file named **`r ifelse(filename %in% dir(), filename, "no file found")`**.  This script was most recently updated on **`r date()`**.
+These data can be found in `r getwd()` in a file named `r ifelse(filename %in% dir(), filename, "no file found")`.  This input file was most recently updated on `r ifelse(filename %in% dir(), format(file.info(filename)$mtime, "%Y-%m-%d"), "unknown")`.  This script was most recently updated on `r date()`.
 
 ## Analysis
 
