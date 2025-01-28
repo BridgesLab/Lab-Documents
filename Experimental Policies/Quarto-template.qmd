@@ -9,24 +9,18 @@ format:
     keep-md: true
     code-fold: true
     code-summary: "Show the code"
+    fig-path: "figures/"
+  gfm:
+    html-math-method: webtex
 theme: journal
+
 ---
 
 ```{r global_options}
 #hide this code chunk
 #| echo: false
 #| message: false
-
-library(knitr)
-#figures makde will go to directory called figures, will make them as both png and pdf files 
-opts_chunk$set(fig.path='figures/',
-               dev=c('png','pdf'))
-options(scipen = 2, digits = 3)
-
-knitr::knit_hooks$set(inline = function(x) {
-  knitr:::format_sci(x, 'md')
-})
-  
+#| 
 se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
 
 #load these packages, nearly always needed
