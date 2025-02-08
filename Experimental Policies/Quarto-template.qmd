@@ -2,6 +2,7 @@
 title: "Informative title"
 author: "Authors"
 date: "2000-01-01"
+editor: source
 format: 
   html:
     toc: true
