@@ -143,6 +143,32 @@ plot(lm.1)
 * **Scale-Location Plot** This plot checks the assumption of equal variance (homoscedasticity). *Equal Variance*: Look for a horizontal line with randomly spread points. Any patterns or funneling suggest heteroscedasticity.
 * **Residuals vs. Leverage Plot** This plot helps identify influential observations. *Influential Points*: Look for any points falling outside Cook's distance (usually marked by dashed lines). These are considered influential observations. *Leverage*: Points far to the right have high leverage, meaning they have a strong influence on the model coefficients.
 
+My interpretation is that there are several issues with our model fit.  First from the residuals vs fitted plot, I see a cone-shape of points rather than a slug shape.  This means that as the price increases the error is worse.  Similarly the scale-location plot has an upward slope indicating the same thing. This suggests unequal variance across the estimates or *heteroscedasticity*.  In terms of normality, the Q-Q plot shows points lifting off the line, so this suggests these data are not *normally distributed*.  This can be confirmed by a Shapiro-Wilk test of either covariate or the model fit residuals:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+#note shapiro tests require 5000 or less values, so i randomly sampled
+bind_rows(
+sample(house_prices$price,5000,replace=F) %>% shapiro.test %>% tidy() %>% mutate(input="prices"), 
+sample(house_prices$sqft_living,5000,replace=F) %>% shapiro.test %>% tidy() %>% mutate(input="sqft_living"), 
+sample(residuals(lm.1),5000,replace=F) %>% shapiro.test %>% tidy() %>% mutate(input="redisuals")) %>% relocate(input) %>%
+  kable(caption="Shapiro-Wilk Tests for Variables and Residuals",digits=c(0,3,99))
+```
+
+::: {.cell-output-display}
+Table: Shapiro-Wilk Tests for Variables and Residuals
+
+|input       | statistic|      p.value|method                      |
+|:-----------|---------:|------------:|:---------------------------|
+|prices      |     0.759| 3.605339e-65|Shapiro-Wilk normality test |
+|sqft_living |     0.924| 1.293608e-44|Shapiro-Wilk normality test |
+|redisuals   |     0.831| 1.877965e-58|Shapiro-Wilk normality test |
+:::
+:::
+
+
 #### What to Do if Assumptions are Not Met
 
 * **Linearity**.  Apply a non-linear transformation to the predictor or response variable (*e.g.*, log, square root, or polynomial terms).  Add interaction terms or higher-order terms (*e.g.*, quadratic) to the model to account for non-linear relationships.  Alternatively use a generalized additive model (GAM) or other non-linear modeling techniques.

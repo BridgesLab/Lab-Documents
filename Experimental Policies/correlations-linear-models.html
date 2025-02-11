@@ -303,6 +303,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>Scale-Location Plot</strong> This plot checks the assumption of equal variance (homoscedasticity). <em>Equal Variance</em>: Look for a horizontal line with randomly spread points. Any patterns or funneling suggest heteroscedasticity.</li>
 <li><strong>Residuals vs.&nbsp;Leverage Plot</strong> This plot helps identify influential observations. <em>Influential Points</em>: Look for any points falling outside Cook’s distance (usually marked by dashed lines). These are considered influential observations. <em>Leverage</em>: Points far to the right have high leverage, meaning they have a strong influence on the model coefficients.</li>
 </ul>
+<p>My interpretation is that there are several issues with our model fit. First from the residuals vs fitted plot, I see a cone-shape of points rather than a slug shape. This means that as the price increases the error is worse. Similarly the scale-location plot has an upward slope indicating the same thing. This suggests unequal variance across the estimates or <em>heteroscedasticity</em>. In terms of normality, the Q-Q plot shows points lifting off the line, so this suggests these data are not <em>normally distributed</em>. This can be confirmed by a Shapiro-Wilk test of either covariate or the model fit residuals:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#note shapiro tests require 5000 or less values, so i randomly sampled</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(house_prices<span class="sc">$</span>price,<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"prices"</span>), </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(house_prices<span class="sc">$</span>sqft_living,<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"sqft_living"</span>), </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(<span class="fu">residuals</span>(lm<span class="fl">.1</span>),<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"redisuals"</span>)) <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(input) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Shapiro-Wilk Tests for Variables and Residuals"</span>,<span class="at">digits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dv">99</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Shapiro-Wilk Tests for Variables and Residuals</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">input</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: left;">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">prices</td>
+<td style="text-align: right;">0.759</td>
+<td style="text-align: right;">3.605339e-65</td>
+<td style="text-align: left;">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sqft_living</td>
+<td style="text-align: right;">0.924</td>
+<td style="text-align: right;">1.293608e-44</td>
+<td style="text-align: left;">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">redisuals</td>
+<td style="text-align: right;">0.831</td>
+<td style="text-align: right;">1.877965e-58</td>
+<td style="text-align: left;">Shapiro-Wilk normality test</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="what-to-do-if-assumptions-are-not-met" class="level4">
 <h4 class="anchored" data-anchor-id="what-to-do-if-assumptions-are-not-met">What to Do if Assumptions are Not Met</h4>
@@ -323,7 +365,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="session-information" class="level2">
 <h2 class="anchored" data-anchor-id="session-information">Session Information</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31)
 Platform: x86_64-apple-darwin20
