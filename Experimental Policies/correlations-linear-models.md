@@ -1,6 +1,6 @@
 ---
 title: "Correlations and Linear Models"
-author: "Authors"
+author: "Dave Bridges"
 date: "2025-02-10"
 editor: source
 format: 
@@ -48,7 +48,7 @@ The best first thing to do is to make a plot looking at the two variables.  Here
 library(ggplot2)
 ggplot(house_prices,
        aes(y=price,x=sqft_living)) +
-  geom_point(alpha=0.5) + #transparency of the points
+  geom_point(alpha=0.1) + #transparency of the points
   geom_smooth(method="loess",color=color_scheme[2]) + #smoothed line
   geom_smooth(method="lm",color=color_scheme[1]) + #linear relationship
   theme_classic(base_size=16) #classic theme, and increasing the font size
@@ -59,7 +59,7 @@ ggplot(house_prices,
 :::
 :::
 
-This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maiz line) suggests it might be nonlinear below about 3000 square feet.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in @non_linear.
+This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maize line) suggests it might be nonlinear below about 3000 square feet.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in [Non-Linear Relationships](#non_linear).
 
 ## Describing the Linear Relationship
 
@@ -114,6 +114,7 @@ For a linear model there are four assumptions
 * **Homoscedasticity**: The residuals are assumed to have constant variance across all levels of the predictor variable. This is also known as homogeneity of variance.
 * **Normality**: The residuals are assumed to be normally distributed. While perfect normality is not required, it suggests that the model is doing a good job of predicting the response.
 
+These can be generated in base r or using the `lindia` package.  I'll show code for both, but we will focus on the four main diagnostic plots in base R.
 
 
 ::: {.cell}
@@ -126,12 +127,34 @@ plot(lm.1)
 ::: {.cell-output-display}
 ![](correlations-linear-models_files/figure-html/lm-assumptions-1.png){width=672}
 :::
+
+```{.r .cell-code}
+#alternatively can use diagnostics in the lindia package
+#library(lindia)
+#gg_diagnose(lm.1)
+```
 :::
 
 
+#### Interpreting these Model Plots
+
+* **Residuals vs. Fitted Plot** This plot helps detect non-linearity, unequal error variances, and outliers.  *Linearity*: The residuals should "bounce randomly" around the horizontal line at y=0. If you see a pattern, it suggests non-linearity.  *Equal Variance*: The vertical spread of residuals should be similar across the plot. A "horizontal band" indicates equal error variances. *Outliers*: Look for any points that stand out from the overall pattern.
+* **Normal Q-Q Plot** This plot checks if residuals are normally distributed. *Normal Distribution*: Points should fall approximately along the diagonal line. Significant deviations suggest non-normality. *Tails*: Pay attention to deviations at the ends of the line, which indicate issues with the tails of the distribution.
+* **Scale-Location Plot** This plot checks the assumption of equal variance (homoscedasticity). *Equal Variance*: Look for a horizontal line with randomly spread points. Any patterns or funneling suggest heteroscedasticity.
+* **Residuals vs. Leverage Plot** This plot helps identify influential observations. *Influential Points*: Look for any points falling outside Cook's distance (usually marked by dashed lines). These are considered influential observations. *Leverage*: Points far to the right have high leverage, meaning they have a strong influence on the model coefficients.
+
+#### What to Do if Assumptions are Not Met
+
+* **Linearity**.  Apply a non-linear transformation to the predictor or response variable (*e.g.*, log, square root, or polynomial terms).  Add interaction terms or higher-order terms (*e.g.*, quadratic) to the model to account for non-linear relationships.  Alternatively use a generalized additive model (GAM) or other non-linear modeling techniques.
+* **Independence**  Check for omitted variables that might explain the correlation and include them in the model.  For time-series data, use models like ARIMA or include lagged variables to account for autocorrelation.  If independence is violated due to clustering or grouping, consider using mixed-effects models or hierarchical models.
+* **Homoscedasticity (Constant Variance)**  Apply a log transformation or other variance-stabilizing transformations to the response variable.  Use weighted least squares (WLS) regression, which assigns weights inversely proportional to the variance of residuals.  Consider robust regression methods, such as those implemented in the robustbase package (lmrob).
+* **Normality of Residuals**  Apply transformations (*e.g.*, log, square root) to the response variable if it is skewed.  Use non-parametric regression methods that do not assume normality, such as quantile regression.  If normality is violated due to outliers, investigate and either remove or down-weight their influence using robust regression techniques like least trimmed squares or MM-estimators.
+
 ## Evaluating Non-Linear Relationships {#non_linear}
 
-Note perplexity.ai was used to help in generating this script
+TODO
+
+Note [perplexity.ai](perplexity.ai) was used to help in generating this script
 
 ## Session Information
 

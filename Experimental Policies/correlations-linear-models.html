@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Authors">
+<meta name="author" content="Dave Bridges">
 <meta name="dcterms.date" content="2025-02-10">
 
 <title>Correlations and Linear Models</title>
@@ -135,7 +135,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Authors </p>
+             <p>Dave Bridges </p>
           </div>
   </div>
     
@@ -168,7 +168,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(house_prices,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">y=</span>price,<span class="at">x=</span>sqft_living)) <span class="sc">+</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span> <span class="co">#transparency of the points</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.1</span>) <span class="sc">+</span> <span class="co">#transparency of the points</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"loess"</span>,<span class="at">color=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span> <span class="co">#smoothed line</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>,<span class="at">color=</span>color_scheme[<span class="dv">1</span>]) <span class="sc">+</span> <span class="co">#linear relationship</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="co">#classic theme, and increasing the font size</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -176,7 +176,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="correlations-linear-models_files/figure-html/price-sqft-living-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maiz line) suggests it might be nonlinear below about 3000 square feet. For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in <span class="citation" data-cites="non_linear">@non_linear</span>.</p>
+<p>This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maize line) suggests it might be nonlinear below about 3000 square feet. For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in <a href="#non_linear">Non-Linear Relationships</a>.</p>
 </section>
 <section id="describing-the-linear-relationship" class="level2">
 <h2 class="anchored" data-anchor-id="describing-the-linear-relationship">Describing the Linear Relationship</h2>
@@ -284,23 +284,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>Homoscedasticity</strong>: The residuals are assumed to have constant variance across all levels of the predictor variable. This is also known as homogeneity of variance.</li>
 <li><strong>Normality</strong>: The residuals are assumed to be normally distributed. While perfect normality is not required, it suggests that the model is doing a good job of predicting the response.</li>
 </ul>
+<p>These can be generated in base r or using the <code>lindia</code> package. I’ll show code for both, but we will focus on the four main diagnostic plots in base R.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lm<span class="fl">.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="correlations-linear-models_files/figure-html/lm-assumptions-1.png" class="img-fluid" width="672"></p>
 </div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#alternatively can use diagnostics in the lindia package</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#library(lindia)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#gg_diagnose(lm.1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<section id="interpreting-these-model-plots" class="level4">
+<h4 class="anchored" data-anchor-id="interpreting-these-model-plots">Interpreting these Model Plots</h4>
+<ul>
+<li><strong>Residuals vs.&nbsp;Fitted Plot</strong> This plot helps detect non-linearity, unequal error variances, and outliers. <em>Linearity</em>: The residuals should “bounce randomly” around the horizontal line at y=0. If you see a pattern, it suggests non-linearity. <em>Equal Variance</em>: The vertical spread of residuals should be similar across the plot. A “horizontal band” indicates equal error variances. <em>Outliers</em>: Look for any points that stand out from the overall pattern.</li>
+<li><strong>Normal Q-Q Plot</strong> This plot checks if residuals are normally distributed. <em>Normal Distribution</em>: Points should fall approximately along the diagonal line. Significant deviations suggest non-normality. <em>Tails</em>: Pay attention to deviations at the ends of the line, which indicate issues with the tails of the distribution.</li>
+<li><strong>Scale-Location Plot</strong> This plot checks the assumption of equal variance (homoscedasticity). <em>Equal Variance</em>: Look for a horizontal line with randomly spread points. Any patterns or funneling suggest heteroscedasticity.</li>
+<li><strong>Residuals vs.&nbsp;Leverage Plot</strong> This plot helps identify influential observations. <em>Influential Points</em>: Look for any points falling outside Cook’s distance (usually marked by dashed lines). These are considered influential observations. <em>Leverage</em>: Points far to the right have high leverage, meaning they have a strong influence on the model coefficients.</li>
+</ul>
+</section>
+<section id="what-to-do-if-assumptions-are-not-met" class="level4">
+<h4 class="anchored" data-anchor-id="what-to-do-if-assumptions-are-not-met">What to Do if Assumptions are Not Met</h4>
+<ul>
+<li><strong>Linearity</strong>. Apply a non-linear transformation to the predictor or response variable (<em>e.g.</em>, log, square root, or polynomial terms). Add interaction terms or higher-order terms (<em>e.g.</em>, quadratic) to the model to account for non-linear relationships. Alternatively use a generalized additive model (GAM) or other non-linear modeling techniques.</li>
+<li><strong>Independence</strong> Check for omitted variables that might explain the correlation and include them in the model. For time-series data, use models like ARIMA or include lagged variables to account for autocorrelation. If independence is violated due to clustering or grouping, consider using mixed-effects models or hierarchical models.</li>
+<li><strong>Homoscedasticity (Constant Variance)</strong> Apply a log transformation or other variance-stabilizing transformations to the response variable. Use weighted least squares (WLS) regression, which assigns weights inversely proportional to the variance of residuals. Consider robust regression methods, such as those implemented in the robustbase package (lmrob).</li>
+<li><strong>Normality of Residuals</strong> Apply transformations (<em>e.g.</em>, log, square root) to the response variable if it is skewed. Use non-parametric regression methods that do not assume normality, such as quantile regression. If normality is violated due to outliers, investigate and either remove or down-weight their influence using robust regression techniques like least trimmed squares or MM-estimators.</li>
+</ul>
+</section>
 </section>
 </section>
 <section id="non_linear" class="level2">
 <h2 class="anchored" data-anchor-id="non_linear">Evaluating Non-Linear Relationships</h2>
-<p>Note perplexity.ai was used to help in generating this script</p>
+<p>TODO</p>
+<p>Note <a href="perplexity.ai">perplexity.ai</a> was used to help in generating this script</p>
 </section>
 <section id="session-information" class="level2">
 <h2 class="anchored" data-anchor-id="session-information">Session Information</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31)
 Platform: x86_64-apple-darwin20
