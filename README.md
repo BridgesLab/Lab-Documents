@@ -3,6 +3,7 @@ This repository contains publicly available documents regarding the Bridges Labo
 ## Statistics
 
 * [General Statistics](Experimental%20Policies/general-statistics.html)
+* [Correlations and Linear Models](Experimental%20Policies/correlations-linear-models.html)
 * [ANOVA Analyses and Simple Linear Models](Experimental%20Policies/anova-example.html)
 * [Power Analyses using pwr](Experimental%20Policies/Power%20Analysis/power-analysis.html)
 * [Introduction to Bayesian Data Analysis](Experimental%20Policies/bayesian-analyses.html)

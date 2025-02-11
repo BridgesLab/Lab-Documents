@@ -1,0 +1,90 @@
+---
+title: "Correlations and Linear Models"
+author: "Authors"
+date: "2025-02-10"
+editor: source
+format: 
+  html:
+    toc: true
+    toc-location: right
+    keep-md: true
+    code-fold: false
+    code-summary: "Show the code"
+  gfm:
+    html-math-method: webtex
+theme: journal
+execute:
+  echo: true
+  warning: false
+---
+
+Lets say you want to explore the relationship between two continuous variables.  Here we will cover how to explore, graph, and quantify these relationships.
+
+```{r dataset}
+# sets maize and blue color scheme
+color_scheme <- c("#00274c", "#ffcb05")
+
+library(tidyverse)
+library(moderndive)
+```
+
+We will use the `houseprices` dataset in the moderndive package.  It has data about a variety of factors about housing.  Here we will explore how the square feet of living space (`sqft_living`) relates to the `price`.
+
+## Visualizing a Relationship
+
+The best first thing to do is to make a plot looking at the two variables.  Here we will use ggplot, defining the x and y axis aesthetics, and adding both a linear and smoothed line (geom)
+
+```{r price-sqft-living}
+library(ggplot2)
+ggplot(house_prices,
+       aes(y=price,x=sqft_living)) +
+  geom_point(alpha=0.5) + #transparency of the points
+  geom_smooth(method="loess",color=color_scheme[2]) + #smoothed line
+  geom_smooth(method="lm",color=color_scheme[1]) + #linear relationship
+  theme_classic(base_size=16) #classic theme, and increasing the font size
+```
+This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maiz line) suggests it might be nonlinear below about 3000 square feet.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in @non_linear.
+
+## Describing the Linear Relationship
+
+In general there are two components to a relationship
+
+1. The slope estimate and its error, in this example how much does price increase per square foot of living space
+2. The linearity ($R^2$), or how much of the price is explained by square feet of living space.
+
+In both cases this can be solved with a linear model, and the results visualized with the `tidy` and `glance` functions from the `broom` package
+
+```{r linear-model}
+lm.1 <- lm(price~sqft_living,data=house_prices)
+library(broom) #for glance/tidy
+library(knitr) #for kable
+tidy(lm.1) %>% kable(caption="Estimates for the price/square foot relationship")
+glance(lm.1) %>% kable(caption="Model fit for the price/square food relationship")
+```
+
+As you can see from these tables, we estimate that the price increases by \$`r lm.1$coefficients['sqft_living']` $\pm$ `r summary(lm.1)$coefficients['sqft_living', "Std. Error"]` per square foot of living space.  This is a highly significant relationship (p=`r summary(lm.1)$coefficients['sqft_living', "Pr(>|t|)"]`).  The $R^2$ for this model is estimated at `r summary(lm.1)$r.squared`.
+
+### Testing the Assumptions of the Model
+
+For a linear model there are four assumptions
+
+* **Linearity**: The relationship between the predictor (x) and the outcome (y) is assumed to be linear. This means that for one unit change in the predictor, there is a constant change in the response.
+* **Independence**: The residuals (error terms) are assumed to be independent of each other. This means we cannot predict the size of a residual from another residual or from the value of a predictor variable.
+* **Homoscedasticity**: The residuals are assumed to have constant variance across all levels of the predictor variable. This is also known as homogeneity of variance.
+* **Normality**: The residuals are assumed to be normally distributed. While perfect normality is not required, it suggests that the model is doing a good job of predicting the response.
+
+
+```{r lm-assumptions}
+par(mfrow = c(2, 2))
+plot(lm.1)
+```
+
+## Evaluating Non-Linear Relationships {#non_linear}
+
+Note perplexity.ai was used to help in generating this script
+
+## Session Information
+
+```{r session-information}
+sessionInfo()
+```
