@@ -43,7 +43,7 @@ ggplot(house_prices,
   geom_smooth(method="lm",color=color_scheme[1]) + #linear relationship
   theme_classic(base_size=16) #classic theme, and increasing the font size
 ```
-This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maize line) suggests it might be nonlinear below about 3000 square feet.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in [Non-Linear Relationships](#non_linear).
+This appears to be an approximately linear relationship (blue line), though the smooth best fit curve (maize line) suggests it might be nonlinear and slightly upward sloping.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in [Non-Linear Relationships](#non_linear).
 
 ## Describing the Linear Relationship
 
@@ -108,13 +108,73 @@ sample(residuals(lm.1),5000,replace=F) %>% shapiro.test %>% tidy() %>% mutate(in
 * **Homoscedasticity (Constant Variance)**  Apply a log transformation or other variance-stabilizing transformations to the response variable.  Use weighted least squares (WLS) regression, which assigns weights inversely proportional to the variance of residuals.  Consider robust regression methods, such as those implemented in the robustbase package (lmrob).
 * **Normality of Residuals**  Apply transformations (*e.g.*, log, square root) to the response variable if it is skewed.  Use non-parametric regression methods that do not assume normality, such as quantile regression.  If normality is violated due to outliers, investigate and either remove or down-weight their influence using robust regression techniques like least trimmed squares or MM-estimators.
 
+## Bayesian Approach
+
+Lets say you want to take a Bayesian approach to this question, and dispense with null hypothesis significance testing (see [here for an introduction](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html)).  In this approach you would set a prior probablity, indexing what you would expect from this relationship then use a MCMC sampling method to estimate the $\beta$ coefficient and $R^2$ along with confidence intervals.  You can then derive a Bayes Factor and Posterior Probability of some hypothesis.  We will use the `brms` package for this.
+
+For our prior probability, I have a general sense of this relationship.  I could assign an uninformative flat prior (meaning the $\beta$ coefficient can be any value) but I did a quick AI query and came up with a plausible global estimate of \$1663/sq ft with a standard deviation of \$602.  Im also setting the family to Student's *t* distribution which is more robust to outliers due to its heavier tails (normal or gaussian distribution of residualsis the default).
+
+```{r brms-linear-regression}
+#| output: false
+library(brms)
+housing.priors <- prior(normal(1663,602), class=b, coef=sqft_living)
+brm.1 <- brm(price~sqft_living,
+                  data=house_prices,
+                  prior = housing.priors,
+                  family = student(),
+                  sample_prior = TRUE)
+```
+
+In summary, this is what we did:
+
+```{r linear-analysis}
+prior_summary(brm.1) %>% kable(caption="Prior summary for effects of square feet of living space on price")
+library(broom.mixed)
+tidy(brm.1) %>% kable(caption="Summary of model fit for price vs square feet of living space")
+
+plot(brm.1)
+hypothesis(brm.1, "sqft_living>0") # hypothesis testing for a positive relationship
+hypothesis(brm.1, "sqft_living=1663") # hypothesis testing that my prior is correct
+
+as_draws_df(brm.1) %>%
+  ggplot(aes(x=b_sqft_living)) +
+  geom_density(fill=color_scheme[2]) +
+  #geom_vline(xintercept=0,color=color_scheme[2],lty=2) +
+  labs(y="",
+       x="Living Space (square feet)",
+       title="Posterior probabilities") +
+  theme_classic(base_size=16)
+```
+
+This gives me an estimate of \$`r fixef(brm.1)['sqft_living','Estimate']` $\pm$ `r fixef(brm.1)['sqft_living','Est.Error']`, compared to the linear model approach which estimated `r lm.1$coefficients['sqft_living']` $\pm$ `r summary(lm.1)$coefficients['sqft_living', "Std. Error"]` per square foot of living space, so very similar results. We also get a very similar value for $R^2$
+
+```{r r2-calculations}
+kable(bayes_R2(brm.1),caption="Estimates for R2 between price and square feet of living space")
+r2.probs <- bayes_R2(brm.1, summary=F) #summary false is to get the posterior probabilities
+ggplot(data=r2.probs, aes(x=R2)) +
+  geom_density(fill=color_scheme[2]) +
+  #geom_vline(xintercept=0,color=color_scheme[1],lty=2) +
+  labs(y="",
+       x="R2",
+       title="Posterior probabilities") +
+  #lims(x=c(0,1)) +
+  theme_classic(base_size=16)
+```
+This approach has several advantages, including allowing for more robust handling of outliers and heteroscedasticity (due to using the Student's *t* distribution).  This allows for more robust posterior predictions.  This is probably why the estimates of the relationship are somewhat attenuated (because there are several influential high price/high square foot data points).
+
+The linearity concerns may still remain in this approach.  We can evaluate this with a posterior probability check.  It shows again that when plotting the observed ($y$) and the predicted ($y_{rep}$) values, they tend to lift off the line as $y$ increases, so the relationship is nonlinear and slightly exponential in nature.
+
+```{r brms-pp-check}
+pp_check(brm.1, type = "scatter_avg")
+pp_check(brm.1, type = "dens_overlay")
+```
 ## Evaluating Non-Linear Relationships {#non_linear}
 
 TODO
 
-Note [perplexity.ai](perplexity.ai) was used to help in generating this script
-
 ## Session Information
+
+This script used [perplexity.ai](perplexity.ai) to help with its design and interpretation.
 
 ```{r session-information}
 sessionInfo()

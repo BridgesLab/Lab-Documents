@@ -59,7 +59,7 @@ ggplot(house_prices,
 :::
 :::
 
-This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maize line) suggests it might be nonlinear below about 3000 square feet.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in [Non-Linear Relationships](#non_linear).
+This appears to be an approximately linear relationship (blue line), though the smooth best fit curve (maize line) suggests it might be nonlinear and slightly upward sloping.  For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in [Non-Linear Relationships](#non_linear).
 
 ## Describing the Linear Relationship
 
@@ -162,9 +162,9 @@ Table: Shapiro-Wilk Tests for Variables and Residuals
 
 |input       | statistic|      p.value|method                      |
 |:-----------|---------:|------------:|:---------------------------|
-|prices      |     0.759| 3.605339e-65|Shapiro-Wilk normality test |
-|sqft_living |     0.924| 1.293608e-44|Shapiro-Wilk normality test |
-|redisuals   |     0.831| 1.877965e-58|Shapiro-Wilk normality test |
+|prices      |     0.739| 1.016735e-66|Shapiro-Wilk normality test |
+|sqft_living |     0.909| 1.358138e-47|Shapiro-Wilk normality test |
+|redisuals   |     0.818| 7.172625e-60|Shapiro-Wilk normality test |
 :::
 :::
 
@@ -176,13 +176,193 @@ Table: Shapiro-Wilk Tests for Variables and Residuals
 * **Homoscedasticity (Constant Variance)**  Apply a log transformation or other variance-stabilizing transformations to the response variable.  Use weighted least squares (WLS) regression, which assigns weights inversely proportional to the variance of residuals.  Consider robust regression methods, such as those implemented in the robustbase package (lmrob).
 * **Normality of Residuals**  Apply transformations (*e.g.*, log, square root) to the response variable if it is skewed.  Use non-parametric regression methods that do not assume normality, such as quantile regression.  If normality is violated due to outliers, investigate and either remove or down-weight their influence using robust regression techniques like least trimmed squares or MM-estimators.
 
+## Bayesian Approach
+
+Lets say you want to take a Bayesian approach to this question, and dispense with null hypothesis significance testing (see [here for an introduction](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html)).  In this approach you would set a prior probablity, indexing what you would expect from this relationship then use a MCMC sampling method to estimate the $\beta$ coefficient and $R^2$ along with confidence intervals.  You can then derive a Bayes Factor and Posterior Probability of some hypothesis.  We will use the `brms` package for this.
+
+For our prior probability, I have a general sense of this relationship.  I could assign an uninformative flat prior (meaning the $\beta$ coefficient can be any value) but I did a quick AI query and came up with a plausible global estimate of \$1663/sq ft with a standard deviation of \$602.  Im also setting the family to Student's *t* distribution which is more robust to outliers due to its heavier tails (normal or gaussian distribution of residualsis the default).
+
+
+::: {.cell}
+
+```{.r .cell-code}
+library(brms)
+housing.priors <- prior(normal(1663,602), class=b, coef=sqft_living)
+brm.1 <- brm(price~sqft_living,
+                  data=house_prices,
+                  prior = housing.priors,
+                  family = student(),
+                  sample_prior = TRUE)
+```
+:::
+
+
+In summary, this is what we did:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+prior_summary(brm.1) %>% kable(caption="Prior summary for effects of square feet of living space on price")
+```
+
+::: {.cell-output-display}
+Table: Prior summary for effects of square feet of living space on price
+
+|prior                        |class     |coef        |group |resp |dpar |nlpar |lb |ub |source  |
+|:----------------------------|:---------|:-----------|:-----|:----|:----|:-----|:--|:--|:-------|
+|                             |b         |            |      |     |     |      |   |   |default |
+|normal(1663, 602)            |b         |sqft_living |      |     |     |      |   |   |user    |
+|student_t(3, 450000, 222390) |Intercept |            |      |     |     |      |   |   |default |
+|gamma(2, 0.1)                |nu        |            |      |     |     |      |1  |   |default |
+|student_t(3, 0, 222390)      |sigma     |            |      |     |     |      |0  |   |default |
+:::
+
+```{.r .cell-code}
+library(broom.mixed)
+tidy(brm.1) %>% kable(caption="Summary of model fit for price vs square feet of living space")
+```
+
+::: {.cell-output-display}
+Table: Summary of model fit for price vs square feet of living space
+
+|effect   |component |group    |term                           |   estimate|    std.error|    conf.low|   conf.high|
+|:--------|:---------|:--------|:------------------------------|----------:|------------:|-----------:|-----------:|
+|fixed    |cond      |NA       |(Intercept)                    |  78680.667| 3.137489e+03|  72542.5723|  84686.1084|
+|fixed    |cond      |NA       |sqft_living                    |    201.072| 1.563087e+00|    198.0120|    204.1136|
+|fixed    |cond      |NA       |sigma                          | 145400.993| 1.201075e+03| 143090.5328| 147743.0192|
+|ran_pars |cond      |Residual |sd__Observation                |   1665.013| 6.032739e+02|    530.5786|   2843.0668|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma | 255182.674| 2.980049e+05|   7987.6953| 967846.2853|
+:::
+
+```{.r .cell-code}
+plot(brm.1)
+```
+
+::: {.cell-output-display}
+![](correlations-linear-models_files/figure-html/linear-analysis-1.png){width=672}
+:::
+
+```{.r .cell-code}
+hypothesis(brm.1, "sqft_living>0") # hypothesis testing for a positive relationship
+```
+
+::: {.cell-output .cell-output-stdout}
+```
+Hypothesis Tests for class b:
+         Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob
+1 (sqft_living) > 0   201.07      1.56   198.48   203.63        Inf         1
+  Star
+1    *
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+:::
+
+```{.r .cell-code}
+hypothesis(brm.1, "sqft_living=1663") # hypothesis testing that my prior is correct
+```
+
+::: {.cell-output .cell-output-stdout}
+```
+Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (sqft_living)-(1663) = 0 -1461.93      1.56 -1464.99 -1458.89          0
+  Post.Prob Star
+1         0    *
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+:::
+
+```{.r .cell-code}
+as_draws_df(brm.1) %>%
+  ggplot(aes(x=b_sqft_living)) +
+  geom_density(fill=color_scheme[2]) +
+  #geom_vline(xintercept=0,color=color_scheme[2],lty=2) +
+  labs(y="",
+       x="Living Space (square feet)",
+       title="Posterior probabilities") +
+  theme_classic(base_size=16)
+```
+
+::: {.cell-output-display}
+![](correlations-linear-models_files/figure-html/linear-analysis-2.png){width=672}
+:::
+:::
+
+
+This gives me an estimate of \$201.0720219 $\pm$ 1.5630874, compared to the linear model approach which estimated 280.6235679 $\pm$ 1.9363986 per square foot of living space, so very similar results. We also get a very similar value for $R^2$
+
+
+::: {.cell}
+
+```{.r .cell-code}
+kable(bayes_R2(brm.1),caption="Estimates for R2 between price and square feet of living space")
+```
+
+::: {.cell-output-display}
+Table: Estimates for R2 between price and square feet of living space
+
+|   |  Estimate| Est.Error|      Q2.5|     Q97.5|
+|:--|---------:|---------:|---------:|---------:|
+|R2 | 0.3163687| 0.0039779| 0.3085678| 0.3240956|
+:::
+
+```{.r .cell-code}
+r2.probs <- bayes_R2(brm.1, summary=F) #summary false is to get the posterior probabilities
+ggplot(data=r2.probs, aes(x=R2)) +
+  geom_density(fill=color_scheme[2]) +
+  #geom_vline(xintercept=0,color=color_scheme[1],lty=2) +
+  labs(y="",
+       x="R2",
+       title="Posterior probabilities") +
+  #lims(x=c(0,1)) +
+  theme_classic(base_size=16)
+```
+
+::: {.cell-output-display}
+![](correlations-linear-models_files/figure-html/r2-calculations-1.png){width=672}
+:::
+:::
+
+This approach has several advantages, including allowing for more robust handling of outliers and heteroscedasticity (due to using the Student's *t* distribution).  This allows for more robust posterior predictions.  This is probably why the estimates of the relationship are somewhat attenuated (because there are several influential high price/high square foot data points).
+
+The linearity concerns may still remain in this approach.  We can evaluate this with a posterior probability check.  It shows again that when plotting the observed ($y$) and the predicted ($y_{rep}$) values, they tend to lift off the line as $y$ increases, so the relationship is nonlinear and slightly exponential in nature.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+pp_check(brm.1, type = "scatter_avg")
+```
+
+::: {.cell-output-display}
+![](correlations-linear-models_files/figure-html/brms-pp-check-1.png){width=672}
+:::
+
+```{.r .cell-code}
+pp_check(brm.1, type = "dens_overlay")
+```
+
+::: {.cell-output-display}
+![](correlations-linear-models_files/figure-html/brms-pp-check-2.png){width=672}
+:::
+:::
+
 ## Evaluating Non-Linear Relationships {#non_linear}
 
 TODO
 
-Note [perplexity.ai](perplexity.ai) was used to help in generating this script
-
 ## Session Information
+
+This script used [perplexity.ai](perplexity.ai) to help with its design and interpretation.
 
 
 ::: {.cell}
@@ -211,28 +391,41 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] knitr_1.49       broom_1.0.7      moderndive_0.7.0 lubridate_1.9.4 
- [5] forcats_1.0.0    stringr_1.5.1    dplyr_1.1.4      purrr_1.0.2     
- [9] readr_2.1.5      tidyr_1.3.1      tibble_3.2.1     ggplot2_3.5.1   
-[13] tidyverse_2.0.0 
+ [1] broom.mixed_0.2.9.6 brms_2.22.0         Rcpp_1.0.14        
+ [4] knitr_1.49          broom_1.0.7         moderndive_0.7.0   
+ [7] lubridate_1.9.4     forcats_1.0.0       stringr_1.5.1      
+[10] dplyr_1.1.4         purrr_1.0.2         readr_2.1.5        
+[13] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
+[16] tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] generics_0.1.3       lattice_0.22-6       stringi_1.8.4       
- [4] hms_1.1.3            digest_0.6.37        magrittr_2.0.3      
- [7] evaluate_1.0.3       grid_4.4.2           timechange_0.3.0    
-[10] fastmap_1.2.0        Matrix_1.7-1         operator.tools_1.6.3
-[13] jsonlite_1.8.9       backports_1.5.0      mgcv_1.9-1          
-[16] scales_1.3.0         infer_1.0.7          cli_3.6.3           
-[19] rlang_1.1.4          munsell_0.5.1        splines_4.4.2       
-[22] withr_3.0.2          yaml_2.3.10          tools_4.4.2         
-[25] tzdb_0.4.0           colorspace_2.1-1     vctrs_0.6.5         
-[28] R6_2.5.1             lifecycle_1.0.4      snakecase_0.11.1    
-[31] htmlwidgets_1.6.4    janitor_2.2.1        pkgconfig_2.0.3     
-[34] pillar_1.10.1        gtable_0.3.6         glue_1.8.0          
-[37] xfun_0.50            tidyselect_1.2.1     rstudioapi_0.17.1   
-[40] farver_2.1.2         htmltools_0.5.8.1    nlme_3.1-166        
-[43] labeling_0.4.3       rmarkdown_2.29       formula.tools_1.7.1 
-[46] compiler_4.4.2      
+ [1] tidyselect_1.2.1     farver_2.1.2         loo_2.8.0           
+ [4] fastmap_1.2.0        tensorA_0.36.2.1     janitor_2.2.1       
+ [7] digest_0.6.37        timechange_0.3.0     lifecycle_1.0.4     
+[10] StanHeaders_2.32.10  processx_3.8.5       magrittr_2.0.3      
+[13] posterior_1.6.0      compiler_4.4.2       rlang_1.1.4         
+[16] tools_4.4.2          yaml_2.3.10          labeling_0.4.3      
+[19] bridgesampling_1.1-2 htmlwidgets_1.6.4    pkgbuild_1.4.5      
+[22] plyr_1.8.9           abind_1.4-8          withr_3.0.2         
+[25] grid_4.4.2           stats4_4.4.2         future_1.34.0       
+[28] colorspace_2.1-1     inline_0.3.21        globals_0.16.3      
+[31] scales_1.3.0         cli_3.6.3            mvtnorm_1.3-3       
+[34] rmarkdown_2.29       generics_0.1.3       RcppParallel_5.1.9  
+[37] rstudioapi_0.17.1    reshape2_1.4.4       tzdb_0.4.0          
+[40] rstan_2.32.6         operator.tools_1.6.3 splines_4.4.2       
+[43] bayesplot_1.11.1     parallel_4.4.2       infer_1.0.7         
+[46] matrixStats_1.5.0    vctrs_0.6.5          Matrix_1.7-1        
+[49] jsonlite_1.8.9       callr_3.7.6          hms_1.1.3           
+[52] listenv_0.9.1        parallelly_1.41.0    glue_1.8.0          
+[55] codetools_0.2-20     ps_1.8.1             distributional_0.5.0
+[58] stringi_1.8.4        gtable_0.3.6         QuickJSR_1.5.1      
+[61] munsell_0.5.1        furrr_0.3.1          pillar_1.10.1       
+[64] htmltools_0.5.8.1    Brobdingnag_1.2-9    R6_2.5.1            
+[67] formula.tools_1.7.1  evaluate_1.0.3       lattice_0.22-6      
+[70] backports_1.5.0      snakecase_0.11.1     rstantools_2.4.0    
+[73] coda_0.19-4.1        gridExtra_2.3        nlme_3.1-166        
+[76] checkmate_2.3.2      mgcv_1.9-1           xfun_0.50           
+[79] pkgconfig_2.0.3     
 ```
 :::
 :::

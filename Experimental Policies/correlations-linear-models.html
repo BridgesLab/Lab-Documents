@@ -116,6 +116,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul class="collapse">
   <li><a href="#testing-the-assumptions-of-the-model" id="toc-testing-the-assumptions-of-the-model" class="nav-link" data-scroll-target="#testing-the-assumptions-of-the-model">Testing the Assumptions of the Model</a></li>
   </ul></li>
+  <li><a href="#bayesian-approach" id="toc-bayesian-approach" class="nav-link" data-scroll-target="#bayesian-approach">Bayesian Approach</a></li>
   <li><a href="#non_linear" id="toc-non_linear" class="nav-link" data-scroll-target="#non_linear">Evaluating Non-Linear Relationships</a></li>
   <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
   </ul>
@@ -176,7 +177,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="correlations-linear-models_files/figure-html/price-sqft-living-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>This appears to be an approximately linear relationship (blue line), though th smooth best fit curve (maize line) suggests it might be nonlinear below about 3000 square feet. For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in <a href="#non_linear">Non-Linear Relationships</a>.</p>
+<p>This appears to be an approximately linear relationship (blue line), though the smooth best fit curve (maize line) suggests it might be nonlinear and slightly upward sloping. For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in <a href="#non_linear">Non-Linear Relationships</a>.</p>
 </section>
 <section id="describing-the-linear-relationship" class="level2">
 <h2 class="anchored" data-anchor-id="describing-the-linear-relationship">Describing the Linear Relationship</h2>
@@ -325,20 +326,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">prices</td>
-<td style="text-align: right;">0.759</td>
-<td style="text-align: right;">3.605339e-65</td>
+<td style="text-align: right;">0.739</td>
+<td style="text-align: right;">1.016735e-66</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">sqft_living</td>
-<td style="text-align: right;">0.924</td>
-<td style="text-align: right;">1.293608e-44</td>
+<td style="text-align: right;">0.909</td>
+<td style="text-align: right;">1.358138e-47</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">redisuals</td>
-<td style="text-align: right;">0.831</td>
-<td style="text-align: right;">1.877965e-58</td>
+<td style="text-align: right;">0.818</td>
+<td style="text-align: right;">7.172625e-60</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 </tbody>
@@ -357,15 +358,299 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 </section>
 </section>
+<section id="bayesian-approach" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
+<p>Lets say you want to take a Bayesian approach to this question, and dispense with null hypothesis significance testing (see <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html">here for an introduction</a>). In this approach you would set a prior probablity, indexing what you would expect from this relationship then use a MCMC sampling method to estimate the <span class="math inline">\(\beta\)</span> coefficient and <span class="math inline">\(R^2\)</span> along with confidence intervals. You can then derive a Bayes Factor and Posterior Probability of some hypothesis. We will use the <code>brms</code> package for this.</p>
+<p>For our prior probability, I have a general sense of this relationship. I could assign an uninformative flat prior (meaning the <span class="math inline">\(\beta\)</span> coefficient can be any value) but I did a quick AI query and came up with a plausible global estimate of $1663/sq ft with a standard deviation of $602. Im also setting the family to Student’s <em>t</em> distribution which is more robust to outliers due to its heavier tails (normal or gaussian distribution of residualsis the default).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>housing.priors <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">1663</span>,<span class="dv">602</span>), <span class="at">class=</span>b, <span class="at">coef=</span>sqft_living)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>brm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">brm</span>(price<span class="sc">~</span>sqft_living,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>house_prices,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prior =</span> housing.priors,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">family =</span> <span class="fu">student</span>(),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In summary, this is what we did:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of square feet of living space on price"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Prior summary for effects of square feet of living space on price</caption>
+<colgroup>
+<col style="width: 33%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 6%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">prior</th>
+<th style="text-align: left;">class</th>
+<th style="text-align: left;">coef</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">resp</th>
+<th style="text-align: left;">dpar</th>
+<th style="text-align: left;">nlpar</th>
+<th style="text-align: left;">lb</th>
+<th style="text-align: left;">ub</th>
+<th style="text-align: left;">source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal(1663, 602)</td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">sqft_living</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">user</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">student_t(3, 450000, 222390)</td>
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gamma(2, 0.1)</td>
+<td style="text-align: left;">nu</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">student_t(3, 0, 222390)</td>
+<td style="text-align: left;">sigma</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for price vs square feet of living space"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Summary of model fit for price vs square feet of living space</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 28%">
+<col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">78680.667</td>
+<td style="text-align: right;">3.137489e+03</td>
+<td style="text-align: right;">72542.5723</td>
+<td style="text-align: right;">84686.1084</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">sqft_living</td>
+<td style="text-align: right;">201.072</td>
+<td style="text-align: right;">1.563087e+00</td>
+<td style="text-align: right;">198.0120</td>
+<td style="text-align: right;">204.1136</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">sigma</td>
+<td style="text-align: right;">145400.993</td>
+<td style="text-align: right;">1.201075e+03</td>
+<td style="text-align: right;">143090.5328</td>
+<td style="text-align: right;">147743.0192</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">1665.013</td>
+<td style="text-align: right;">6.032739e+02</td>
+<td style="text-align: right;">530.5786</td>
+<td style="text-align: right;">2843.0668</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">255182.674</td>
+<td style="text-align: right;">2.980049e+05</td>
+<td style="text-align: right;">7987.6953</td>
+<td style="text-align: right;">967846.2853</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(brm<span class="fl">.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="correlations-linear-models_files/figure-html/linear-analysis-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living&gt;0"</span>) <span class="co"># hypothesis testing for a positive relationship</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hypothesis Tests for class b:
+         Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob
+1 (sqft_living) &gt; 0   201.07      1.56   198.48   203.63        Inf         1
+  Star
+1    *
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living=1663"</span>) <span class="co"># hypothesis testing that my prior is correct</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (sqft_living)-(1663) = 0 -1461.93      1.56 -1464.99 -1458.89          0
+  Post.Prob Star
+1         0    *
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_sqft_living)) <span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_vline(xintercept=0,color=color_scheme[2],lty=2) +</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Living Space (square feet)"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="correlations-linear-models_files/figure-html/linear-analysis-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This gives me an estimate of $201.0720219 <span class="math inline">\(\pm\)</span> 1.5630874, compared to the linear model approach which estimated 280.6235679 <span class="math inline">\(\pm\)</span> 1.9363986 per square foot of living space, so very similar results. We also get a very similar value for <span class="math inline">\(R^2\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>),<span class="at">caption=</span><span class="st">"Estimates for R2 between price and square feet of living space"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Estimates for R2 between price and square feet of living space</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Est.Error</th>
+<th style="text-align: right;">Q2.5</th>
+<th style="text-align: right;">Q97.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">R2</td>
+<td style="text-align: right;">0.3163687</td>
+<td style="text-align: right;">0.0039779</td>
+<td style="text-align: right;">0.3085678</td>
+<td style="text-align: right;">0.3240956</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>r2.probs <span class="ot">&lt;-</span> <span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>, <span class="at">summary=</span>F) <span class="co">#summary false is to get the posterior probabilities</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>r2.probs, <span class="fu">aes</span>(<span class="at">x=</span>R2)) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_vline(xintercept=0,color=color_scheme[1],lty=2) +</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"R2"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#lims(x=c(0,1)) +</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="correlations-linear-models_files/figure-html/r2-calculations-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This approach has several advantages, including allowing for more robust handling of outliers and heteroscedasticity (due to using the Student’s <em>t</em> distribution). This allows for more robust posterior predictions. This is probably why the estimates of the relationship are somewhat attenuated (because there are several influential high price/high square foot data points).</p>
+<p>The linearity concerns may still remain in this approach. We can evaluate this with a posterior probability check. It shows again that when plotting the observed (<span class="math inline">\(y\)</span>) and the predicted (<span class="math inline">\(y_{rep}\)</span>) values, they tend to lift off the line as <span class="math inline">\(y\)</span> increases, so the relationship is nonlinear and slightly exponential in nature.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"scatter_avg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="correlations-linear-models_files/figure-html/brms-pp-check-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"dens_overlay"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="correlations-linear-models_files/figure-html/brms-pp-check-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
 <section id="non_linear" class="level2">
 <h2 class="anchored" data-anchor-id="non_linear">Evaluating Non-Linear Relationships</h2>
 <p>TODO</p>
-<p>Note <a href="perplexity.ai">perplexity.ai</a> was used to help in generating this script</p>
 </section>
 <section id="session-information" class="level2">
 <h2 class="anchored" data-anchor-id="session-information">Session Information</h2>
+<p>This script used <a href="perplexity.ai">perplexity.ai</a> to help with its design and interpretation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31)
 Platform: x86_64-apple-darwin20
@@ -385,28 +670,41 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] knitr_1.49       broom_1.0.7      moderndive_0.7.0 lubridate_1.9.4 
- [5] forcats_1.0.0    stringr_1.5.1    dplyr_1.1.4      purrr_1.0.2     
- [9] readr_2.1.5      tidyr_1.3.1      tibble_3.2.1     ggplot2_3.5.1   
-[13] tidyverse_2.0.0 
+ [1] broom.mixed_0.2.9.6 brms_2.22.0         Rcpp_1.0.14        
+ [4] knitr_1.49          broom_1.0.7         moderndive_0.7.0   
+ [7] lubridate_1.9.4     forcats_1.0.0       stringr_1.5.1      
+[10] dplyr_1.1.4         purrr_1.0.2         readr_2.1.5        
+[13] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
+[16] tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] generics_0.1.3       lattice_0.22-6       stringi_1.8.4       
- [4] hms_1.1.3            digest_0.6.37        magrittr_2.0.3      
- [7] evaluate_1.0.3       grid_4.4.2           timechange_0.3.0    
-[10] fastmap_1.2.0        Matrix_1.7-1         operator.tools_1.6.3
-[13] jsonlite_1.8.9       backports_1.5.0      mgcv_1.9-1          
-[16] scales_1.3.0         infer_1.0.7          cli_3.6.3           
-[19] rlang_1.1.4          munsell_0.5.1        splines_4.4.2       
-[22] withr_3.0.2          yaml_2.3.10          tools_4.4.2         
-[25] tzdb_0.4.0           colorspace_2.1-1     vctrs_0.6.5         
-[28] R6_2.5.1             lifecycle_1.0.4      snakecase_0.11.1    
-[31] htmlwidgets_1.6.4    janitor_2.2.1        pkgconfig_2.0.3     
-[34] pillar_1.10.1        gtable_0.3.6         glue_1.8.0          
-[37] xfun_0.50            tidyselect_1.2.1     rstudioapi_0.17.1   
-[40] farver_2.1.2         htmltools_0.5.8.1    nlme_3.1-166        
-[43] labeling_0.4.3       rmarkdown_2.29       formula.tools_1.7.1 
-[46] compiler_4.4.2      </code></pre>
+ [1] tidyselect_1.2.1     farver_2.1.2         loo_2.8.0           
+ [4] fastmap_1.2.0        tensorA_0.36.2.1     janitor_2.2.1       
+ [7] digest_0.6.37        timechange_0.3.0     lifecycle_1.0.4     
+[10] StanHeaders_2.32.10  processx_3.8.5       magrittr_2.0.3      
+[13] posterior_1.6.0      compiler_4.4.2       rlang_1.1.4         
+[16] tools_4.4.2          yaml_2.3.10          labeling_0.4.3      
+[19] bridgesampling_1.1-2 htmlwidgets_1.6.4    pkgbuild_1.4.5      
+[22] plyr_1.8.9           abind_1.4-8          withr_3.0.2         
+[25] grid_4.4.2           stats4_4.4.2         future_1.34.0       
+[28] colorspace_2.1-1     inline_0.3.21        globals_0.16.3      
+[31] scales_1.3.0         cli_3.6.3            mvtnorm_1.3-3       
+[34] rmarkdown_2.29       generics_0.1.3       RcppParallel_5.1.9  
+[37] rstudioapi_0.17.1    reshape2_1.4.4       tzdb_0.4.0          
+[40] rstan_2.32.6         operator.tools_1.6.3 splines_4.4.2       
+[43] bayesplot_1.11.1     parallel_4.4.2       infer_1.0.7         
+[46] matrixStats_1.5.0    vctrs_0.6.5          Matrix_1.7-1        
+[49] jsonlite_1.8.9       callr_3.7.6          hms_1.1.3           
+[52] listenv_0.9.1        parallelly_1.41.0    glue_1.8.0          
+[55] codetools_0.2-20     ps_1.8.1             distributional_0.5.0
+[58] stringi_1.8.4        gtable_0.3.6         QuickJSR_1.5.1      
+[61] munsell_0.5.1        furrr_0.3.1          pillar_1.10.1       
+[64] htmltools_0.5.8.1    Brobdingnag_1.2-9    R6_2.5.1            
+[67] formula.tools_1.7.1  evaluate_1.0.3       lattice_0.22-6      
+[70] backports_1.5.0      snakecase_0.11.1     rstantools_2.4.0    
+[73] coda_0.19-4.1        gridExtra_2.3        nlme_3.1-166        
+[76] checkmate_2.3.2      mgcv_1.9-1           xfun_0.50           
+[79] pkgconfig_2.0.3     </code></pre>
 </div>
 </div>
 </section>
