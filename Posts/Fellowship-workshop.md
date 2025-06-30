@@ -4,7 +4,7 @@ With the support of the [Elizabeth Weiser Caswell Diabetes Institute](https://di
 
 The structure of the workshop is such that documents will be read once, and reviewed again once within the 6 weeks
 
-![Schematic of Fellowship Writing Timeline](!https://bridgeslab.github.io/FellowshipWorkshopDocuments/Documents/Images/Workshop%20Timeline.png)
+![Schematic of Fellowship Writing Timeline](https://bridgeslab.github.io/FellowshipWorkshopDocuments/Documents/Images/Workshop%20Timeline.png)
 
 As of 2026 the Fellowship documents have been updated.  [Here is my summary](https://bridgeslab.github.io/FellowshipWorkshopDocuments/Documents/F31_PAF_Comparason.html) of what has changed with the new review criteria and change in forms
 
