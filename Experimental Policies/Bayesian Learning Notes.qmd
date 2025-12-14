@@ -1,0 +1,132 @@
+---
+title: "Notes while learning Bayesian inference"
+author: "Dave Bridges"
+date: "2025-12-13"
+editor: source
+format: 
+  html:
+    toc: true
+    toc-location: right
+    keep-md: true
+    code-fold: true
+    code-summary: "Show the code"
+    fig-path: "figures/"
+theme: journal
+bibliography: references.bib
+execute:
+  echo: true
+  warning: false
+---
+
+```{r global_options}
+# hide this code chunk
+#| echo: false
+#| message: false
+
+# defines the se function
+se <- function(x) {
+  sd(x, na.rm = TRUE) / sqrt(length(x))
+}
+
+#load these packages, nearly always needed
+library(tidyverse)
+library(knitr)
+
+# sets maize and blue color scheme
+color_scheme <- c("#00274c", "#ffcb05")
+```
+
+## Purpose
+
+These are notes as I work through and understand the notes from BIOSTAT 682
+
+### Lecture 2: Single Parameter Models
+
+The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people.  The question is whether this incidence is greater than the expected incidence of 4.458% from [@CancerStatisticsNCI2015]
+
+Using the binomial distribution probability mass function for a binomial distribution
+
+$$P(Y = y | n, \theta) = \binom{n}{y} \theta^y (1 - \theta)^{n-y}$$
+In this nomenclature $\binom{n}{y}$ expands out to $\frac{n!}{y! \times (1-y)!}$ where $y$ is the number of successes, $n$ is the number of trials.  In the overall cuntion $\theta$ is the probability of success on each trial.  
+
+
+This can also be denoted as $Y \sim \text{Binomial}(n, \theta)$ where $n$ is the number of trials and $\theta$ is the probability of success on each trial, Using this we can calculate the likelihood of observing 8 or more cancers out of 145 people given the expected incidence rate of 4.44% and some other probabilities
+
+The hypothesis being tested are that:
+
+- $H_A: \theta = 0.03$
+- $H_B: \theta = 0.04$ 
+- $H_C: \theta = 0.05$
+- $H_D: \theta = 0.06$
+
+
+In terms of prior probabilities, we can assign prior probabilities to each of the hypotheses above.  If we think that $H1$ is 50% likely, and $H_{A-D}$ are equally likely after that.
+
+Likelihoods are calculated from the probability mass function for the binomal function $Y \sim \text{Binomial}(n, \theta)$ 
+
+ can be calculated for each tested hypothesis ($H_x$ in comparason to all possible hypotheses $Hi$) via $P(H_x \mid y_o = 8) = \frac{P(H_x) \times, P(y_o = 8 \mid H_x)}{\sum_{i=A}^{D} P(H_i) \times, P(y_o = 8 \mid H_i)}$.  In simplified terms this is the prior probability of the hypothesis, times its likelihood divided by the sum of all prior probabilities times their likelihoods.
+
+```{r lecture-2-cancer}
+n <- 145
+cases <- 8
+theta <- c(0.03, 0.04, 0.05, 0.06)
+priors <- c(0.5, rep(0.5/3,3))
+
+data.frame(hypothesis = theta,
+           priors=priors) |>
+  mutate(likelihood = dbinom(cases, size = n, prob = hypothesis)) |> #this does not give the same results as the notes probably an approximation
+  mutate(rel.likelihood = likelihood / min(likelihood)) |>
+  mutate(posterior = priors * likelihood / sum(priors * likelihood)) |>
+  kable(caption=paste0("Probability of observing ", cases, " cases out of ",n, " trials"),
+        digits=c(3,3,2))
+
+#this does not give the same results as the notes
+```
+
+This means that hypotheses 4 and 5 explain the data approximately the same times better than hypothesis 1.
+
+There is an articulation of the *Likelihood Principal*: once $Y$ has been observed we now note it as $Y = y_o$ , and no other value of Y matters. We should treat as $L(\theta|y_o) = Pr(Y = y_o | \theta)$ as the only likelihood function of $\theta$ and no other aspects of the experiment or data matter for inference.
+
+What if the prior probabilities are continuous, if we model them as $\theta = Beta(\alpha,\beta)$.  The density of this prior is given by:
+
+$$ \pi(\theta \mid \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} \theta^{\alpha - 1} (1 - \theta)^{\beta - 1} $$
+
+In this case $\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)}$ is a normalizing factor that ensures probabilities intgrate to one and exist between zero and one.
+
+The posterior density is therefore proprotional to to the prior times the likelihood $\pi(\theta \mid y) \propto \pi(\theta) \times p(y \mid \theta)$.  This expands out to this $\pi(\theta \mid y) \propto \theta^{\alpha - 1} (1 - \theta)^{\beta - 1} \times \theta^y (1 - \theta)^{n - y}$ droppping the constants for now.  By combining the exponents we get $\pi(\theta \mid y) \propto \theta^{(\alpha + y) - 1} (1 - \theta)^{( \beta + n - y) - 1}$.  This is the kernel (un-normalized density) of a Beta distribution with updated parameters $\alpha' = \alpha + y, \quad \beta' = \beta + n - y$
+
+To get the proper density, we need to insert the Beta normalizing constant with the new parameters $\pi(\theta \mid y) = \frac{\Gamma(\alpha + y + \beta + n - y)}{\Gamma(\alpha + y)\Gamma(\beta + n - y)} \theta^{\alpha + y - 1} (1 - \theta)^{\beta + n - y - 1}$ which simplifies to
+$\theta \mid y \sim \operatorname{Beta}(y + \alpha, \, n - y + \beta)$.  This is the posterior probability distribution.
+
+To calculate the mean and variance, for any $\operatorname{Beta}(a, b)$ random variable:$\mathbb{E}[\theta] = \frac{a}{a + b}, \quad \operatorname{Var}(\theta) = \frac{ab}{(a + b)^2 (a + b + 1)}$ we can plug in $a = y + \alpha$, $b = n - y + \beta$: $\mathbb{E}[\theta \mid y] = \frac{y + \alpha}{n + \alpha + \beta}$ (this is a weighted average between the observed proportion $y/n$ and the prior “pseudo-mean” $\alpha/(\alpha + \beta)$, with more weight on the data when n is large) $\operatorname{Var}(\theta \mid y) = \frac{(y + \alpha)(n - y + \beta)}{(n + \alpha + \beta)^2 (n + \alpha + \beta + 1)}$
+
+To summarize if our priors are $Beta(\alpha, \beta)$ then $P(\theta|Y=8)=y ∼ Beta(y + α, n − y + β)$
+
+
+```{r lecture-2-continuous-prior}
+alpha <- 2
+beta <- 10
+range <- seq(0,1,by=0.1)
+likelihood <- pbeta(range,shape1=alpha,shape2=beta)
+data.beta <- data.frame(range=range,
+                        likelihood=likelihood)
+
+ggplot(data.beta,aes(y=likelihood,x=range)) +
+  geom_line() +
+  labs(title=paste0("Prior Distribution - Beta(",alpha,",",beta,")"),
+       x="Value",
+       y="Likelihood") +
+  theme_classic(base_size=16)
+
+```
+
+## References
+
+::: {#refs}
+:::
+
+## Session Information
+
+```{r session-information}
+sessionInfo()
+```
