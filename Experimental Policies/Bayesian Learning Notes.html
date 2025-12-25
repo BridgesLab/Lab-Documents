@@ -279,30 +279,43 @@ window.Quarto = {
 </details>
 </div>
 <p>This means that hypotheses 4 and 5 explain the data approximately the same times better than hypothesis 1.</p>
+<section id="the-likilihood-principal" class="level4">
+<h4 class="anchored" data-anchor-id="the-likilihood-principal">The likilihood principal</h4>
 <p>There is an articulation of the <em>Likelihood Principal</em>: once <span class="math inline">\(Y\)</span> has been observed we now note it as <span class="math inline">\(Y = y_o\)</span> , and no other value of Y matters. We should treat as <span class="math inline">\(L(\theta|y_o) = Pr(Y = y_o | \theta)\)</span> as the only likelihood function of <span class="math inline">\(\theta\)</span> and no other aspects of the experiment or data matter for inference.</p>
+</section>
+<section id="the-conjugate-prior-for-a-binomial-distribution-is-a-beta-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="the-conjugate-prior-for-a-binomial-distribution-is-a-beta-distribution">The conjugate prior for a binomial distribution is a beta distribution</h4>
 <p>What if the prior probabilities are continuous, if we model them as <span class="math inline">\(\theta = Beta(\alpha,\beta)\)</span>. The density of this prior is given by:</p>
 <p><span class="math display">\[ \pi(\theta \mid \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} \theta^{\alpha - 1} (1 - \theta)^{\beta - 1} \]</span></p>
 <p>In this case <span class="math inline">\(\frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)}\)</span> is a normalizing factor that ensures probabilities intgrate to one and exist between zero and one.</p>
 <p>The posterior density is therefore proprotional to to the prior times the likelihood <span class="math inline">\(\pi(\theta \mid y) \propto \pi(\theta) \times p(y \mid \theta)\)</span>. This expands out to this <span class="math inline">\(\pi(\theta \mid y) \propto \theta^{\alpha - 1} (1 - \theta)^{\beta - 1} \times \theta^y (1 - \theta)^{n - y}\)</span> droppping the constants for now. By combining the exponents we get <span class="math inline">\(\pi(\theta \mid y) \propto \theta^{(\alpha + y) - 1} (1 - \theta)^{( \beta + n - y) - 1}\)</span>. This is the kernel (un-normalized density) of a Beta distribution with updated parameters <span class="math inline">\(\alpha' = \alpha + y, \quad \beta' = \beta + n - y\)</span></p>
 <p>To get the proper density, we need to insert the Beta normalizing constant with the new parameters <span class="math inline">\(\pi(\theta \mid y) = \frac{\Gamma(\alpha + y + \beta + n - y)}{\Gamma(\alpha + y)\Gamma(\beta + n - y)} \theta^{\alpha + y - 1} (1 - \theta)^{\beta + n - y - 1}\)</span> which simplifies to <span class="math inline">\(\theta \mid y \sim \operatorname{Beta}(y + \alpha, \, n - y + \beta)\)</span>. This is the posterior probability distribution.</p>
 <p>To calculate the mean and variance, for any <span class="math inline">\(\operatorname{Beta}(a, b)\)</span> random variable:<span class="math inline">\(\mathbb{E}[\theta] = \frac{a}{a + b}, \quad \operatorname{Var}(\theta) = \frac{ab}{(a + b)^2 (a + b + 1)}\)</span> we can plug in <span class="math inline">\(a = y + \alpha\)</span>, <span class="math inline">\(b = n - y + \beta\)</span>: <span class="math inline">\(\mathbb{E}[\theta \mid y] = \frac{y + \alpha}{n + \alpha + \beta}\)</span> (this is a weighted average between the observed proportion <span class="math inline">\(y/n\)</span> and the prior “pseudo-mean” <span class="math inline">\(\alpha/(\alpha + \beta)\)</span>, with more weight on the data when n is large) <span class="math inline">\(\operatorname{Var}(\theta \mid y) = \frac{(y + \alpha)(n - y + \beta)}{(n + \alpha + \beta)^2 (n + \alpha + \beta + 1)}\)</span></p>
-<p>To summarize if our priors are <span class="math inline">\(Beta(\alpha, \beta)\)</span> then <span class="math inline">\(P(\theta|Y=8)=y ∼ Beta(y + α, n − y + β)\)</span></p>
+<p>To summarize if our priors are <span class="math inline">\(Beta(\alpha, \beta)\)</span> and our posterior probabilities are <span class="math inline">\(P(\theta|Y=y_o=8)=Beta(y_o + α, n − y_o + β)\)</span></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>range <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.1</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>likelihood <span class="ot">&lt;-</span> <span class="fu">pbeta</span>(range,<span class="at">shape1=</span>alpha,<span class="at">shape2=</span>beta)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>data.beta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">range=</span>range,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">likelihood=</span>likelihood)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data.beta,<span class="fu">aes</span>(<span class="at">y=</span>likelihood,<span class="at">x=</span>range)) <span class="sc">+</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="fu">paste0</span>(<span class="st">"Prior Distribution - Beta("</span>,alpha,<span class="st">","</span>,beta,<span class="st">")"</span>),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Value"</span>,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Likelihood"</span>) <span class="sc">+</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mean = alpha / (alpha + beta) so to guestimate 0.444 is 4/85</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span>  <span class="dv">1</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>range <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.001</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>prior <span class="ot">&lt;-</span> <span class="fu">dbeta</span>(range,<span class="at">shape1=</span>alpha,<span class="at">shape2=</span>beta)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>posterior <span class="ot">&lt;-</span> <span class="fu">dbeta</span>(range,<span class="at">shape1=</span>cases <span class="sc">+</span> alpha, <span class="at">shape2=</span>n <span class="sc">-</span> cases <span class="sc">+</span> beta)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>data.beta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">range=</span>range,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">prior=</span>prior,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                        <span class="at">posterior=</span>posterior) <span class="sc">|&gt;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">c</span>(<span class="st">"prior"</span>,<span class="st">"posterior"</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"distribution"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"value"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data.beta,<span class="fu">aes</span>(<span class="at">y=</span>value,<span class="at">x=</span>range,<span class="at">col=</span>distribution)) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="fu">paste0</span>(<span class="st">"Distribution - Beta("</span>,<span class="fu">round</span>(alpha,<span class="dv">2</span>),<span class="st">","</span>,<span class="fu">round</span>(beta,<span class="dv">2</span>),<span class="st">")"</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Value"</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Likelihood"</span>) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.85</span>,<span class="fl">0.85</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -311,7 +324,119 @@ window.Quarto = {
 </figure>
 </div>
 </div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#these are defined from the conjugate prior/posterior relationship</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="ot">=</span> alpha<span class="sc">/</span>(alpha<span class="sc">+</span>beta)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>prior_ci_lower <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.025</span>, alpha, beta)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>prior_ci_upper <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.975</span>, alpha, beta)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>posterior_mean <span class="ot">=</span> (alpha <span class="sc">+</span> cases)<span class="sc">/</span>(alpha<span class="sc">+</span>cases<span class="sc">+</span>n<span class="sc">-</span>cases<span class="sc">+</span>beta)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>posterior_ci_lower <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.025</span>, (alpha <span class="sc">+</span> cases), (cases<span class="sc">+</span>n<span class="sc">-</span>cases<span class="sc">+</span>beta))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>posterior_ci_upper <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.975</span>, (alpha <span class="sc">+</span> cases), (cases<span class="sc">+</span>n<span class="sc">-</span>cases<span class="sc">+</span>beta))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">Distribution=</span><span class="fu">c</span>(<span class="st">"Prior"</span>,<span class="st">"Posterior"</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">Mean=</span><span class="fu">c</span>(prior_mean,posterior_mean),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">CI_Lower=</span><span class="fu">c</span>(prior_ci_lower,posterior_ci_lower),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">CI_Upper=</span><span class="fu">c</span>(prior_ci_upper,posterior_ci_upper)) <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits=</span><span class="dv">3</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption=</span><span class="st">"Summary statistics for prior and posterior distributions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Summary statistics for prior and posterior distributions</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Distribution</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">CI_Lower</th>
+<th style="text-align: right;">CI_Upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Prior</td>
+<td style="text-align: right;">0.500</td>
+<td style="text-align: right;">0.025</td>
+<td style="text-align: right;">0.975</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Posterior</td>
+<td style="text-align: right;">0.061</td>
+<td style="text-align: right;">0.027</td>
+<td style="text-align: right;">0.100</td>
+</tr>
+</tbody>
+</table>
 </div>
+</div>
+<p>By this model the posterior probability that the incidence is greater than 4.44% is 79.8%.</p>
+</section>
+<section id="example-of-beta-as-a-conjugate-prior" class="level4">
+<h4 class="anchored" data-anchor-id="example-of-beta-as-a-conjugate-prior">Example of Beta as a Conjugate Prior</h4>
+<p>Imagine there is a mouse that has a rare phenotype, we observe <span class="math inline">\(n=20\)</span> mice, and find <span class="math inline">\(y=4\)</span> have this phenotype. The probability of this occuring can be denoted as <span class="math inline">\(Y | p \sim Bin(20,p)\)</span>. Before noticing this, we believe the phenotype is uncommon but i have low certainty on this hypothesis, given as <span class="math inline">\(p \sim Beta(2,20)\)</span>. This was selected because in <span class="math inline">\(Beta(\alpha,\beta)\)</span> this means that</p>
+<ul>
+<li><span class="math inline">\(\alpha-1\)</span> is how often its observed (successes)</li>
+<li><span class="math inline">\(\beta-1\)</span> is the number of times not observed (failures)</li>
+<li><span class="math inline">\(\alpha + \beta\)</span> is the strength of this conviction</li>
+<li>The mean estimate is <span class="math inline">\(E[p]=\frac{\alpha}{\alpha + \beta}\)</span></li>
+</ul>
+<p>So this prior is formulating on the expectation that out of 18 examples, I would have expected one example of this phenotype. This corresponds to an estimate of 10% <span class="math inline">\(\frac{2}{2+19}\)</span>. Here are three possible visualizations of priors for this example, presuming one success out of 18, 5, or 30 trials</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>prior.data.frame <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_grid</span>(<span class="at">observed=</span><span class="dv">1</span>, <span class="at">attempts=</span><span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">5</span>,<span class="dv">30</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">alpha =</span> observed <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">beta =</span> attempts <span class="sc">-</span> observed <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior =</span> <span class="fu">paste0</span>(<span class="st">"Beta("</span>,alpha,<span class="st">","</span>,beta,<span class="st">")"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">density=</span><span class="fu">dbeta</span>(probability,alpha,beta)) </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(prior.data.frame, <span class="fu">aes</span>(<span class="at">y=</span>density,<span class="at">x=</span>probability,<span class="at">col=</span>prior)) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/binomial-conjugate-example-prior-plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The posterior is the likelihood times prior is <span class="math inline">\(L(p|y_o=4) \times \pi(p)\)</span>. This becomes <span class="math inline">\((p∣y_o) \sim Beta(\alpha+Y_o,\beta+n−y_o)\)</span>. For this example this computes to <span class="math inline">\(Beta(2+4,20+20-4)=Beta(6,36)\)</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">2</span>,<span class="dv">18</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">6</span>,<span class="dv">36</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>density,<span class="at">x=</span>probability,<span class="at">col=</span>type)) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">4</span><span class="sc">/</span><span class="dv">20</span>, <span class="at">lty=</span><span class="dv">2</span>, <span class="at">col=</span><span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">geom  =</span> <span class="st">"text"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x     =</span> <span class="dv">4</span><span class="sc">/</span><span class="dv">20</span><span class="fl">+0.01</span>,           <span class="co"># ← your chosen x-position</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y     =</span> <span class="dv">8</span>,            <span class="co"># ← your chosen y-position</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Observed"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">0</span>,            <span class="co"># 0 = left justified (most important part)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="fl">0.5</span>,          <span class="co"># optional: 0.5 = vertically centered</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/beta-example-prior-posterior-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Given this result of a posterior probability of <span class="math inline">\(Beta(6,36)\)</span> this corresponds to a mean probability of <span class="math inline">\(\frac{6}{6+36}=\frac{6}{42}=\)</span> 0.1428571. The variance is <span class="math inline">\(Var(p)=\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}= \frac{6\times 36}{(6+36)^2\times(6+36+1)}=\)</span> 0.0028477. The posterior mode is <span class="math inline">\(MAP=\frac{\alpha-1}{\alpha + \beta - 2}=\)</span> 0.125.</p>
+</section>
 </section>
 </section>
 <section id="references" class="level2">
@@ -327,12 +452,12 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
 Platform: aarch64-apple-darwin20
-Running under: macOS Tahoe 26.1
+Running under: macOS Tahoe 26.2
 
 Matrix products: default
 BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
@@ -354,14 +479,14 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
- [5] scales_1.4.0       yaml_2.3.11        fastmap_1.2.0      R6_2.6.1          
- [9] labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4  pillar_1.11.1     
-[13] RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.1.6        stringi_1.8.7     
-[17] xfun_0.54          S7_0.2.1           timechange_0.3.0   cli_3.6.5         
-[21] withr_3.0.2        magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
-[25] rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.4    vctrs_0.6.5       
-[29] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       rmarkdown_2.30    
-[33] tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
+ [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
+ [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
+[13] pillar_1.11.1      RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.1.6       
+[17] stringi_1.8.7      xfun_0.54          S7_0.2.1           timechange_0.3.0  
+[21] cli_3.6.5          withr_3.0.2        magrittr_2.0.4     digest_0.6.39     
+[25] grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.4   
+[29] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2      
+[33] rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
 </div>
 </div>
 </section>
