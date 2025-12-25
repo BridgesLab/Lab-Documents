@@ -31,6 +31,7 @@ se <- function(x) {
 
 #load these packages, nearly always needed
 library(tidyverse)
+library(ggplot)
 
 # sets maize and blue color scheme
 color_scheme <- c("#00274c", "#ffcb05")
