@@ -45,7 +45,7 @@ color_scheme <- c("#00274c", "#ffcb05")
 
 These are notes as I work through and understand the notes from BIOSTAT 682
 
-### Lecture 2: Single Parameter Models
+### Single Parameter Models
 
 The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people.  The question is whether this incidence is greater than the expected incidence of 4.458% from [@CancerStatisticsNCI2015]
 
@@ -199,12 +199,12 @@ Table: Summary statistics for prior and posterior distributions
 
 By this model the posterior probability that the incidence is greater than 4.44% is 79.8%.
 
-#### Example of Beta as a Conjugate Prior
+##### Example of Beta as a Conjugate Prior
 
 Imagine there is a mouse that has a rare phenotype, we observe $n=20$ mice, and find $y=4$ have this phenotype. The probability of this occuring can be denoted as $Y | p \sim Bin(20,p)$.  Before noticing this, we believe the phenotype is uncommon but i have low certainty on this hypothesis, given as $p \sim Beta(2,20)$. This was selected because in $Beta(\alpha,\beta)$ this means that
 
-- $\alpha-1$ is how often its observed (successes)
-- $\beta-1$ is the number of times not observed (failures)
+- $\alpha-1$ is how often its observed (successes).  By that $\alpha=\text{successes}+1$
+- $\beta-1$ is the number of times not observed (failures).  By that $\beta=\text{failures}+1$
 - $\alpha + \beta$ is the strength of this conviction
 - The mean estimate is $E[p]=\frac{\alpha}{\alpha + \beta}$
 
@@ -268,6 +268,140 @@ data.frame(probability=seq(0,1,by=0.01)) |>
 
 Given this result of a posterior probability of $Beta(6,36)$ this corresponds to a mean probability of $\frac{6}{6+36}=\frac{6}{42}=$ 0.1428571.  The variance is $Var(p)=\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}= \frac{6\times 36}{(6+36)^2\times(6+36+1)}=$ 0.0028477.  The posterior mode is $MAP=\frac{\alpha-1}{\alpha + \beta - 2}=$ 0.125.
 
+##### Nutrition Example
+
+You are studying a rare adverse event from a new dietary supplement.  From prior literature, events are uncommon, but not impossible.  You now run a small pilot study. You observe 7 adverse events out of 50 participants.
+
+I think a reasonable prior probability for adverse events would be something like 1% with reasonable certainty (perhaps 1000 prior data points with 10 being affected, so $\alpha=\text{successes}+1=11$ 990 being unaffected so $\beta=\text{failures}+1=991$), so i think a prior distribution of $Beta(11,991)$ makes sense.  
+
+
+::: {.cell}
+
+```{.r .cell-code}
+observed <- 7
+tested <- 50
+alpha <- 18
+beta <- 1037
+```
+:::
+
+
+By this logic, the posterior probability should be $Beta(\alpha+y_o,beta+n-y_o)$ or $Beta(18,1037)$.  This computes to a posterior mean of 0.0170616 [0.010152, 0.0256989] in comparison to an observed maximum likelihood estimator (MLE) of 0.14.  The modal observation is $MAP=\frac{\alpha-1}{\alpha + \beta - 2}=$ or 0.0161443 with a variance of $\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}$ or 1.5881167\times 10^{-5}.  This is visualized below, illustrating the effect of a strong prior
+
+
+::: {.cell}
+
+```{.r .cell-code}
+data.frame(probability=seq(0,1,by=0.01)) |>
+  mutate(prior = dbeta(probability,11,991),
+         posterior = dbeta(probability,18,1037)) |>
+  pivot_longer(c(prior,posterior),names_to="type",values_to = "density") |>
+  ggplot(aes(y=density,x=probability,col=type)) +
+  geom_line() +
+  geom_vline(xintercept=observed/tested, lty=2, col="grey") +
+  annotate(
+    geom  = "text",
+    x     = observed/tested+0.01,           # ← your chosen x-position
+    y     = 8,            # ← your chosen y-position
+    label = "Observed",
+    hjust = 0,            # 0 = left justified (most important part)
+    vjust = 0.5,          # optional: 0.5 = vertically centered
+    size  = 5, color = "grey"
+  ) +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.8,0.8))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/second-beta-example-prior-posterior-1.png){width=672}
+:::
+:::
+
+
+##### Proper and Improper Distributions
+
+A **proper probability distribution** integrates to 1, this means if you add up the sum of all possible outcomes, you get unity.  Bayes theorom assumes proper posterior probability distributions.  This means that for discrete distributions like the bimomal $\sum \text{probabilities}=1$ and for continuous distributions $\int \text{density}=1$ (discreted distributions give exact probabilities for a number whereas continuous distributions give density between specific ranges).
+
+#### Continuous Distributions
+
+The **central limit theorem** justifies using a normal distribution for many casses.  This means that for a binomial distribution for example, that as n becomes large, the binomial distribution becomes a normal distribution.  The CLT says that averages and estimators can become normal even if the underlying data (*e.g.* binomal, bernoulli, poisson) is not.
+
+For a normal distribution $N(\mu, \sigma^2)$ where $\mu$ is the mean and $\sigma^2$ is the variance (or the $SE^2$).  
+
+##### Specifying a Prior for the Standard Error From the Conjugate Prior of the Normal Distribution
+
+For a Normal likelihood with known mean $\mu$, the conjugate prior for the variance is the inverse-gamma distribution: $\sigma^2 \sim InvGamma(\alpha,\beta)$ where $\alpha$ is the strength of the prior, approximately $\alpha \approx \frac{df_{prior}}{2}$ and $\beta$ is the prior scale, or approximately $\beta \approx \frac{df_{prior} \times s^2_0}{2}$ where $s^2_0$ is the prior guess of the variance.  Key equations:
+
+- For the variance $E(\sigma^2)=\frac{\beta}{\alpha-1}$ and $Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$ 
+- The posterior mode is $\frac{\beta}{\alpha+1}$.
+- With posterior updating (given a new degree of freedom $\frac{n}{2}$ and sum of squares $\frac{S}{2}$), $\sigma^2|y \sim InvGamma(\alpha + \frac{n}{2},\beta + \frac{S}{2})$
+
+If we use precision $\frac{1}{\sigma^2}$ then the conjugate prior for variance is the Gamma distribution with the same meaning for $\alpha$ and $\beta$ except that $\beta$ is now a rate rather than a scale.
+
+##### Example for Estimating Prior and Posterior Variance
+
+You are studying a biomarker that is known (from calibration experiments) to have mean $\mu=100$.  You are uncertain about the variance $\sigma^2$.  You have this prior information:
+
+- From historical data, you believe that the standard deviation is around 5 units (so $\sigma^2=25$)
+- This belief is roughly equivalent to 20 prior observations
+
+Based on this $\alpha$ should be approximately $\frac{20}{2}=10$ and $\beta$ should be approximately $\beta \approx \frac{df_{prior} \times s^2_0}{2} = \frac{20 \times 5^2}{2}=250$.  Therefore the prior for the variance should be described as $\sigma^2 \sim InvGamma(10,250)$.  This gives a prior mean of $E(\sigma^2)=\frac{\beta}{\alpha-1}=\frac{250}{10-1}=$ 27.7777778 with a variance of 96.4506173.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+new.values <- c(101,96,98,103,99,100,97,102,104,95)
+```
+:::
+
+You now collect 10 new measurements 101, 96, 98, 103, 99, 100, 97, 102, 104, 95.  The sum of squares of these new values is 85.  The posterior distribution of $\sigma^2$ is therefore 
+
+$$\sigma^2|y \sim InvGamma(\alpha + \frac{n}{2},\beta + \frac{S}{2})$$
+
+$$ \sigma^2|y \sim InvGamma(10+\frac{10}{2},250+\frac{85}{2})=InvGamma(15,292.5)$$ 
+
+This is visualized as
+
+
+::: {.cell}
+
+```{.r .cell-code}
+alpha_prior <- 10
+beta_prior <- 250
+
+alpha_posterior <- alpha_prior + length(new.values)/2
+beta_posterior <- beta_prior + sum((new.values-100)^2)/2
+
+library(invgamma)
+data.frame(variance=seq(0,100,by=1)) |>
+  mutate(prior=dinvgamma(variance,alpha_prior,beta_prior),
+         posterior = dinvgamma(variance,alpha_posterior,beta_posterior)) |> 
+  pivot_longer(c(prior,posterior),
+               names_to = "Distribution",
+               values_to = "density") |>
+  ggplot(aes(y=density,x=variance,col=Distribution)) +
+  geom_line() +
+    geom_vline(xintercept=25, lty=2, col="grey") +
+  annotate(
+    geom  = "text",
+    x     = 25+1,           # ← your chosen x-position
+    y     = 0.07,            # ← your chosen y-position
+    label = "Initial Estimate",
+    hjust = 0,            # 0 = left justified (most important part)
+    vjust = 0.5,          # optional: 0.5 = vertically centered
+    size  = 5, color = "grey"
+  ) +
+  theme_classic(base_size = 16) +
+  theme(legend.position=c(0.8,0.8))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/continuous-prior-example-1.png){width=672}
+:::
+:::
+
+The updated $\sigma^2$ values are then $E(\sigma^2)=\frac{\beta}{\alpha-1}$,  $Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$, and $\text{Mode}=\frac{\beta}{\alpha+1}$ so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727.  As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected.  The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5.  The probability that the value is below 5 is 0.7984651.  Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in `pinvgamma`.
 
 ## References
 
@@ -304,9 +438,9 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] knitr_1.50      lubridate_1.9.4 forcats_1.0.1   stringr_1.6.0  
- [5] dplyr_1.1.4     purrr_1.2.0     readr_2.1.6     tidyr_1.3.1    
- [9] tibble_3.3.0    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] invgamma_1.2    knitr_1.50      lubridate_1.9.4 forcats_1.0.1  
+ [5] stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0     readr_2.1.6    
+ [9] tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1   tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
