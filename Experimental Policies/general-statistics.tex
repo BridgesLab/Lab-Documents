@@ -1,34 +1,42 @@
-\documentclass[]{article}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-\else % if luatex or xelatex
-  \ifxetex
-    \usepackage{mathspec}
-  \else
-    \usepackage{fontspec}
-  \fi
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
-% use upquote if available, for straight quotes in verbatim environments
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
-\usepackage{hyperref}
-\hypersetup{unicode=true,
-            pdftitle={General Statistics},
-            pdfauthor={Dave Bridges},
-            pdfborder={0 0 0},
-            breaklinks=true}
-\urlstyle{same}  % don't use monospace font for urls
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -38,39 +46,48 @@
 \usepackage{framed}
 \definecolor{shadecolor}{RGB}{248,248,248}
 \newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
-\newcommand{\ImportTok}[1]{{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{{#1}}}}
-\newcommand{\BuiltInTok}[1]{{#1}}
-\newcommand{\ExtensionTok}[1]{{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{{#1}}}
-\newcommand{\RegionMarkerTok}[1]{{#1}}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{{#1}}}}
-\newcommand{\NormalTok}[1]{{#1}}
-\usepackage{longtable,booktabs}
-\usepackage{graphicx,grffile}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
 \def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
@@ -79,51 +96,29 @@
 % margins by default, and it is still possible to overwrite the defaults
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
-\IfFileExists{parskip.sty}{%
-\usepackage{parskip}
-}{% else
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-}
-\setlength{\emergencystretch}{3em}  % prevent overfull lines
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
 \fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={General Statistics},
+  pdfauthor={Dave Bridges},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-%%% Use protect on footnotes to avoid problems with footnotes in titles
-\let\rmarkdownfootnote\footnote%
-\def\footnote{\protect\rmarkdownfootnote}
-
-%%% Change title format to be more compact
-\usepackage{titling}
-
-% Create subtitle command for use in maketitle
-\newcommand{\subtitle}[1]{
-  \posttitle{
-    \begin{center}\large#1\end{center}
-    }
-}
-
-\setlength{\droptitle}{-2em}
-  \title{General Statistics}
-  \pretitle{\vspace{\droptitle}\centering\huge}
-  \posttitle{\par}
-  \author{Dave Bridges}
-  \preauthor{\centering\large\emph}
-  \postauthor{\par}
-  \predate{\centering\large\emph}
-  \postdate{\par}
-  \date{May 9, 2014}
-
+\title{General Statistics}
+\author{Dave Bridges}
+\date{May 9, 2014}
 
 \begin{document}
 \maketitle
@@ -136,7 +131,14 @@
 
 There are several important concepts that we will adhere to in our
 group. These involve design considerations, execution considerations and
-analysis concerns.
+analysis concerns. The standard for our field is null hypothesis
+significance testing, which means that we are generally comparing our
+data to a null hypothesis, generating an \textbf{effect size} and a
+\textbf{p-value}. As a general rule, we report both of these both within
+our Rmd scripts, and in our publications.
+
+We generally use an \(\alpha\) of \(p<0.05\) to determine significance,
+which means that (if true) we are rejecting the null hypothesis.
 
 \subsection{Experimental Design}\label{experimental-design}
 
@@ -164,18 +166,18 @@ sizes. To do this, you need to know a few of things:
 \end{itemize}
 
 We use the R package \textbf{pwr} to do a power analysis (Champely,
-2017). Here is an example:
+2020). Here is an example:
 
 \subsubsection{Pairwise Comparasons}\label{pairwise-comparasons}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{require}\NormalTok{(pwr)}
-\NormalTok{false.negative.rate <-}\StringTok{ }\FloatTok{0.05}
-\NormalTok{statistical.power <-}\StringTok{ }\FloatTok{0.8}
-\NormalTok{sd <-}\StringTok{ }\FloatTok{3.5} \CommentTok{#this is calculated from known measurements}
-\NormalTok{difference <-}\StringTok{ }\DecValTok{3}  \CommentTok{#you hope to detect a difference }
-\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{d =} \NormalTok{difference, }\DataTypeTok{sig.level =} \NormalTok{false.negative.rate, }\DataTypeTok{power=}\NormalTok{statistical.power)}
+\FunctionTok{require}\NormalTok{(pwr)}
+\NormalTok{false.negative.rate }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\NormalTok{statistical.power }\OtherTok{\textless{}{-}} \FloatTok{0.8}
+\NormalTok{sd }\OtherTok{\textless{}{-}} \FloatTok{3.5} \CommentTok{\#this is calculated from known measurements}
+\NormalTok{difference }\OtherTok{\textless{}{-}} \DecValTok{3}  \CommentTok{\#you hope to detect a difference }
+\FunctionTok{pwr.t.test}\NormalTok{(}\AttributeTok{d =}\NormalTok{ difference, }\AttributeTok{sig.level =}\NormalTok{ false.negative.rate, }\AttributeTok{power=}\NormalTok{statistical.power)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -202,11 +204,11 @@ The following is an example for detecting a correlation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{require}\NormalTok{(pwr)}
-\NormalTok{false.negative.rate <-}\StringTok{ }\FloatTok{0.05}
-\NormalTok{statistical.power <-}\StringTok{ }\FloatTok{0.8}
-\NormalTok{correlation.coefficient <-}\StringTok{ }\FloatTok{0.6} \CommentTok{#note that this is the r, to get the R2 value you will have to square this result.}
-\KeywordTok{pwr.r.test}\NormalTok{(}\DataTypeTok{r =} \NormalTok{correlation.coefficient, }\DataTypeTok{sig.level =} \NormalTok{false.negative.rate, }\DataTypeTok{power=}\NormalTok{statistical.power)}
+\FunctionTok{require}\NormalTok{(pwr)}
+\NormalTok{false.negative.rate }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\NormalTok{statistical.power }\OtherTok{\textless{}{-}} \FloatTok{0.8}
+\NormalTok{correlation.coefficient }\OtherTok{\textless{}{-}} \FloatTok{0.6} \CommentTok{\#note that this is the r, to get the R2 value you will have to square this result.}
+\FunctionTok{pwr.r.test}\NormalTok{(}\AttributeTok{r =}\NormalTok{ correlation.coefficient, }\AttributeTok{sig.level =}\NormalTok{ false.negative.rate, }\AttributeTok{power=}\NormalTok{statistical.power)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -255,38 +257,39 @@ groups:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#create seed for reproducibility}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1265}\NormalTok{)}
-\NormalTok{test.data <-}\StringTok{ }\KeywordTok{tibble}\NormalTok{(}\DataTypeTok{Treatment=}\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\StringTok{"Experiment"}\NormalTok{,}\DecValTok{6}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\StringTok{"Control"}\NormalTok{,}\DecValTok{6}\NormalTok{)),}
-           \DataTypeTok{Result =} \KeywordTok{rnorm}\NormalTok{(}\DataTypeTok{n=}\DecValTok{12}\NormalTok{, }\DataTypeTok{mean=}\DecValTok{10}\NormalTok{, }\DataTypeTok{sd=}\DecValTok{3}\NormalTok{))}
-\CommentTok{#test.data$Treatment <- as.factor(test.data$Treatment)}
-\KeywordTok{kable}\NormalTok{(test.data, }\DataTypeTok{caption=}\StringTok{"The test data used in the following examples"}\NormalTok{)}
+\CommentTok{\#create seed for reproducibility}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1265}\NormalTok{)}
+\NormalTok{test.data }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{Treatment=}\FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{"Experiment"}\NormalTok{,}\DecValTok{6}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\StringTok{"Control"}\NormalTok{,}\DecValTok{6}\NormalTok{)),}
+           \AttributeTok{Result =} \FunctionTok{rnorm}\NormalTok{(}\AttributeTok{n=}\DecValTok{12}\NormalTok{, }\AttributeTok{mean=}\DecValTok{10}\NormalTok{, }\AttributeTok{sd=}\DecValTok{3}\NormalTok{))}
+\CommentTok{\#test.data$Treatment \textless{}{-} as.factor(test.data$Treatment)}
+\FunctionTok{kable}\NormalTok{(test.data, }\AttributeTok{caption=}\StringTok{"The test data used in the following examples"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}lr@{}}
 \caption{The test data used in the following examples}\tabularnewline
-\toprule
-Treatment & Result\tabularnewline
-\midrule
+\toprule\noalign{}
+Treatment & Result \\
+\midrule\noalign{}
 \endfirsthead
-\toprule
-Treatment & Result\tabularnewline
-\midrule
+\toprule\noalign{}
+Treatment & Result \\
+\midrule\noalign{}
 \endhead
-Experiment & 11.26\tabularnewline
-Experiment & 8.33\tabularnewline
-Experiment & 9.94\tabularnewline
-Experiment & 11.83\tabularnewline
-Experiment & 6.56\tabularnewline
-Experiment & 11.41\tabularnewline
-Control & 8.89\tabularnewline
-Control & 11.59\tabularnewline
-Control & 9.39\tabularnewline
-Control & 8.74\tabularnewline
-Control & 6.31\tabularnewline
-Control & 7.82\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+Experiment & 11.26 \\
+Experiment & 8.33 \\
+Experiment & 9.94 \\
+Experiment & 11.83 \\
+Experiment & 6.56 \\
+Experiment & 11.41 \\
+Control & 8.89 \\
+Control & 11.59 \\
+Control & 9.39 \\
+Control & 8.74 \\
+Control & 6.31 \\
+Control & 7.82 \\
 \end{longtable}
 
 Each of the two groups, in this case \textbf{Test} and \textbf{Control}
@@ -295,42 +298,44 @@ is below (requires dplyr to be loaded):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#filter only for the control data}
-\NormalTok{control.data <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(test.data, Treatment==}\StringTok{"Control"}\NormalTok{)}
-\CommentTok{#The broom package makes the results of the test appear in a table, with the tidy command}
-\KeywordTok{library}\NormalTok{(broom)}
+\CommentTok{\#filter only for the control data}
+\NormalTok{control.data }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(test.data, Treatment}\SpecialCharTok{==}\StringTok{"Control"}\NormalTok{)}
+\CommentTok{\#The broom package makes the results of the test appear in a table, with the tidy command}
+\FunctionTok{library}\NormalTok{(broom)}
 
-\CommentTok{#run the Shapiro-Wilk test on the values}
-\KeywordTok{shapiro.test}\NormalTok{(control.data$Result) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\CommentTok{\#run the Shapiro{-}Wilk test on the values}
+\FunctionTok{shapiro.test}\NormalTok{(control.data}\SpecialCharTok{$}\NormalTok{Result) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}rrl@{}}
-\toprule
-statistic & p.value & method\tabularnewline
-\midrule
+\toprule\noalign{}
+statistic & p.value & method \\
+\midrule\noalign{}
 \endhead
-0.968 & 0.88 & Shapiro-Wilk normality test\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+0.968 & 0.88 & Shapiro-Wilk normality test \\
 \end{longtable}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{experiment.data <-}\StringTok{ }\KeywordTok{filter}\NormalTok{(test.data, Treatment==}\StringTok{"Experiment"}\NormalTok{)}
-\KeywordTok{shapiro.test}\NormalTok{(test.data$Result) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\NormalTok{experiment.data }\OtherTok{\textless{}{-}} \FunctionTok{filter}\NormalTok{(test.data, Treatment}\SpecialCharTok{==}\StringTok{"Experiment"}\NormalTok{)}
+\FunctionTok{shapiro.test}\NormalTok{(test.data}\SpecialCharTok{$}\NormalTok{Result) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}rrl@{}}
-\toprule
-statistic & p.value & method\tabularnewline
-\midrule
+\toprule\noalign{}
+statistic & p.value & method \\
+\midrule\noalign{}
 \endhead
-0.93 & 0.377 & Shapiro-Wilk normality test\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+0.93 & 0.377 & Shapiro-Wilk normality test \\
 \end{longtable}
 
-Based on these results, since both p-values are \textgreater{}0.05 we do
+Based on these results, since both p-values are \textgreater0.05 we do
 not reject the presumption of normality and can go on. If one or more of
 the p-values were less than 0.05 we would then use a Mann-Whitney test
 (also known as a Wilcoxon rank sum test) will be done, see below for
@@ -347,22 +352,22 @@ see if two groups can be assumed to have equal variance:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#load the car package}
-\KeywordTok{library}\NormalTok{(car)}
+\CommentTok{\#load the car package}
+\FunctionTok{library}\NormalTok{(car)}
 
-\CommentTok{#runs the test, grouping by the Treatment variable}
-\KeywordTok{leveneTest}\NormalTok{(Result ~}\StringTok{ }\NormalTok{Treatment, }\DataTypeTok{data=}\NormalTok{test.data) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\CommentTok{\#runs the test, grouping by the Treatment variable}
+\FunctionTok{leveneTest}\NormalTok{(Result }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Treatment, }\AttributeTok{data=}\NormalTok{test.data) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}lrrr@{}}
-\toprule
-term & df & statistic & p.value\tabularnewline
-\midrule
+\begin{longtable}[]{@{}rrrr@{}}
+\toprule\noalign{}
+statistic & p.value & df & df.residual \\
+\midrule\noalign{}
 \endhead
-group & 1 & 0.368 & 0.558\tabularnewline
-& 10 & NA & NA\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+0.368 & 0.558 & 1 & 10 \\
 \end{longtable}
 
 \subsection{Performing the Appropriate Pairwise
@@ -388,20 +393,50 @@ Test}{Student's t Test}}\label{students-t-test}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE}
-\KeywordTok{t.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data, }\DataTypeTok{var.equal=}\NormalTok{T) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\CommentTok{\#The default for t.test in R is Welch\textquotesingle{}s, so you need to set the var.equal variable to be TRUE}
+\FunctionTok{t.test}\NormalTok{(Result}\SpecialCharTok{\textasciitilde{}}\NormalTok{Treatment,}\AttributeTok{data=}\NormalTok{test.data, }\AttributeTok{var.equal=}\NormalTok{T) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}rrrrrrrll@{}}
-\toprule
-estimate1 & estimate2 & statistic & p.value & parameter & conf.low &
-conf.high & method & alternative\tabularnewline
-\midrule
+\begin{longtable}[]{@{}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0849}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0943}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0943}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0943}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0755}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0943}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0849}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0943}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1698}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1132}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedleft
+estimate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+estimate1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+estimate2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p.value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+parameter
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+conf.low
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+conf.high
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+alternative
+\end{minipage} \\
+\midrule\noalign{}
 \endhead
-8.79 & 9.89 & -0.992 & 0.345 & 10 & -3.56 & 1.37 & Two Sample t-test &
-two.sided\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+-1.1 & 8.79 & 9.89 & -0.992 & 0.345 & 10 & -3.56 & 1.37 & Two Sample
+t-test & two.sided \\
 \end{longtable}
 
 \subsubsection{\texorpdfstring{Welch's \emph{t}
@@ -409,38 +444,69 @@ Test}{Welch's t Test}}\label{welchs-t-test}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default}
-\KeywordTok{t.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data, }\DataTypeTok{var.equal=}\NormalTok{F) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\CommentTok{\#The default for t.test in R is Welch\textquotesingle{}s, so you need to set the var.equal variable to be FALSE, or leave the default}
+\FunctionTok{t.test}\NormalTok{(Result}\SpecialCharTok{\textasciitilde{}}\NormalTok{Treatment,}\AttributeTok{data=}\NormalTok{test.data, }\AttributeTok{var.equal=}\NormalTok{F) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}rrrrrrrrll@{}}
-\toprule
-estimate & estimate1 & estimate2 & statistic & p.value & parameter &
-conf.low & conf.high & method & alternative\tabularnewline
-\midrule
+\begin{longtable}[]{@{}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0804}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0893}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0893}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0893}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0893}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0804}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0893}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.2143}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1071}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedleft
+estimate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+estimate1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+estimate2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p.value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+parameter
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+conf.low
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+conf.high
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+alternative
+\end{minipage} \\
+\midrule\noalign{}
 \endhead
+\bottomrule\noalign{}
+\endlastfoot
 -1.1 & 8.79 & 9.89 & -0.992 & 0.345 & 9.72 & -3.57 & 1.38 & Welch Two
-Sample t-test & two.sided\tabularnewline
-\bottomrule
+Sample t-test & two.sided \\
 \end{longtable}
 
 \subsubsection{Wilcoxon Rank Sum Test}\label{wilcoxon-rank-sum-test}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# no need to specify anything about variance}
-\KeywordTok{wilcox.test}\NormalTok{(Result~Treatment,}\DataTypeTok{data=}\NormalTok{test.data) %>%}\StringTok{ }\NormalTok{tidy %>%}\StringTok{ }\NormalTok{kable}
+\CommentTok{\# no need to specify anything about variance}
+\FunctionTok{wilcox.test}\NormalTok{(Result}\SpecialCharTok{\textasciitilde{}}\NormalTok{Treatment,}\AttributeTok{data=}\NormalTok{test.data) }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ tidy }\SpecialCharTok{\%\textgreater{}\%}\NormalTok{ kable}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}rrll@{}}
-\toprule
-statistic & p.value & method & alternative\tabularnewline
-\midrule
+\toprule\noalign{}
+statistic & p.value & method & alternative \\
+\midrule\noalign{}
 \endhead
-12 & 0.394 & Wilcoxon rank sum test & two.sided\tabularnewline
-\bottomrule
+\bottomrule\noalign{}
+\endlastfoot
+12 & 0.394 & Wilcoxon rank sum exact test & two.sided \\
 \end{longtable}
 
 \section{Corrections for Multiple
@@ -449,7 +515,7 @@ Observations}\label{corrections-for-multiple-observations}
 The best illustration I have seen for the need for multiple observation
 corrections is this cartoon from XKCD (see \url{http://xkcd.com/882/}):
 
-\begin{figure}[htbp]
+\begin{figure}
 \centering
 \includegraphics{http://imgs.xkcd.com/comics/significant.png}
 \caption{Significance by XKCD. Image is from
@@ -463,8 +529,8 @@ independent. Some sample code for this is here:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p.values <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\FloatTok{0.023}\NormalTok{, }\FloatTok{0.043}\NormalTok{, }\FloatTok{0.056}\NormalTok{, }\FloatTok{0.421}\NormalTok{, }\FloatTok{0.012}\NormalTok{)}
-\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{unadjusted =} \NormalTok{p.values, }\DataTypeTok{adjusted=}\KeywordTok{p.adjust}\NormalTok{(p.values, }\DataTypeTok{method=}\StringTok{"BH"}\NormalTok{))}
+\NormalTok{p.values }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.023}\NormalTok{, }\FloatTok{0.043}\NormalTok{, }\FloatTok{0.056}\NormalTok{, }\FloatTok{0.421}\NormalTok{, }\FloatTok{0.012}\NormalTok{)}
+\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{unadjusted =}\NormalTok{ p.values, }\AttributeTok{adjusted=}\FunctionTok{p.adjust}\NormalTok{(p.values, }\AttributeTok{method=}\StringTok{"BH"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -481,55 +547,50 @@ independent. Some sample code for this is here:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{sessionInfo}\NormalTok{()}
+\FunctionTok{sessionInfo}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## R version 3.4.2 (2017-09-28)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.1
+## R version 4.4.1 (2024-06-14)
+## Platform: x86_64-apple-darwin20
+## Running under: macOS Monterey 12.7.6
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## time zone: America/Detroit
+## tzcode source: internal
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] car_2.1-6           broom_0.4.3         bindrcpp_0.2       
-## [4] pwr_1.2-1           knitcitations_1.0.9 dplyr_0.7.4        
-## [7] tidyr_0.7.2         knitr_1.17         
+## [1] car_3.1-2            carData_3.0-5        broom_1.0.6         
+## [4] pwr_1.3-0            knitcitations_1.0.12 dplyr_1.1.4         
+## [7] tidyr_1.3.1          knitr_1.48          
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14       nloptr_1.0.4       compiler_3.4.2    
-##  [4] plyr_1.8.4         highr_0.6          bindr_0.1         
-##  [7] tools_3.4.2        lme4_1.1-14        digest_0.6.12     
-## [10] jsonlite_1.5       lubridate_1.7.1    evaluate_0.10.1   
-## [13] tibble_1.3.4       nlme_3.1-131       lattice_0.20-35   
-## [16] mgcv_1.8-22        pkgconfig_2.0.1    rlang_0.1.4       
-## [19] Matrix_1.2-12      psych_1.7.8        bibtex_0.4.2      
-## [22] yaml_2.1.15        parallel_3.4.2     SparseM_1.77      
-## [25] RefManageR_0.14.20 stringr_1.2.0      httr_1.3.1        
-## [28] xml2_1.1.1         MatrixModels_0.4-1 nnet_7.3-12       
-## [31] rprojroot_1.2      grid_3.4.2         glue_1.2.0        
-## [34] R6_2.2.2           foreign_0.8-69     rmarkdown_1.8     
-## [37] minqa_1.2.4        reshape2_1.4.2     purrr_0.2.4       
-## [40] magrittr_1.5       splines_3.4.2      MASS_7.3-47       
-## [43] backports_1.1.1    htmltools_0.3.6    pbkrtest_0.4-7    
-## [46] assertthat_0.2.0   mnormt_1.5-5       quantreg_5.34     
-## [49] stringi_1.1.6
+##  [1] jsonlite_1.8.8    compiler_4.4.1    tidyselect_1.2.1  Rcpp_1.0.13      
+##  [5] xml2_1.3.6        stringr_1.5.1     yaml_2.3.10       fastmap_1.2.0    
+##  [9] R6_2.5.1          plyr_1.8.9        generics_0.1.3    backports_1.5.0  
+## [13] tibble_3.2.1      RefManageR_1.4.0  lubridate_1.9.3   pillar_1.9.0     
+## [17] rlang_1.1.4       utf8_1.2.4        stringi_1.8.4     xfun_0.46        
+## [21] bibtex_0.5.1      timechange_0.3.0  cli_3.6.3         withr_3.0.0      
+## [25] magrittr_2.0.3    digest_0.6.36     lifecycle_1.0.4   vctrs_0.6.5      
+## [29] evaluate_0.24.0   glue_1.7.0        abind_1.4-5       fansi_1.0.6      
+## [33] rmarkdown_2.27    purrr_1.0.2       httr_1.4.7        tools_4.4.1      
+## [37] pkgconfig_2.0.3   htmltools_0.5.8.1
 \end{verbatim}
 
 \section{References}\label{references}
 
-\protect\hyperlink{cite-pwr}{{[}1{]}} S. Champely. \emph{pwr: Basic
-Functions for Power Analysis}. R package version 1.2-1. 2017. URL:
+\hyperref[cite-pwr]{{[}1{]}} S. Champely. \emph{pwr: Basic Functions for
+Power Analysis}. R package version 1.3-0. 2020. URL:
 \url{https://CRAN.R-project.org/package=pwr}.
-
 
 \end{document}

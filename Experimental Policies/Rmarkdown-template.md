@@ -1,7 +1,7 @@
 ---
 title: "Informative title"
 author: "Authors"
-date: "Date script was first written"
+date: "2000-01-01"
 output:
   html_document:
     highlight: tango
@@ -29,7 +29,7 @@ Describe your raw data files, including what the columns mean (and what units th
 
 
 
-These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents/Experimental Policies** in a file named **no file found**.  This script was most recently updated on **Sun Dec 10 20:14:20 2017**.
+These data can be found in **/Users/davebrid/Documents/GitHub/Lab-Documents-BL/Experimental Policies** in a file named **no file found**.  This script was most recently updated on **Wed Aug 21 10:58:43 2024**.
 
 # Analysis
 
@@ -42,35 +42,40 @@ A brief summary of what the interpretation of these results were
 # Session Information
 
 
-```r
+``` r
 sessionInfo()
 ```
 
 ```
-## R version 3.4.2 (2017-09-28)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.1
+## R version 4.4.1 (2024-06-14)
+## Platform: x86_64-apple-darwin20
+## Running under: macOS Monterey 12.7.6
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## time zone: America/Detroit
+## tzcode source: internal
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] readr_1.1.1 dplyr_0.7.4 tidyr_0.7.2 knitr_1.17 
+## [1] readr_2.1.5 dplyr_1.1.4 tidyr_1.3.1 knitr_1.48 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14     bindr_0.1        magrittr_1.5     hms_0.4.0       
-##  [5] R6_2.2.2         rlang_0.1.4      stringr_1.2.0    tools_3.4.2     
-##  [9] htmltools_0.3.6  yaml_2.1.15      rprojroot_1.2    digest_0.6.12   
-## [13] assertthat_0.2.0 tibble_1.3.4     bindrcpp_0.2     purrr_0.2.4     
-## [17] glue_1.2.0       evaluate_0.10.1  rmarkdown_1.8    stringi_1.1.6   
-## [21] compiler_3.4.2   backports_1.1.1  pkgconfig_2.0.1
+##  [1] vctrs_0.6.5       cli_3.6.3         rlang_1.1.4       xfun_0.46        
+##  [5] purrr_1.0.2       generics_0.1.3    jsonlite_1.8.8    glue_1.7.0       
+##  [9] htmltools_0.5.8.1 sass_0.4.9        hms_1.1.3         fansi_1.0.6      
+## [13] rmarkdown_2.27    evaluate_0.24.0   jquerylib_0.1.4   tibble_3.2.1     
+## [17] tzdb_0.4.0        fastmap_1.2.0     yaml_2.3.10       lifecycle_1.0.4  
+## [21] compiler_4.4.1    pkgconfig_2.0.3   digest_0.6.36     R6_2.5.1         
+## [25] tidyselect_1.2.1  utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3   
+## [29] bslib_0.8.0       tools_4.4.1       cachem_1.1.0
 ```
 
 # References

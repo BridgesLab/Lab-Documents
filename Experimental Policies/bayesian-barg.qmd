@@ -1,0 +1,264 @@
+---
+title: "Bayesian Analyses - Efective Reporting"
+author: "Dave Bridges"
+date: "2024-08-22"
+format: 
+  html:
+    toc: true
+    toc-location: right
+theme: journal
+execute:
+  keep-md: true
+  message: false
+  warning: false
+bibliography: bayesian-references.bib
+---
+
+So how do we report the results of a bayesian analysis.  As mentioned previously, at a minimum you need to report either the Bayes Factor or the Posterior Probabilities.  However that is not typically sufficient or reproducible.
+
+Fortunately there are reporting guidelines set out in [@kruschkeBayesianAnalysisReporting2021], which includes the rationale and importance for each of these.  These are known as the Bayesian Analysis Reporting Guidelines or BARG.  Lets go over them, and some ideas of how we could do this with our example analysis of mtcars evaluating the relationship between transmission type and vehicle weight
+
+```{r mtcars}
+library(tinytex)
+library(knitr)
+library(dplyr)
+mtcars.data <- 
+  as.data.frame(mtcars) %>%
+  mutate(transmission = factor(case_when(am==0~"automatic",
+                           am==1~"manual")),
+         engine=factor(case_when(vs==0~"V-Shaped",
+                       vs==1~"Straight")),
+         cylindars=factor(cyl))
+```
+
+## Preamble
+
+### Justify why you are using a Bayesian approach
+
+This is important as it is likely most readers will be unfamiliar with this approach and will be hoping to see conventional p-values.
+
+For each of these I will show some sample language
+
+>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested
+
+### Explain the goals of the analysis
+
+>To determine whether transmission has a relationship with the weight in the mtcars dataset.
+
+## Model Specification
+
+### Describe dependent and independent variables
+
+This should be done in the results section so it is clear what the comparason is.
+
+>We evaluated whether the vehicle had an automatic or manual transmission and how that related to the weight.
+
+### Likelihood function and model parameters
+
+Lets look at our analysis from before.  We used a bernoulli family fit (this is a binomial regression).  This is the default analysis:
+
+```{r brms-binomial}
+#| output: false
+# Fit the model
+library(brms)
+binomial.fit.default <- brm(transmission ~ wt, 
+           data = mtcars.data, 
+           family = bernoulli())
+```
+
+As we will shortly see its helpful for us to be more thoughtful about the choice of priors which by default are flat with no upper or lower bounds.  The intercept is set roughly to a Student's *t* distribution centered around 3 tons.
+
+```{r binomial-default-priors}
+prior_summary(binomial.fit.default) %>% kable(caption="Prior summary for effects of transmission on engine type")
+```
+
+
+We have *some* information already, for example we know that there are more automatic than manual transmission vehicles.  Globally 56% of vehicles are automatic.  That means the log odds of a transmission being automatic is $LogOdds=\ln{p/(1-p)}$ since $\ln \frac{0.56}{1-0.56} \approx 0.241$ we will set this as the intercept with a wide standard deviation of 5.
+
+I dont have a good sense of what I estimated for the effects of weight (class b, coef wt), so I set that to normal distribution around zero with a standard deviation of 5, zero degrees of freedom and and with no boundaries.  I would consider these are somewhat informative priors.
+
+```{r informed-priors}
+#| output: false
+new.priors <- c(prior(normal(0.241,5), class=Intercept),
+                prior(normal(0,5),class=b, coef=wt))
+
+binomial.fit <- brm(transmission ~ wt, 
+           data = mtcars.data, 
+           family = bernoulli(),
+           sample_prior = T,
+           prior = new.priors)
+```
+
+```{r new-prior-summary}
+prior_summary(binomial.fit) %>% kable(caption="Prior summary for effects of weight on transmission type")
+```
+
+Using the bernouli family, the default is the logit link function.
+
+>The data were fit to a bernoulli distribution with a logit link function.
+
+### Prior Distributions
+
+What was the prior probabilities set at.  As noted above we set our priors to be this, including some justification:
+
+>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission ($\beta = 0.241$; based on worldwide automobile statistics), with a relatively wide standard deviation of 5.  For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.
+
+### Formal Specification of the Likelihood Function
+
+The Bernouli family probability function including a logit link is automatically implemented in brms but is $P(TYPE|\eta) = (1 / (1 + exp(-\eta)))^{TYPE} * (1 - 1 / (1 + exp(-\eta)))^(1-TYPE)$ where TYPE is the type of transmission (0 for manual, 1 for automatic).
+
+This is implemented within `brms` so I think this is covered by our statement about the likelihood function.
+
+### Prior Predictive Check
+
+This is to make sure that our priors are reasonable and fit the shape and values of our data.  To do this we simulate some data from our priors, and compare that with the observed data.  To do this within `brms` we will need to re-run our model but just sampling the priors:
+
+```{r prior-predictive-check}
+#| output: false
+
+binomial.fit.pp.check <- brm(transmission ~ wt, 
+           data = mtcars.data, 
+           family = bernoulli(),
+           sample_prior = "only",
+           prior = new.priors)
+```
+
+Lets visualize these the solid line is the observed data with the lighter lines being those simulated from our priors.  These look ok to me.
+
+```{r pp_check_results}
+# Show density plot
+pp_check(binomial.fit.pp.check, type = "dens_overlay", ndraws = 100)
+```
+
+>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.
+
+## Reporting Details of the Computation
+
+### Software
+
+It is good practice to cite the package and the version numbers for reproducibility.
+
+>We used the brms package version `r packageVersion("brms")` [@brms;@brms-mlm] implemented in R version `r getRversion()` [@r-core].
+
+### MCMC Chain Convergence
+
+This is given by $\hat{R}$ or Rhat in brms, which is the same as as the PSRF (Position scale response factor) or the Gelman-Rubin convergence diagnostic [@Gelman1992].  We want this to be as close to 1 as possible (ideally between $0.99-1.01$).  You could report this for each model, or just give a range of values.
+
+>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters
+
+```{r rhat}
+kable(data.frame(
+  Parameter = names(rhat(binomial.fit)),
+  Rhat = format(rhat(binomial.fit), nsmall = 5)),
+caption="Rhat values for model testing the association between weight and transmission (should b between 0.99 and 1.01 for convergence).",
+row.names = F)
+```
+
+### MCMC Chain Resolution
+
+This is the ESS or effective sample size.  We use the default 4000 samples, and the ESS is how many are unique.  This should be >400, you can report its greater than some value if you are reporting several models.
+
+```{r ess}
+library(broom.mixed)
+tidy(binomial.fit, ess = TRUE) %>% kable(caption="Model random effects for weight vs transmission")
+```
+
+>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were >1500 samples for each parameter.
+
+## Posterior Distribution
+
+### Posterior Predictive Check
+
+Similar to the prior predictive check we should check if our posterior results match the actual results.
+
+```{r posterior-predictive-check}
+pp_check(binomial.fit, type = "dens_overlay",ndraws=100)
+```
+
+This looks great, with the modeled curve being in the middle of the posterior drawn lines.
+
+>A posterior predictive check indicated a good model fit.
+
+### Summarize Posterior of Variables
+
+Describe the posterior variables, including their shape, estimates and range.
+
+```{r posterior-plots}
+plot(binomial.fit)
+library(ggplot2)
+library(cowplot)
+b_wt_plot <- 
+  as_draws_df(binomial.fit) %>%
+  ggplot(aes(x=b_wt)) +
+  geom_density(fill="#FFCB05") +
+  geom_vline(xintercept=0,color="#00274C",lty=2) +
+  labs(y="",
+       x="",
+       title="Beta (Weight)") +
+  theme_classic(base_size=16)
+
+b_int_plot <- 
+  as_draws_df(binomial.fit) %>%
+  ggplot(aes(x=b_Intercept)) +
+  geom_density(fill="#FFCB05") +
+  geom_vline(xintercept=0,color="#00274C",lty=2) +
+  labs(y="",
+       x="",
+       title="Intercept") +
+  theme_classic(base_size=16)
+
+plot_grid(b_int_plot,b_wt_plot)
+```
+These are both roughly unimodal distributions centered at:
+
+```{r binomial-fixef}
+fixef(binomial.fit) %>% kable(caption="Posterior estimates", digits=3)
+```
+
+>The beta coefficient for the effect of weight on transmission type is `r round(fixef(binomial.fit)['wt','Estimate'],3)`  with a 95% confidence interval of `r round(fixef(binomial.fit)['wt','Q2.5'],3)` to `r round(fixef(binomial.fit)['wt','Q97.5'],3)` (OR=`r round(exp(fixef(binomial.fit)['wt','Estimate']),3)`).
+
+### Bayes Factor and Posterior Probabilities
+
+The Bayes Factor and posterior probabilities are extracted by testing a particular hypothesis
+
+```{r bayes-factor}
+hypothesis(binomial.fit, "wt<0")$hypothesis %>%
+  kable(caption="Hypothesis test for effects of weight on automatic transmission", digits=3)
+```
+
+In this case the values are off the scale high so its best to report as greater than a large number rather than infinity and zero.
+
+>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
+
+
+## Summary
+
+Here are some recommendations to where to put this information
+
+| Reporting Point | Location |
+| -- | -- |
+| Justification | Introduction |
+| Goals | Introduction |
+| Description of Variables | Results |
+| Likelihood Function | Methods |
+| Prior Distribution | Methods |
+| Formal Specification | Methods or Default |
+| Prior Predictive Check | Methods/Repository |
+| Sotware | Methods |
+| $\hat{R}$ | Methods |
+| ESS | Methods |
+| Posterior Probability Check | Methods/Repository |
+| Posterior Distributions | Results/Repository |
+| BF and Postrior Probability | Results |
+
+### References
+
+::: {#refs}
+:::
+
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+```

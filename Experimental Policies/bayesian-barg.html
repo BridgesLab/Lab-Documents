@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dave Bridges">
+<meta name="dcterms.date" content="2024-08-22">
+
+<title>Bayesian Analyses - Efective Reporting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="bayesian-barg_files/libs/clipboard/clipboard.min.js"></script>
+<script src="bayesian-barg_files/libs/quarto-html/quarto.js"></script>
+<script src="bayesian-barg_files/libs/quarto-html/popper.min.js"></script>
+<script src="bayesian-barg_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="bayesian-barg_files/libs/quarto-html/anchor.min.js"></script>
+<link href="bayesian-barg_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="bayesian-barg_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="bayesian-barg_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="bayesian-barg_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="bayesian-barg_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#preamble" id="toc-preamble" class="nav-link active" data-scroll-target="#preamble">Preamble</a>
+  <ul class="collapse">
+  <li><a href="#justify-why-you-are-using-a-bayesian-approach" id="toc-justify-why-you-are-using-a-bayesian-approach" class="nav-link" data-scroll-target="#justify-why-you-are-using-a-bayesian-approach">Justify why you are using a Bayesian approach</a></li>
+  <li><a href="#explain-the-goals-of-the-analysis" id="toc-explain-the-goals-of-the-analysis" class="nav-link" data-scroll-target="#explain-the-goals-of-the-analysis">Explain the goals of the analysis</a></li>
+  </ul></li>
+  <li><a href="#model-specification" id="toc-model-specification" class="nav-link" data-scroll-target="#model-specification">Model Specification</a>
+  <ul class="collapse">
+  <li><a href="#describe-dependent-and-independent-variables" id="toc-describe-dependent-and-independent-variables" class="nav-link" data-scroll-target="#describe-dependent-and-independent-variables">Describe dependent and independent variables</a></li>
+  <li><a href="#likelihood-function-and-model-parameters" id="toc-likelihood-function-and-model-parameters" class="nav-link" data-scroll-target="#likelihood-function-and-model-parameters">Likelihood function and model parameters</a></li>
+  <li><a href="#prior-distributions" id="toc-prior-distributions" class="nav-link" data-scroll-target="#prior-distributions">Prior Distributions</a></li>
+  <li><a href="#formal-specification-of-the-likelihood-function" id="toc-formal-specification-of-the-likelihood-function" class="nav-link" data-scroll-target="#formal-specification-of-the-likelihood-function">Formal Specification of the Likelihood Function</a></li>
+  <li><a href="#prior-predictive-check" id="toc-prior-predictive-check" class="nav-link" data-scroll-target="#prior-predictive-check">Prior Predictive Check</a></li>
+  </ul></li>
+  <li><a href="#reporting-details-of-the-computation" id="toc-reporting-details-of-the-computation" class="nav-link" data-scroll-target="#reporting-details-of-the-computation">Reporting Details of the Computation</a>
+  <ul class="collapse">
+  <li><a href="#software" id="toc-software" class="nav-link" data-scroll-target="#software">Software</a></li>
+  <li><a href="#mcmc-chain-convergence" id="toc-mcmc-chain-convergence" class="nav-link" data-scroll-target="#mcmc-chain-convergence">MCMC Chain Convergence</a></li>
+  <li><a href="#mcmc-chain-resolution" id="toc-mcmc-chain-resolution" class="nav-link" data-scroll-target="#mcmc-chain-resolution">MCMC Chain Resolution</a></li>
+  </ul></li>
+  <li><a href="#posterior-distribution" id="toc-posterior-distribution" class="nav-link" data-scroll-target="#posterior-distribution">Posterior Distribution</a>
+  <ul class="collapse">
+  <li><a href="#posterior-predictive-check" id="toc-posterior-predictive-check" class="nav-link" data-scroll-target="#posterior-predictive-check">Posterior Predictive Check</a></li>
+  <li><a href="#summarize-posterior-of-variables" id="toc-summarize-posterior-of-variables" class="nav-link" data-scroll-target="#summarize-posterior-of-variables">Summarize Posterior of Variables</a></li>
+  <li><a href="#bayes-factor-and-posterior-probabilities" id="toc-bayes-factor-and-posterior-probabilities" class="nav-link" data-scroll-target="#bayes-factor-and-posterior-probabilities">Bayes Factor and Posterior Probabilities</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
+  <ul class="collapse">
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info">Session Info</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Bayesian Analyses - Efective Reporting</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dave Bridges </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 22, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>So how do we report the results of a bayesian analysis. As mentioned previously, at a minimum you need to report either the Bayes Factor or the Posterior Probabilities. However that is not typically sufficient or reproducible.</p>
+<p>Fortunately there are reporting guidelines set out in <span class="citation" data-cites="kruschkeBayesianAnalysisReporting2021">(<a href="#ref-kruschkeBayesianAnalysisReporting2021" role="doc-biblioref">Kruschke 2021</a>)</span>, which includes the rationale and importance for each of these. These are known as the Bayesian Analysis Reporting Guidelines or BARG. Lets go over them, and some ideas of how we could do this with our example analysis of mtcars evaluating the relationship between transmission type and vehicle weight</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytex)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>mtcars.data <span class="ot">&lt;-</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(mtcars) <span class="sc">%&gt;%</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">transmission =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(am<span class="sc">==</span><span class="dv">0</span><span class="sc">~</span><span class="st">"automatic"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                           am<span class="sc">==</span><span class="dv">1</span><span class="sc">~</span><span class="st">"manual"</span>)),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">engine=</span><span class="fu">factor</span>(<span class="fu">case_when</span>(vs<span class="sc">==</span><span class="dv">0</span><span class="sc">~</span><span class="st">"V-Shaped"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                       vs<span class="sc">==</span><span class="dv">1</span><span class="sc">~</span><span class="st">"Straight"</span>)),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">cylindars=</span><span class="fu">factor</span>(cyl))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="preamble" class="level2">
+<h2 class="anchored" data-anchor-id="preamble">Preamble</h2>
+<section id="justify-why-you-are-using-a-bayesian-approach" class="level3">
+<h3 class="anchored" data-anchor-id="justify-why-you-are-using-a-bayesian-approach">Justify why you are using a Bayesian approach</h3>
+<p>This is important as it is likely most readers will be unfamiliar with this approach and will be hoping to see conventional p-values.</p>
+<p>For each of these I will show some sample language</p>
+<blockquote class="blockquote">
+<p>We used a Bayesian approach here because it provides a continuous probability interpretation of the hypotheses being tested</p>
+</blockquote>
+</section>
+<section id="explain-the-goals-of-the-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="explain-the-goals-of-the-analysis">Explain the goals of the analysis</h3>
+<blockquote class="blockquote">
+<p>To determine whether transmission has a relationship with the weight in the mtcars dataset.</p>
+</blockquote>
+</section>
+</section>
+<section id="model-specification" class="level2">
+<h2 class="anchored" data-anchor-id="model-specification">Model Specification</h2>
+<section id="describe-dependent-and-independent-variables" class="level3">
+<h3 class="anchored" data-anchor-id="describe-dependent-and-independent-variables">Describe dependent and independent variables</h3>
+<p>This should be done in the results section so it is clear what the comparason is.</p>
+<blockquote class="blockquote">
+<p>We evaluated whether the vehicle had an automatic or manual transmission and how that related to the weight.</p>
+</blockquote>
+</section>
+<section id="likelihood-function-and-model-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood-function-and-model-parameters">Likelihood function and model parameters</h3>
+<p>Lets look at our analysis from before. We used a bernoulli family fit (this is a binomial regression). This is the default analysis:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>binomial.fit.default <span class="ot">&lt;-</span> <span class="fu">brm</span>(transmission <span class="sc">~</span> wt, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As we will shortly see its helpful for us to be more thoughtful about the choice of priors which by default are flat with no upper or lower bounds. The intercept is set roughly to a Student’s <em>t</em> distribution centered around 3 tons.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(binomial.fit.default) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of transmission on engine type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Prior summary for effects of transmission on engine type</caption>
+<colgroup>
+<col style="width: 29%">
+<col style="width: 13%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">prior</th>
+<th style="text-align: left;">class</th>
+<th style="text-align: left;">coef</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">resp</th>
+<th style="text-align: left;">dpar</th>
+<th style="text-align: left;">nlpar</th>
+<th style="text-align: left;">lb</th>
+<th style="text-align: left;">ub</th>
+<th style="text-align: left;">source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">wt</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">student_t(3, 0, 2.5)</td>
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We have <em>some</em> information already, for example we know that there are more automatic than manual transmission vehicles. Globally 56% of vehicles are automatic. That means the log odds of a transmission being automatic is <span class="math inline">\(LogOdds=\ln{p/(1-p)}\)</span> since <span class="math inline">\(\ln \frac{0.56}{1-0.56} \approx 0.241\)</span> we will set this as the intercept with a wide standard deviation of 5.</p>
+<p>I dont have a good sense of what I estimated for the effects of weight (class b, coef wt), so I set that to normal distribution around zero with a standard deviation of 5, zero degrees of freedom and and with no boundaries. I would consider these are somewhat informative priors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>new.priors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="fl">0.241</span>,<span class="dv">5</span>), <span class="at">class=</span>Intercept),</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>,<span class="dv">5</span>),<span class="at">class=</span>b, <span class="at">coef=</span>wt))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>binomial.fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(transmission <span class="sc">~</span> wt, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">sample_prior =</span> T,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">prior =</span> new.priors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of weight on transmission type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Prior summary for effects of weight on transmission type</caption>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">prior</th>
+<th style="text-align: left;">class</th>
+<th style="text-align: left;">coef</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">resp</th>
+<th style="text-align: left;">dpar</th>
+<th style="text-align: left;">nlpar</th>
+<th style="text-align: left;">lb</th>
+<th style="text-align: left;">ub</th>
+<th style="text-align: left;">source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">default</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">normal(0, 5)</td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;">wt</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">user</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">normal(0.241, 5)</td>
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">user</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Using the bernouli family, the default is the logit link function.</p>
+<blockquote class="blockquote">
+<p>The data were fit to a bernoulli distribution with a logit link function.</p>
+</blockquote>
+</section>
+<section id="prior-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="prior-distributions">Prior Distributions</h3>
+<p>What was the prior probabilities set at. As noted above we set our priors to be this, including some justification:</p>
+<blockquote class="blockquote">
+<p>The prior distributions were set so that the intercept was a normal distribution with a beta coefficient corresponding to the log odds corresponding to a 56% probability of an automatic transmission (<span class="math inline">\(\beta = 0.241\)</span>; based on worldwide automobile statistics), with a relatively wide standard deviation of 5. For the prior effects of weight on transmission type we used normally distributed priors with a mean of zero and a standard deviation of 5.</p>
+</blockquote>
+</section>
+<section id="formal-specification-of-the-likelihood-function" class="level3">
+<h3 class="anchored" data-anchor-id="formal-specification-of-the-likelihood-function">Formal Specification of the Likelihood Function</h3>
+<p>The Bernouli family probability function including a logit link is automatically implemented in brms but is <span class="math inline">\(P(TYPE|\eta) = (1 / (1 + exp(-\eta)))^{TYPE} * (1 - 1 / (1 + exp(-\eta)))^(1-TYPE)\)</span> where TYPE is the type of transmission (0 for manual, 1 for automatic).</p>
+<p>This is implemented within <code>brms</code> so I think this is covered by our statement about the likelihood function.</p>
+</section>
+<section id="prior-predictive-check" class="level3">
+<h3 class="anchored" data-anchor-id="prior-predictive-check">Prior Predictive Check</h3>
+<p>This is to make sure that our priors are reasonable and fit the shape and values of our data. To do this we simulate some data from our priors, and compare that with the observed data. To do this within <code>brms</code> we will need to re-run our model but just sampling the priors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>binomial.fit.pp.check <span class="ot">&lt;-</span> <span class="fu">brm</span>(transmission <span class="sc">~</span> wt, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> mtcars.data, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">sample_prior =</span> <span class="st">"only"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">prior =</span> new.priors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lets visualize these the solid line is the observed data with the lighter lines being those simulated from our priors. These look ok to me.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show density plot</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(binomial.fit.pp.check, <span class="at">type =</span> <span class="st">"dens_overlay"</span>, <span class="at">ndraws =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-barg_files/figure-html/pp_check_results-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>We did a prior predictive check and values from simulated from our prior distributions were similar to the observed data.</p>
+</blockquote>
+</section>
+</section>
+<section id="reporting-details-of-the-computation" class="level2">
+<h2 class="anchored" data-anchor-id="reporting-details-of-the-computation">Reporting Details of the Computation</h2>
+<section id="software" class="level3">
+<h3 class="anchored" data-anchor-id="software">Software</h3>
+<p>It is good practice to cite the package and the version numbers for reproducibility.</p>
+<blockquote class="blockquote">
+<p>We used the brms package version 2.21.0 <span class="citation" data-cites="brms brms-mlm">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2021</a>, <a href="#ref-brms-mlm" role="doc-biblioref">2017</a>)</span> implemented in R version 4.4.1 <span class="citation" data-cites="r-core">(<a href="#ref-r-core" role="doc-biblioref">R Core Team 2024</a>)</span>.</p>
+</blockquote>
+</section>
+<section id="mcmc-chain-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="mcmc-chain-convergence">MCMC Chain Convergence</h3>
+<p>This is given by <span class="math inline">\(\hat{R}\)</span> or Rhat in brms, which is the same as as the PSRF (Position scale response factor) or the Gelman-Rubin convergence diagnostic <span class="citation" data-cites="Gelman1992">(<a href="#ref-Gelman1992" role="doc-biblioref">Gelman and Rubin 1992</a>)</span>. We want this to be as close to 1 as possible (ideally between <span class="math inline">\(0.99-1.01\)</span>). You could report this for each model, or just give a range of values.</p>
+<blockquote class="blockquote">
+<p>We verified that the Gelman-Rubin statistic for chain convergence was between 1 and 1.01 for all model parameters</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Parameter =</span> <span class="fu">names</span>(<span class="fu">rhat</span>(binomial.fit)),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Rhat =</span> <span class="fu">format</span>(<span class="fu">rhat</span>(binomial.fit), <span class="at">nsmall =</span> <span class="dv">5</span>)),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">caption=</span><span class="st">"Rhat values for model testing the association between weight and transmission (should b between 0.99 and 1.01 for convergence)."</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">row.names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Rhat values for model testing the association between weight and transmission (should b between 0.99 and 1.01 for convergence).</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Rhat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">b_Intercept</td>
+<td style="text-align: left;">1.002042</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">b_wt</td>
+<td style="text-align: left;">1.001543</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: left;">1.002517</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">prior_Intercept</td>
+<td style="text-align: left;">1.000273</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prior_b_wt</td>
+<td style="text-align: left;">1.000092</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lprior</td>
+<td style="text-align: left;">1.001200</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lp__</td>
+<td style="text-align: left;">1.001149</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="mcmc-chain-resolution" class="level3">
+<h3 class="anchored" data-anchor-id="mcmc-chain-resolution">MCMC Chain Resolution</h3>
+<p>This is the ESS or effective sample size. We use the default 4000 samples, and the ESS is how many are unique. This should be &gt;400, you can report its greater than some value if you are reporting several models.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(binomial.fit, <span class="at">ess =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Model random effects for weight vs transmission"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Model random effects for weight vs transmission</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 11%">
+<col style="width: 7%">
+<col style="width: 14%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: right;">ess</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">13.0749075</td>
+<td style="text-align: right;">4.381090</td>
+<td style="text-align: right;">5.893250</td>
+<td style="text-align: right;">23.104665</td>
+<td style="text-align: right;">1877.921</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">wt</td>
+<td style="text-align: right;">-4.3543135</td>
+<td style="text-align: right;">1.389451</td>
+<td style="text-align: right;">-7.430027</td>
+<td style="text-align: right;">-2.050400</td>
+<td style="text-align: right;">1793.746</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">priorwt</td>
+<td style="text-align: right;">0.0745448</td>
+<td style="text-align: right;">4.962379</td>
+<td style="text-align: right;">-9.666938</td>
+<td style="text-align: right;">9.774055</td>
+<td style="text-align: right;">4029.507</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>The effective sample size for the Markov Chain Monte Carlo (MCMC) analyses were &gt;1500 samples for each parameter.</p>
+</blockquote>
+</section>
+</section>
+<section id="posterior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="posterior-distribution">Posterior Distribution</h2>
+<section id="posterior-predictive-check" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-predictive-check">Posterior Predictive Check</h3>
+<p>Similar to the prior predictive check we should check if our posterior results match the actual results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(binomial.fit, <span class="at">type =</span> <span class="st">"dens_overlay"</span>,<span class="at">ndraws=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-barg_files/figure-html/posterior-predictive-check-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This looks great, with the modeled curve being in the middle of the posterior drawn lines.</p>
+<blockquote class="blockquote">
+<p>A posterior predictive check indicated a good model fit.</p>
+</blockquote>
+</section>
+<section id="summarize-posterior-of-variables" class="level3">
+<h3 class="anchored" data-anchor-id="summarize-posterior-of-variables">Summarize Posterior of Variables</h3>
+<p>Describe the posterior variables, including their shape, estimates and range.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(binomial.fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-barg_files/figure-html/posterior-plots-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>b_wt_plot <span class="ot">&lt;-</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_draws_df</span>(binomial.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_wt)) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"#FFCB05"</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"#00274C"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">""</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Beta (Weight)"</span>) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>b_int_plot <span class="ot">&lt;-</span> </span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_draws_df</span>(binomial.fit) <span class="sc">%&gt;%</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_Intercept)) <span class="sc">+</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"#FFCB05"</span>) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="dv">0</span>,<span class="at">color=</span><span class="st">"#00274C"</span>,<span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">""</span>,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Intercept"</span>) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(b_int_plot,b_wt_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bayesian-barg_files/figure-html/posterior-plots-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>These are both roughly unimodal distributions centered at:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixef</span>(binomial.fit) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Posterior estimates"</span>, <span class="at">digits=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Posterior estimates</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Est.Error</th>
+<th style="text-align: right;">Q2.5</th>
+<th style="text-align: right;">Q97.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: right;">13.075</td>
+<td style="text-align: right;">4.381</td>
+<td style="text-align: right;">5.893</td>
+<td style="text-align: right;">23.105</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">wt</td>
+<td style="text-align: right;">-4.354</td>
+<td style="text-align: right;">1.389</td>
+<td style="text-align: right;">-7.430</td>
+<td style="text-align: right;">-2.050</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<blockquote class="blockquote">
+<p>The beta coefficient for the effect of weight on transmission type is -4.354 with a 95% confidence interval of -7.43 to -2.05 (OR=0.013).</p>
+</blockquote>
+</section>
+<section id="bayes-factor-and-posterior-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="bayes-factor-and-posterior-probabilities">Bayes Factor and Posterior Probabilities</h3>
+<p>The Bayes Factor and posterior probabilities are extracted by testing a particular hypothesis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(binomial.fit, <span class="st">"wt&lt;0"</span>)<span class="sc">$</span>hypothesis <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Hypothesis test for effects of weight on automatic transmission"</span>, <span class="at">digits=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<caption>Hypothesis test for effects of weight on automatic transmission</caption>
+<colgroup>
+<col style="width: 14%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hypothesis</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Est.Error</th>
+<th style="text-align: right;">CI.Lower</th>
+<th style="text-align: right;">CI.Upper</th>
+<th style="text-align: right;">Evid.Ratio</th>
+<th style="text-align: right;">Post.Prob</th>
+<th style="text-align: left;">Star</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(wt) &lt; 0</td>
+<td style="text-align: right;">-4.354</td>
+<td style="text-align: right;">1.389</td>
+<td style="text-align: right;">-6.9</td>
+<td style="text-align: right;">-2.331</td>
+<td style="text-align: right;">Inf</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>In this case the values are off the scale high so its best to report as greater than a large number rather than infinity and zero.</p>
+<blockquote class="blockquote">
+<p>The Bayes Factor for the hypothesis that weight results in a lower likelihood of an automatic transmission is &gt;1,000,000 with a posterior probability of &gt;0.999.</p>
+</blockquote>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>Here are some recommendations to where to put this information</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Reporting Point</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Justification</td>
+<td>Introduction</td>
+</tr>
+<tr class="even">
+<td>Goals</td>
+<td>Introduction</td>
+</tr>
+<tr class="odd">
+<td>Description of Variables</td>
+<td>Results</td>
+</tr>
+<tr class="even">
+<td>Likelihood Function</td>
+<td>Methods</td>
+</tr>
+<tr class="odd">
+<td>Prior Distribution</td>
+<td>Methods</td>
+</tr>
+<tr class="even">
+<td>Formal Specification</td>
+<td>Methods or Default</td>
+</tr>
+<tr class="odd">
+<td>Prior Predictive Check</td>
+<td>Methods/Repository</td>
+</tr>
+<tr class="even">
+<td>Sotware</td>
+<td>Methods</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\hat{R}\)</span></td>
+<td>Methods</td>
+</tr>
+<tr class="even">
+<td>ESS</td>
+<td>Methods</td>
+</tr>
+<tr class="odd">
+<td>Posterior Probability Check</td>
+<td>Methods/Repository</td>
+</tr>
+<tr class="even">
+<td>Posterior Distributions</td>
+<td>Results/Repository</td>
+</tr>
+<tr class="odd">
+<td>BF and Postrior Probability</td>
+<td>Results</td>
+</tr>
+</tbody>
+</table>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-brms-mlm" class="csl-entry" role="doc-biblioentry">
+Bürkner, Paul-Christian. 2017. <span>“<span class="nocase">brms</span>: An <span>R</span> Package for <span>Bayesian</span> Multilevel Models Using <span>Stan</span>.”</span> <em>Journal of Statistical Software</em> 80 (1): 1–28. <a href="https://doi.org/10.18637/jss.v080.i01">https://doi.org/10.18637/jss.v080.i01</a>.
+</div>
+<div id="ref-brms" class="csl-entry" role="doc-biblioentry">
+———. 2021. <span>“Bayesian Item Response Modeling in <span>R</span> with <span class="nocase">brms</span> and <span>Stan</span>.”</span> <em>Journal of Statistical Software</em> 100 (5): 1–54. <a href="https://doi.org/10.18637/jss.v100.i05">https://doi.org/10.18637/jss.v100.i05</a>.
+</div>
+<div id="ref-Gelman1992" class="csl-entry" role="doc-biblioentry">
+Gelman, A., and D. B. Rubin. 1992. <span>“Inference from Iterative Simulation Using Multiple Sequences.”</span> <em>Statistical Science</em> 7 (4): 457–72. <a href="https://doi.org/10.1214/ss/1177011136">https://doi.org/10.1214/ss/1177011136</a>.
+</div>
+<div id="ref-kruschkeBayesianAnalysisReporting2021" class="csl-entry" role="doc-biblioentry">
+Kruschke, John K. 2021. <span>“Bayesian <span>Analysis Reporting Guidelines</span>.”</span> <em>Nature Human Behaviour</em> 5 (10): 1282–91. <a href="https://doi.org/10.1038/s41562-021-01177-7">https://doi.org/10.1038/s41562-021-01177-7</a>.
+</div>
+<div id="ref-r-core" class="csl-entry" role="doc-biblioentry">
+R Core Team. 2024. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+</div>
+</section>
+</section>
+<section id="session-info" class="level1">
+<h1>Session Info</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Monterey 12.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] cowplot_1.1.3       ggplot2_3.5.1       broom.mixed_0.2.9.5
+[4] brms_2.21.0         Rcpp_1.0.13         dplyr_1.1.4        
+[7] knitr_1.48          tinytex_0.52       
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.5         tensorA_0.36.2.1     xfun_0.46           
+ [4] QuickJSR_1.3.1       processx_3.8.4       inline_0.3.19       
+ [7] lattice_0.22-6       callr_3.7.6          vctrs_0.6.5         
+[10] tools_4.4.1          ps_1.7.7             generics_0.1.3      
+[13] stats4_4.4.1         parallel_4.4.1       tibble_3.2.1        
+[16] fansi_1.0.6          pkgconfig_2.0.3      Matrix_1.7-0        
+[19] checkmate_2.3.2      distributional_0.4.0 RcppParallel_5.1.8  
+[22] lifecycle_1.0.4      compiler_4.4.1       farver_2.1.2        
+[25] stringr_1.5.1        Brobdingnag_1.2-9    munsell_0.5.1       
+[28] codetools_0.2-20     htmltools_0.5.8.1    bayesplot_1.11.1    
+[31] yaml_2.3.10          furrr_0.3.1          tidyr_1.3.1         
+[34] pillar_1.9.0         StanHeaders_2.32.10  bridgesampling_1.1-2
+[37] abind_1.4-5          parallelly_1.38.0    nlme_3.1-164        
+[40] posterior_1.6.0      rstan_2.32.6         tidyselect_1.2.1    
+[43] digest_0.6.36        future_1.34.0        mvtnorm_1.2-5       
+[46] stringi_1.8.4        listenv_0.9.1        purrr_1.0.2         
+[49] reshape2_1.4.4       splines_4.4.1        forcats_1.0.0       
+[52] labeling_0.4.3       fastmap_1.2.0        grid_4.4.1          
+[55] colorspace_2.1-1     cli_3.6.3            magrittr_2.0.3      
+[58] loo_2.8.0            pkgbuild_1.4.4       utf8_1.2.4          
+[61] broom_1.0.6          withr_3.0.0          scales_1.3.0        
+[64] backports_1.5.0      rmarkdown_2.27       globals_0.16.3      
+[67] matrixStats_1.3.0    gridExtra_2.3        coda_0.19-4.1       
+[70] evaluate_0.24.0      rstantools_2.4.0     rlang_1.1.4         
+[73] glue_1.7.0           rstudioapi_0.16.0    jsonlite_1.8.8      
+[76] R6_2.5.1             plyr_1.8.9          </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

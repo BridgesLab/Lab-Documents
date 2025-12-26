@@ -1,17 +1,13 @@
 ---
 title: "General Statistics"
 author: "Dave Bridges"
-date: "May 9, 2014"
+date: "May 9, 2014, Last Updated 2024-08-11"
 output:
   html_document:
     highlight: tango
     keep_md: yes
-    number_sections: yes
-    toc: yes
-  pdf_document:
-    highlight: tango
-    keep_tex: yes
-    number_sections: yes
+    number_sections: no
+    toc_float: true
     toc: yes
 ---
 
@@ -19,7 +15,9 @@ output:
 
 # General Statistical Methods
 
-There are several important concepts that we will adhere to in our group.  These involve design considerations, execution considerations and analysis concerns.
+There are several important concepts that we will adhere to in our group.  These involve design considerations, execution considerations and analysis concerns.  The standard for our field is null hypothesis significance testing, which means that we are generally comparing our data to a null hypothesis, generating an **effect size** and a **p-value**.  As a general rule, we report both of these both within our Rmd scripts, and in our publications.
+
+We generally use an $\alpha$ of $p<0.05$ to determine significance, which means that (if true) we are rejecting the null hypothesis.
 
 
 
@@ -31,12 +29,12 @@ Where possible, prior to performing an experiment or study perform a power analy
 * The desired false positive rate (normally 0.05).  This is the rate at which you find a difference where there is none.  This is also known as the type I error rate.
 * The desired power (normally 0.8).  This indicates that 80% of the time you will detect the effect if there is one.  This is also known as 1 minus the false negative rate or 1 minus the Type II error rate.
 
-We use the R package **pwr** to do a power analysis (Champely, 2017).  Here is an example:
+We use the R package **pwr** to do a power analysis (Champely, 2020).  Here is an example:
 
 ### Pairwise Comparasons
 
 
-```r
+``` r
 require(pwr)
 false.negative.rate <- 0.05
 statistical.power <- 0.8
@@ -65,7 +63,7 @@ This tells us that in order to see a difference of at least 3, with at standard 
 The following is an example for detecting a correlation.  
 
 
-```r
+``` r
 require(pwr)
 false.negative.rate <- 0.05
 statistical.power <- 0.8
@@ -102,7 +100,7 @@ Best practice is to first test for normality, and if that test passes, to then t
 To test normality, we use a Shapiro-Wilk test (details on [Wikipedia](https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test) on each of your two groups).  Below is an example where there are two groups:
 
 
-```r
+``` r
 #create seed for reproducibility
 set.seed(1265)
 test.data <- tibble(Treatment=c(rep("Experiment",6), rep("Control",6)),
@@ -115,25 +113,25 @@ kable(test.data, caption="The test data used in the following examples")
 
 Table: The test data used in the following examples
 
-Treatment     Result
------------  -------
-Experiment     11.26
-Experiment      8.33
-Experiment      9.94
-Experiment     11.83
-Experiment      6.56
-Experiment     11.41
-Control         8.89
-Control        11.59
-Control         9.39
-Control         8.74
-Control         6.31
-Control         7.82
+|Treatment  | Result|
+|:----------|------:|
+|Experiment |  11.26|
+|Experiment |   8.33|
+|Experiment |   9.94|
+|Experiment |  11.83|
+|Experiment |   6.56|
+|Experiment |  11.41|
+|Control    |   8.89|
+|Control    |  11.59|
+|Control    |   9.39|
+|Control    |   8.74|
+|Control    |   6.31|
+|Control    |   7.82|
 
 Each of the two groups, in this case **Test** and **Control** must have Shapiro-Wilk tests done separately.  Some sample code for this is below (requires dplyr to be loaded):
 
 
-```r
+``` r
 #filter only for the control data
 control.data <- filter(test.data, Treatment=="Control")
 #The broom package makes the results of the test appear in a table, with the tidy command
@@ -145,20 +143,20 @@ shapiro.test(control.data$Result) %>% tidy %>% kable
 
 
 
- statistic   p.value  method                      
-----------  --------  ----------------------------
-     0.968      0.88  Shapiro-Wilk normality test 
+| statistic| p.value|method                      |
+|---------:|-------:|:---------------------------|
+|     0.968|    0.88|Shapiro-Wilk normality test |
 
-```r
+``` r
 experiment.data <- filter(test.data, Treatment=="Experiment")
 shapiro.test(test.data$Result) %>% tidy %>% kable
 ```
 
 
 
- statistic   p.value  method                      
-----------  --------  ----------------------------
-      0.93     0.377  Shapiro-Wilk normality test 
+| statistic| p.value|method                      |
+|---------:|-------:|:---------------------------|
+|      0.93|   0.377|Shapiro-Wilk normality test |
 
 Based on these results, since both p-values are >0.05 we do not reject the presumption of normality and can go on.  If one or more of the p-values were less than 0.05 we would then use a Mann-Whitney test (also known as a Wilcoxon rank sum test) will be done, see below for more details.
 
@@ -167,7 +165,7 @@ Based on these results, since both p-values are >0.05 we do not reject the presu
 We generally use the [car](https://cran.r-project.org/web/packages/car/index.html) package which contains code for [Levene's Test](https://en.wikipedia.org/wiki/Levene%27s_test) to see if two groups can be assumed to have equal variance:
 
 
-```r
+``` r
 #load the car package
 library(car)
 
@@ -177,10 +175,9 @@ leveneTest(Result ~ Treatment, data=test.data) %>% tidy %>% kable
 
 
 
-term     df   statistic   p.value
-------  ---  ----------  --------
-group     1       0.368     0.558
-         10          NA        NA
+| statistic| p.value| df| df.residual|
+|---------:|-------:|--:|-----------:|
+|     0.368|   0.558|  1|          10|
 
 ## Performing the Appropriate Pairwise Test
 
@@ -193,44 +190,44 @@ The logic to follow is:
 ### Student's *t* Test
 
 
-```r
+``` r
 #The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE
 t.test(Result~Treatment,data=test.data, var.equal=T) %>% tidy %>% kable
 ```
 
 
 
- estimate1   estimate2   statistic   p.value   parameter   conf.low   conf.high  method              alternative 
-----------  ----------  ----------  --------  ----------  ---------  ----------  ------------------  ------------
-      8.79        9.89      -0.992     0.345          10      -3.56        1.37  Two Sample t-test   two.sided   
+| estimate| estimate1| estimate2| statistic| p.value| parameter| conf.low| conf.high|method            |alternative |
+|--------:|---------:|---------:|---------:|-------:|---------:|--------:|---------:|:-----------------|:-----------|
+|     -1.1|      8.79|      9.89|    -0.992|   0.345|        10|    -3.56|      1.37|Two Sample t-test |two.sided   |
 
 ### Welch's *t* Test
 
 
-```r
+``` r
 #The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default
 t.test(Result~Treatment,data=test.data, var.equal=F) %>% tidy %>% kable
 ```
 
 
 
- estimate   estimate1   estimate2   statistic   p.value   parameter   conf.low   conf.high  method                    alternative 
----------  ----------  ----------  ----------  --------  ----------  ---------  ----------  ------------------------  ------------
-     -1.1        8.79        9.89      -0.992     0.345        9.72      -3.57        1.38  Welch Two Sample t-test   two.sided   
+| estimate| estimate1| estimate2| statistic| p.value| parameter| conf.low| conf.high|method                  |alternative |
+|--------:|---------:|---------:|---------:|-------:|---------:|--------:|---------:|:-----------------------|:-----------|
+|     -1.1|      8.79|      9.89|    -0.992|   0.345|      9.72|    -3.57|      1.38|Welch Two Sample t-test |two.sided   |
 
 ### Wilcoxon Rank Sum Test
 
 
-```r
+``` r
 # no need to specify anything about variance
 wilcox.test(Result~Treatment,data=test.data) %>% tidy %>% kable
 ```
 
 
 
- statistic   p.value  method                   alternative 
-----------  --------  -----------------------  ------------
-        12     0.394  Wilcoxon rank sum test   two.sided   
+| statistic| p.value|method                       |alternative |
+|---------:|-------:|:----------------------------|:-----------|
+|        12|   0.394|Wilcoxon rank sum exact test |two.sided   |
 
 
 # Corrections for Multiple Observations
@@ -243,7 +240,7 @@ The best illustration I have seen for the need for multiple observation correcti
 Any conceptually coherent set of observations must therefore be corrected for multiple observations.  In most cases, we will use the method of Benjamini and Hochberg since our p-values are not entirely independent.  Some sample code for this is here:
 
 
-```r
+``` r
 p.values <- c(0.023, 0.043, 0.056, 0.421, 0.012)
 data.frame(unadjusted = p.values, adjusted=p.adjust(p.values, method="BH"))
 ```
@@ -260,52 +257,49 @@ data.frame(unadjusted = p.values, adjusted=p.adjust(p.values, method="BH"))
 # Session Information
 
 
-```r
+``` r
 sessionInfo()
 ```
 
 ```
-## R version 3.4.2 (2017-09-28)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.1
+## R version 4.4.1 (2024-06-14)
+## Platform: x86_64-apple-darwin20
+## Running under: macOS Monterey 12.7.6
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## time zone: America/Detroit
+## tzcode source: internal
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] car_2.1-6           broom_0.4.3         bindrcpp_0.2       
-## [4] pwr_1.2-1           knitcitations_1.0.9 dplyr_0.7.4        
-## [7] tidyr_0.7.2         knitr_1.17         
+## [1] car_3.1-2            carData_3.0-5        broom_1.0.6         
+## [4] pwr_1.3-0            knitcitations_1.0.12 dplyr_1.1.4         
+## [7] tidyr_1.3.1          knitr_1.48          
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14       nloptr_1.0.4       compiler_3.4.2    
-##  [4] plyr_1.8.4         highr_0.6          bindr_0.1         
-##  [7] tools_3.4.2        lme4_1.1-14        digest_0.6.12     
-## [10] jsonlite_1.5       lubridate_1.7.1    evaluate_0.10.1   
-## [13] tibble_1.3.4       nlme_3.1-131       lattice_0.20-35   
-## [16] mgcv_1.8-22        pkgconfig_2.0.1    rlang_0.1.4       
-## [19] Matrix_1.2-12      psych_1.7.8        bibtex_0.4.2      
-## [22] yaml_2.1.15        parallel_3.4.2     SparseM_1.77      
-## [25] RefManageR_0.14.20 stringr_1.2.0      httr_1.3.1        
-## [28] xml2_1.1.1         MatrixModels_0.4-1 nnet_7.3-12       
-## [31] rprojroot_1.2      grid_3.4.2         glue_1.2.0        
-## [34] R6_2.2.2           foreign_0.8-69     rmarkdown_1.8     
-## [37] minqa_1.2.4        reshape2_1.4.2     purrr_0.2.4       
-## [40] magrittr_1.5       splines_3.4.2      MASS_7.3-47       
-## [43] backports_1.1.1    htmltools_0.3.6    pbkrtest_0.4-7    
-## [46] assertthat_0.2.0   mnormt_1.5-5       quantreg_5.34     
-## [49] stringi_1.1.6
+##  [1] jsonlite_1.8.8    compiler_4.4.1    tidyselect_1.2.1  Rcpp_1.0.13      
+##  [5] xml2_1.3.6        stringr_1.5.1     jquerylib_0.1.4   yaml_2.3.10      
+##  [9] fastmap_1.2.0     R6_2.5.1          plyr_1.8.9        generics_0.1.3   
+## [13] backports_1.5.0   tibble_3.2.1      RefManageR_1.4.0  lubridate_1.9.3  
+## [17] bslib_0.8.0       pillar_1.9.0      rlang_1.1.4       utf8_1.2.4       
+## [21] stringi_1.8.4     cachem_1.1.0      xfun_0.46         sass_0.4.9       
+## [25] bibtex_0.5.1      timechange_0.3.0  cli_3.6.3         withr_3.0.0      
+## [29] magrittr_2.0.3    digest_0.6.36     lifecycle_1.0.4   vctrs_0.6.5      
+## [33] evaluate_0.24.0   glue_1.7.0        abind_1.4-5       fansi_1.0.6      
+## [37] rmarkdown_2.27    purrr_1.0.2       httr_1.4.7        tools_4.4.1      
+## [41] pkgconfig_2.0.3   htmltools_0.5.8.1
 ```
 
 # References
 
-<a name=bib-pwr></a>[[1]](#cite-pwr) S. Champely. _pwr: Basic
-Functions for Power Analysis_. R package version 1.2-1. 2017. URL:
+<a name=bib-pwr></a>[[1]](#cite-pwr) S. Champely. _pwr: Basic Functions
+for Power Analysis_. R package version 1.3-0. 2020. URL:
 [https://CRAN.R-project.org/package=pwr](https://CRAN.R-project.org/package=pwr).

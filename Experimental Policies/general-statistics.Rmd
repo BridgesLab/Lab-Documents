@@ -1,17 +1,13 @@
 ---
 title: "General Statistics"
 author: "Dave Bridges"
-date: "May 9, 2014"
+date: "May 9, 2014, Last Updated 2024-08-11"
 output:
-  pdf_document:
-    highlight: tango
-    keep_tex: yes
-    number_sections: yes
-    toc: yes
   html_document:
     highlight: tango
     keep_md: yes
-    number_sections: yes
+    number_sections: no
+    toc_float: true
     toc: yes
 ---
 
@@ -45,12 +41,13 @@ color.scheme <- c('#00274c', '#ffcb05')
 
 # General Statistical Methods
 
-There are several important concepts that we will adhere to in our group.  These involve design considerations, execution considerations and analysis concerns.
+There are several important concepts that we will adhere to in our group.  These involve design considerations, execution considerations and analysis concerns.  The standard for our field is null hypothesis significance testing, which means that we are generally comparing our data to a null hypothesis, generating an **effect size** and a **p-value**.  As a general rule, we report both of these both within our Rmd scripts, and in our publications.
+
+We generally use an $\alpha$ of $p<0.05$ to determine significance, which means that (if true) we are rejecting the null hypothesis.
 
 ```{r intial-setup, echo=FALSE, message=FALSE}
 library(knitcitations)
 bib <- read.bibtex("references.bib")
-
 ```
 
 ## Experimental Design

@@ -1,0 +1,80 @@
+---
+title: "Informative title"
+author: "Authors"
+date: "2000-01-01"
+editor: source
+format: 
+  html:
+    toc: true
+    toc-location: right
+    keep-md: true
+    code-fold: true
+    code-summary: "Show the code"
+    fig-path: "figures/"
+  gfm:
+    html-math-method: webtex
+theme: journal
+execute:
+  echo: true
+  warning: false
+---
+
+```{r global_options}
+# hide this code chunk
+#| echo: false
+#| message: false
+
+# defines the se function
+se <- function(x) {
+  sd(x, na.rm = TRUE) / sqrt(length(x))
+}
+
+#load these packages, nearly always needed
+library(tidyverse)
+library(ggplot)
+
+# sets maize and blue color scheme
+color_scheme <- c("#00274c", "#ffcb05")
+```
+
+## Purpose
+
+Succintly describe the purpose of the experiment
+
+## Experimental Details
+
+Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis.  This might include specifics not in the general protocol such as cell lines, treatment doses etc.
+
+## Raw Data
+
+Describe your raw data files, including what the columns mean (and what units they are in).
+
+```{r data-input}
+library(readr) #loads the readr package
+filename <- "testfile.csv" #input file(s)
+
+#this loads whatever the file is into a dataframe called exp.data if it exists
+if (filename %in% dir()) {
+  exp.data <- read_csv(filename)
+}
+```
+
+These data can be found in `r getwd()` in a file named `r ifelse(filename %in% dir(), filename, "no file found")`.  This input file was most recently updated on `r ifelse(filename %in% dir(), format(file.info(filename)$mtime, "%Y-%m-%d"), "unknown")`.  This script was most recently updated on `r date()`.
+
+## Analysis
+
+Describe the analysis as you intersperse code chunks
+
+## Interpretation
+
+A brief summary of what the interpretation of these results were
+
+## References
+
+If needed you will need a *.bib file.  See the details at <https://quarto.org/docs/authoring/citations.html>
+
+## Session Information
+
+```{r session-information}
+sessionInfo()
+```

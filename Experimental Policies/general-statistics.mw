@@ -1,314 +1,444 @@
+<div class="cell">
+
+<syntaxhighlight lang="r">library(knitr)
+#figures makde will go to directory called figures, will make them as both png and pdf files 
+opts_chunk$set(fig.path='figures/',dev=c('png','pdf'))
+options(scipen = 2, digits = 3)
+# set echo and message to TRUE if you want to display code blocks and code output respectively
+
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+
+
+superpose.eb <- function (x, y, ebl, ebu = ebl, length = 0.08, ...)
+  arrows(x, y + ebu, x, y - ebl, angle = 90, code = 3,
+  length = length, ...)
+
+  
+se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+#load these packages, nearly always needed
+library(tidyr)
+library(dplyr)</syntaxhighlight>
+<div class="cell-output cell-output-stderr">
+
+<pre>
+Attaching package: 'dplyr'</pre>
+
+</div>
+<div class="cell-output cell-output-stderr">
+
+<pre>The following objects are masked from 'package:stats':
+
+    filter, lag</pre>
+
+</div>
+<div class="cell-output cell-output-stderr">
+
+<pre>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</pre>
+
+</div>
+<syntaxhighlight lang="r"># sets maize and blue color scheme
+color.scheme <- c('#00274c', '#ffcb05')</syntaxhighlight>
+
+</div>
+<span id="general-statistical-methods"></span>
 = General Statistical Methods =
 
-There are several important concepts that we will adhere to in our group. These involve design considerations, execution considerations and analysis concerns.
+There are several important concepts that we will adhere to in our group. These involve design considerations, execution considerations and analysis concerns. The standard for our field is null hypothesis significance testing, which means that we are generally comparing our data to a null hypothesis, generating an '''effect size''' and a '''p-value'''. As a general rule, we report both of these both within our Rmd/qmd scripts, and in our publications.
 
-== Experimental Design ==
+We generally use an <math display="inline">\alpha</math> of <math display="inline">p<0.05</math> to determine significance, which means that (if true) we are rejecting the null hypothesis. This is known as null hypothesis significance testing.
 
-Where possible, prior to performing an experiment or study perform a power analysis. This is mainly to determine the appropriate sample sizes. To do this, you need to know a few of things:
+An alternative approach is to use a Bayesian approach, described in more detail in [https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html this document]
 
-* Either the sample size or the difference. The difference is provided in standard deviations. This means that you need to know the standard deviation of your measurement in question. It is a good idea to keep a log of these for your data, so that you can approximate what this is. If you hope to detect a correlation you will need to know the expected correlation coefficient.
-* The desired false positive rate (normally 0.05). This is the rate at which you find a difference where there is none. This is also known as the type I error rate.
-* The desired power (normally 0.8). This indicates that 80% of the time you will detect the effect if there is one. This is also known as 1 minus the false negative rate or 1 minus the Type II error rate.
-
-We use the R package '''pwr''' to do a power analysis (Champely, 2017). Here is an example:
-
-=== Pairwise Comparasons ===
-
-<pre class="r">require(pwr)
-false.negative.rate &lt;- 0.05
-statistical.power &lt;- 0.8
-sd &lt;- 3.5 #this is calculated from known measurements
-difference &lt;- 3  #you hope to detect a difference 
-pwr.t.test(d = difference, sig.level = false.negative.rate, power=statistical.power)</pre>
-<pre>## 
-##      Two-sample t test power calculation 
-## 
-##               n = 3.07
-##               d = 3
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = two.sided
-## 
-## NOTE: n is number in *each* group</pre>
-This tells us that in order to see a difference of at least 3, with at standard devation of 3.5 we need at least '''3''' observations in each group.
-
-=== Correlations ===
-
-The following is an example for detecting a correlation.
-
-<pre class="r">require(pwr)
-false.negative.rate &lt;- 0.05
-statistical.power &lt;- 0.8
-correlation.coefficient &lt;- 0.6 #note that this is the r, to get the R2 value you will have to square this result.
-pwr.r.test(r = correlation.coefficient, sig.level = false.negative.rate, power=statistical.power)</pre>
-<pre>## 
-##      approximate correlation power calculation (arctangh transformation) 
-## 
-##               n = 18.6
-##               r = 0.6
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = two.sided</pre>
-This tells us that in order to detect a correlation coefficient of at least 0.6 (or an R^2 of 0.36) you need more than '''18''' observations.
-
+<span id="pairwise-testing"></span>
 = Pairwise Testing =
 
-If you have two groups (and two groups only) that you want to know if they are different, you will normally want to do a pairwise test. This is '''not''' the case if you have paired data (before and after for example). The most common of these is something called a Student's ''t''-test, but this test has two key assumptions:
+If you have two groups (and two groups only) that you want to know if they are different, you will normally want to do a pairwise test. This is '''not''' the case if you have paired data (before and after for example). The most common of these is something called a Student’s ''t''-test, but this test has two key assumptions:
 
 * The data are normally distributed
 * The two groups have equal variance
 
+<span id="testing-the-assumptions"></span>
 == Testing the Assumptions ==
 
 Best practice is to first test for normality, and if that test passes, to then test for equal variance
 
+<span id="testing-normality"></span>
 === Testing Normality ===
 
 To test normality, we use a Shapiro-Wilk test (details on [https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test Wikipedia] on each of your two groups). Below is an example where there are two groups:
 
-<pre class="r">#create seed for reproducibility
+<div class="cell">
+
+<syntaxhighlight lang="r">#create seed for reproducibility
 set.seed(1265)
-test.data &lt;- tibble(Treatment=c(rep(&quot;Experiment&quot;,6), rep(&quot;Control&quot;,6)),
+test.data <- tibble(Treatment=c(rep("Experiment",6), rep("Control",6)),
            Result = rnorm(n=12, mean=10, sd=3))
-#test.data$Treatment &lt;- as.factor(test.data$Treatment)
-kable(test.data, caption=&quot;The test data used in the following examples&quot;)</pre>
-{|
+#test.data$Treatment <- as.factor(test.data$Treatment)
+kable(test.data, caption="The test data used in the following examples")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
 |+ The test data used in the following examples
-! Treatment
-!align="right"| Result
 |-
-| Experiment
-|align="right"| 11.26
+! style="text-align: left;"| Treatment
+! style="text-align: right;"| Result
 |-
-| Experiment
-|align="right"| 8.33
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 11.26
 |-
-| Experiment
-|align="right"| 9.94
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 8.33
 |-
-| Experiment
-|align="right"| 11.83
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 9.94
 |-
-| Experiment
-|align="right"| 6.56
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 11.83
 |-
-| Experiment
-|align="right"| 11.41
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 6.56
 |-
-| Control
-|align="right"| 8.89
+| style="text-align: left;"| Experiment
+| style="text-align: right;"| 11.41
 |-
-| Control
-|align="right"| 11.59
+| style="text-align: left;"| Control
+| style="text-align: right;"| 8.89
 |-
-| Control
-|align="right"| 9.39
+| style="text-align: left;"| Control
+| style="text-align: right;"| 11.59
 |-
-| Control
-|align="right"| 8.74
+| style="text-align: left;"| Control
+| style="text-align: right;"| 9.39
 |-
-| Control
-|align="right"| 6.31
+| style="text-align: left;"| Control
+| style="text-align: right;"| 8.74
 |-
-| Control
-|align="right"| 7.82
+| style="text-align: left;"| Control
+| style="text-align: right;"| 6.31
+|-
+| style="text-align: left;"| Control
+| style="text-align: right;"| 7.82
 |}
 
+
+</div>
+
+</div>
 Each of the two groups, in this case '''Test''' and '''Control''' must have Shapiro-Wilk tests done separately. Some sample code for this is below (requires dplyr to be loaded):
 
-<pre class="r">#filter only for the control data
-control.data &lt;- filter(test.data, Treatment==&quot;Control&quot;)
+<div class="cell">
+
+<syntaxhighlight lang="r">#filter only for the control data
+control.data <- filter(test.data, Treatment=="Control")
 #The broom package makes the results of the test appear in a table, with the tidy command
 library(broom)
 
 #run the Shapiro-Wilk test on the values
-shapiro.test(control.data$Result) %&gt;% tidy %&gt;% kable</pre>
-{|
-!align="right"| statistic
-!align="right"| p.value
-! method
+shapiro.test(control.data$Result) %>% tidy %>% kable(caption="Shapiro-Wilk test for normality of control data")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Shapiro-Wilk test for normality of control data
 |-
-|align="right"| 0.968
-|align="right"| 0.88
-| Shapiro-Wilk normality test
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: left;"| method
+|-
+| style="text-align: right;"| 0.968
+| style="text-align: right;"| 0.88
+| style="text-align: left;"| Shapiro-Wilk normality test
 |}
 
-<pre class="r">experiment.data &lt;- filter(test.data, Treatment==&quot;Experiment&quot;)
-shapiro.test(test.data$Result) %&gt;% tidy %&gt;% kable</pre>
-{|
-!align="right"| statistic
-!align="right"| p.value
-! method
+
+</div>
+<syntaxhighlight lang="r">experiment.data <- filter(test.data, Treatment=="Experiment")
+shapiro.test(test.data$Result) %>% tidy %>% kable(caption="Shapiro-Wilk test for normality of the test data")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Shapiro-Wilk test for normality of the test data
 |-
-|align="right"| 0.93
-|align="right"| 0.377
-| Shapiro-Wilk normality test
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: left;"| method
+|-
+| style="text-align: right;"| 0.93
+| style="text-align: right;"| 0.377
+| style="text-align: left;"| Shapiro-Wilk normality test
 |}
 
+
+</div>
+
+</div>
 Based on these results, since both p-values are &gt;0.05 we do not reject the presumption of normality and can go on. If one or more of the p-values were less than 0.05 we would then use a Mann-Whitney test (also known as a Wilcoxon rank sum test) will be done, see below for more details.
 
+<span id="testing-for-equal-variance"></span>
 === Testing for Equal Variance ===
 
-We generally use the [https://cran.r-project.org/web/packages/car/index.html car] package which contains code for [https://en.wikipedia.org/wiki/Levene%27s_test Levene's Test] to see if two groups can be assumed to have equal variance:
+We generally use the [https://cran.r-project.org/web/packages/car/index.html car] package which contains code for [https://en.wikipedia.org/wiki/Levene%27s_test Levene’s Test] to see if two groups can be assumed to have equal variance. For more details see @car:
 
-<pre class="r">#load the car package
-library(car)
+<div class="cell">
 
-#runs the test, grouping by the Treatment variable
-leveneTest(Result ~ Treatment, data=test.data) %&gt;% tidy %&gt;% kable</pre>
-{|
-! term
-!align="right"| df
-!align="right"| statistic
-!align="right"| p.value
+<syntaxhighlight lang="r">#load the car package
+library(car)</syntaxhighlight>
+<div class="cell-output cell-output-stderr">
+
+<pre>Loading required package: carData</pre>
+
+</div>
+<div class="cell-output cell-output-stderr">
+
+<pre>
+Attaching package: 'car'</pre>
+
+</div>
+<div class="cell-output cell-output-stderr">
+
+<pre>The following object is masked from 'package:dplyr':
+
+    recode</pre>
+
+</div>
+<syntaxhighlight lang="r">#runs the test, grouping by the Treatment variable
+leveneTest(Result ~ Treatment, data=test.data) %>% tidy %>% kable(caption="Levene's test on test data")</syntaxhighlight>
+<div class="cell-output cell-output-stderr">
+
+<pre>Warning in leveneTest.default(y = y, group = group, ...): group coerced to
+factor.</pre>
+
+</div>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Levene’s test on test data
 |-
-| group
-|align="right"| 1
-|align="right"| 0.368
-|align="right"| 0.558
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: right;"| df
+! style="text-align: right;"| df.residual
 |-
-|
-
-|align="right"| 10
-|align="right"| NA
-|align="right"| NA
+| style="text-align: right;"| 0.368
+| style="text-align: right;"| 0.558
+| style="text-align: right;"| 1
+| style="text-align: right;"| 10
 |}
 
+
+</div>
+
+</div>
+<span id="performing-the-appropriate-pairwise-test"></span>
 == Performing the Appropriate Pairwise Test ==
 
 The logic to follow is:
 
-* If the Shapiro-Wilk test passes, do Levene's test. If it fails for either group, move on to a '''Wilcoxon Rank Sum Test'''.
-* If Levene's test ''passes'', do a Student's ''t'' Test, which assumes equal variance.
-* If Levene's test ''fails'', do a Welch's ''t'' Test, which does not assume equal variance.
+* If the Shapiro-Wilk test passes, do Levene’s test. If it fails for either group, move on to a '''Wilcoxon Rank Sum Test'''.
+* If Levene’s test ''passes'', do a Student’s ''t'' Test, which assumes equal variance.
+* If Levene’s test ''fails'', do a Welch’s ''t'' Test, which does not assume equal variance.
 
-=== Student's ''t'' Test ===
+<span id="students-t-test"></span>
+=== Student’s ''t'' Test ===
 
-<pre class="r">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE
-t.test(Result~Treatment,data=test.data, var.equal=T) %&gt;% tidy %&gt;% kable</pre>
-{|
-!align="right"| estimate1
-!align="right"| estimate2
-!align="right"| statistic
-!align="right"| p.value
-!align="right"| parameter
-!align="right"| conf.low
-!align="right"| conf.high
-! method
-! alternative
+<div class="cell">
+
+<syntaxhighlight lang="r">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE
+t.test(Result~Treatment,data=test.data, var.equal=T) %>% tidy %>% kable(caption="Student's t test for test data")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Student’s t test for test data
 |-
-|align="right"| 8.79
-|align="right"| 9.89
-|align="right"| -0.992
-|align="right"| 0.345
-|align="right"| 10
-|align="right"| -3.56
-|align="right"| 1.37
-| Two Sample t-test
-| two.sided
+! style="text-align: right;"| estimate
+! style="text-align: right;"| estimate1
+! style="text-align: right;"| estimate2
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: right;"| parameter
+! style="text-align: right;"| conf.low
+! style="text-align: right;"| conf.high
+! style="text-align: left;"| method
+! style="text-align: left;"| alternative
+|-
+| style="text-align: right;"| -1.1
+| style="text-align: right;"| 8.79
+| style="text-align: right;"| 9.89
+| style="text-align: right;"| -0.992
+| style="text-align: right;"| 0.345
+| style="text-align: right;"| 10
+| style="text-align: right;"| -3.56
+| style="text-align: right;"| 1.37
+| style="text-align: left;"| Two Sample t-test
+| style="text-align: left;"| two.sided
 |}
 
-=== Welch's ''t'' Test ===
 
-<pre class="r">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default
-t.test(Result~Treatment,data=test.data, var.equal=F) %&gt;% tidy %&gt;% kable</pre>
-{|
-!align="right"| estimate
-!align="right"| estimate1
-!align="right"| estimate2
-!align="right"| statistic
-!align="right"| p.value
-!align="right"| parameter
-!align="right"| conf.low
-!align="right"| conf.high
-! method
-! alternative
+</div>
+
+</div>
+<span id="welchs-t-test"></span>
+=== Welch’s ''t'' Test ===
+
+<div class="cell">
+
+<syntaxhighlight lang="r">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default
+t.test(Result~Treatment,data=test.data, var.equal=F) %>% tidy %>% kable(caption="Welch's t test for test data")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Welch’s t test for test data
 |-
-|align="right"| -1.1
-|align="right"| 8.79
-|align="right"| 9.89
-|align="right"| -0.992
-|align="right"| 0.345
-|align="right"| 9.72
-|align="right"| -3.57
-|align="right"| 1.38
-| Welch Two Sample t-test
-| two.sided
+! style="text-align: right;"| estimate
+! style="text-align: right;"| estimate1
+! style="text-align: right;"| estimate2
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: right;"| parameter
+! style="text-align: right;"| conf.low
+! style="text-align: right;"| conf.high
+! style="text-align: left;"| method
+! style="text-align: left;"| alternative
+|-
+| style="text-align: right;"| -1.1
+| style="text-align: right;"| 8.79
+| style="text-align: right;"| 9.89
+| style="text-align: right;"| -0.992
+| style="text-align: right;"| 0.345
+| style="text-align: right;"| 9.72
+| style="text-align: right;"| -3.57
+| style="text-align: right;"| 1.38
+| style="text-align: left;"| Welch Two Sample t-test
+| style="text-align: left;"| two.sided
 |}
 
+
+</div>
+
+</div>
+<span id="wilcoxon-rank-sum-test"></span>
 === Wilcoxon Rank Sum Test ===
 
-<pre class="r"># no need to specify anything about variance
-wilcox.test(Result~Treatment,data=test.data) %&gt;% tidy %&gt;% kable</pre>
-{|
-!align="right"| statistic
-!align="right"| p.value
-! method
-! alternative
+<div class="cell">
+
+<syntaxhighlight lang="r"># no need to specify anything about variance
+wilcox.test(Result~Treatment,data=test.data) %>% tidy %>% kable(caption="Mann-Whitney test for test data")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Mann-Whitney test for test data
 |-
-|align="right"| 12
-|align="right"| 0.394
-| Wilcoxon rank sum test
-| two.sided
+! style="text-align: right;"| statistic
+! style="text-align: right;"| p.value
+! style="text-align: left;"| method
+! style="text-align: left;"| alternative
+|-
+| style="text-align: right;"| 12
+| style="text-align: right;"| 0.394
+| style="text-align: left;"| Wilcoxon rank sum exact test
+| style="text-align: left;"| two.sided
 |}
 
+
+</div>
+
+</div>
+<span id="corrections-for-multiple-observations"></span>
 = Corrections for Multiple Observations =
 
 The best illustration I have seen for the need for multiple observation corrections is this cartoon from XKCD (see http://xkcd.com/882/):
 
-[[File:http://imgs.xkcd.com/comics/significant.png|frame|none|alt=Significance by XKCD. Image is from http://imgs.xkcd.com/comics/significant.png|caption Significance by XKCD. Image is from http://imgs.xkcd.com/comics/significant.png]]
+<div class="figure">
 
-Any conceptually coherent set of observations must therefore be corrected for multiple observations. In most cases, we will use the method of Benjamini and Hochberg since our p-values are not entirely independent. Some sample code for this is here:
+[[File:http://imgs.xkcd.com/comics/significant.png|Significance by XKCD. Image is from http://imgs.xkcd.com/comics/significant.png]]
 
-<pre class="r">p.values &lt;- c(0.023, 0.043, 0.056, 0.421, 0.012)
-data.frame(unadjusted = p.values, adjusted=p.adjust(p.values, method=&quot;BH&quot;))</pre>
-<pre>##   unadjusted adjusted
-## 1      0.023   0.0575
-## 2      0.043   0.0700
-## 3      0.056   0.0700
-## 4      0.421   0.4210
-## 5      0.012   0.0575</pre>
+</div>
+Any conceptually coherent set of observations must therefore be corrected for multiple observations. In most cases, we will use the method of @Benjamini1995 since our p-values are not entirely independent. Some sample code for this is here:
+
+<div class="cell">
+
+<syntaxhighlight lang="r">p.values <- c(0.023, 0.043, 0.056, 0.421, 0.012)
+data.frame(unadjusted = p.values, adjusted=p.adjust(p.values, method="BH")) %>% 
+  kable(caption="Effects of adjusting p-values by the method of Benjamini-Hochberg")</syntaxhighlight>
+<div class="cell-output-display">
+
+{| class="wikitable"
+|+ Effects of adjusting p-values by the method of Benjamini-Hochberg
+|-
+! style="text-align: right;"| unadjusted
+! style="text-align: right;"| adjusted
+|-
+| style="text-align: right;"| 0.023
+| style="text-align: right;"| 0.057
+|-
+| style="text-align: right;"| 0.043
+| style="text-align: right;"| 0.070
+|-
+| style="text-align: right;"| 0.056
+| style="text-align: right;"| 0.070
+|-
+| style="text-align: right;"| 0.421
+| style="text-align: right;"| 0.421
+|-
+| style="text-align: right;"| 0.012
+| style="text-align: right;"| 0.057
+|}
+
+
+</div>
+
+</div>
+<span id="session-information"></span>
 = Session Information =
 
-<pre class="r">sessionInfo()</pre>
-<pre>## R version 3.4.2 (2017-09-28)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.1
-## 
-## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
-## 
-## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-## 
-## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
-## 
-## other attached packages:
-## [1] car_2.1-6           broom_0.4.3         bindrcpp_0.2       
-## [4] pwr_1.2-1           knitcitations_1.0.9 dplyr_0.7.4        
-## [7] tidyr_0.7.2         knitr_1.17         
-## 
-## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14       nloptr_1.0.4       compiler_3.4.2    
-##  [4] plyr_1.8.4         highr_0.6          bindr_0.1         
-##  [7] tools_3.4.2        lme4_1.1-14        digest_0.6.12     
-## [10] jsonlite_1.5       lubridate_1.7.1    evaluate_0.10.1   
-## [13] tibble_1.3.4       nlme_3.1-131       lattice_0.20-35   
-## [16] mgcv_1.8-22        pkgconfig_2.0.1    rlang_0.1.4       
-## [19] Matrix_1.2-12      psych_1.7.8        bibtex_0.4.2      
-## [22] yaml_2.1.15        parallel_3.4.2     SparseM_1.77      
-## [25] RefManageR_0.14.20 stringr_1.2.0      httr_1.3.1        
-## [28] xml2_1.1.1         MatrixModels_0.4-1 nnet_7.3-12       
-## [31] rprojroot_1.2      grid_3.4.2         glue_1.2.0        
-## [34] R6_2.2.2           foreign_0.8-69     rmarkdown_1.8     
-## [37] minqa_1.2.4        reshape2_1.4.2     purrr_0.2.4       
-## [40] magrittr_1.5       splines_3.4.2      MASS_7.3-47       
-## [43] backports_1.1.1    htmltools_0.3.6    pbkrtest_0.4-7    
-## [46] assertthat_0.2.0   mnormt_1.5-5       quantreg_5.34     
-## [49] stringi_1.1.6</pre>
+<div class="cell">
+
+<syntaxhighlight lang="r">sessionInfo()</syntaxhighlight>
+<div class="cell-output cell-output-stdout">
+
+<pre>R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Sonoma 14.7
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] car_3.1-2     carData_3.0-5 broom_1.0.6   dplyr_1.1.4   tidyr_1.3.1  
+[6] knitr_1.48   
+
+loaded via a namespace (and not attached):
+ [1] vctrs_0.6.5       cli_3.6.3         rlang_1.1.4       xfun_0.47        
+ [5] purrr_1.0.2       generics_0.1.3    jsonlite_1.8.8    glue_1.7.0       
+ [9] backports_1.5.0   htmltools_0.5.8.1 fansi_1.0.6       rmarkdown_2.28   
+[13] abind_1.4-8       evaluate_0.24.0   tibble_3.2.1      fastmap_1.2.0    
+[17] yaml_2.3.10       lifecycle_1.0.4   compiler_4.4.1    htmlwidgets_1.6.4
+[21] pkgconfig_2.0.3   rstudioapi_0.16.0 digest_0.6.37     R6_2.5.1         
+[25] tidyselect_1.2.1  utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3   
+[29] withr_3.0.1       tools_4.4.1      </pre>
+
+</div>
+
+</div>
+<span id="references"></span>
 = References =
 
-<a name=bib-pwr></a>[[#cite-pwr|[1]]] S. Champely. ''pwr: Basic Functions for Power Analysis''. R package version 1.2-1. 2017. URL: https://CRAN.R-project.org/package=pwr.
+<div id="refs">
 
+
+
+</div>

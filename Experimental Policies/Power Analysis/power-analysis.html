@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dave Bridges">
+<meta name="dcterms.date" content="2018-02-18">
+
+<title>Power Analysis Example</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="power-analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="power-analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="power-analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="power-analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="power-analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="power-analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="power-analysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="power-analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="power-analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="power-analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Power Analysis Example</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dave Bridges </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 18, 2018</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Commonly we want to know how to design our experiments (<em>a priori</em>), or how estimate how big of an effect we could have seen (<em>a posteriori</em>). We use two different methods for doing these kinds of analyses. One is using the <a href="https://github.com/heliosdrm/pwr">pwr package</a> in R. Alternatively sometimes we use <a href="https://www.psychologie.hhu.de/arbeitsgruppen/allgemeine-psychologie-und-arbeitspsychologie/gpower.html">G*Power</a>, a standalone software with somewhat more functionality. Here we will focus on pwr, which is sufficient for most of our needs.</p>
+<section id="some-definitions" class="level1">
+<h1>Some Definitions</h1>
+<dl>
+<dt>Effect Size</dt>
+<dd>
+<p>The effect you expect to see, generally given as Cohen’s <em>d</em> which is calculated as expected difference between groups divided by the standard deviation <span class="math inline">\(d=\frac{mean(group1)-mean(group2)}{sd}\)</span>. If you are asking for the correlation between two parameters it is related to interested in the correlation coefficient rather than the difference between groups (r), you can use this formula <span class="math inline">\(d= \frac{2r}{\sqrt{1 - r^2}}\)</span></p>
+</dd>
+<dt>Power</dt>
+<dd>
+<p>The likelihood of being able to observe the effect size (if such an effect exists). Generally for prospective design purposes we use a power of 0.8. This is the same as one minus the false negative rate (FNR; the likelihood that an effect exists, but we cannot detect it, sometimes refered to as <span class="math inline">\(\beta\)</span>), so <span class="math inline">\(Power = 1-FNR\)</span>. Therefore conventionally <span class="math inline">\(\beta=0.2\)</span>. Therefore retrospectively the power says that for some particular effect size, n, and false positive rate, how likely we were to observe that effect.</p>
+</dd>
+<dt>False Positive Rate</dt>
+<dd>
+<p>The likelihood that we think there is a difference, when there is none, conventionally set as <span class="math inline">\(\alpha=0.05\)</span>.</p>
+</dd>
+<dt>Sample Size</dt>
+<dd>
+<p>The number used, be it number of participants, number of experimntal animals. <strong>Not</strong> the number of technical replicates</p>
+</dd>
+</dl>
+<p>These four parameters are related to each other such that if you know three of them, you can calculate the fourth. Some examples:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Missing Value</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>n</td>
+<td>Calculate how many needed in a group</td>
+</tr>
+<tr class="even">
+<td>Power</td>
+<td>Calculate likelihood of seeing an effect</td>
+</tr>
+<tr class="odd">
+<td>Effect size</td>
+<td>Calculate detectable difference</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="power-analysis" class="level1">
+<h1>Power Analysis</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pwr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#desired effect size in standard deviations</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>effect.size <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="co"># expected difference in absolute terms</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>assay.sd <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="co"># the standard deviation of the assay, in the same units as the effect size</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>effect.size.sd <span class="ot">&lt;-</span> effect.size<span class="sc">/</span>assay.sd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#desired false positive rate</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>fpr <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#desired power (inverse of false negative rate)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>power <span class="ot">&lt;-</span> <span class="fl">0.8</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate required n</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>required.animals <span class="ot">&lt;-</span> <span class="fu">pwr.t.test</span>(<span class="at">d=</span>effect.size.sd,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">power=</span>power,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sig.level=</span>fpr,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                               <span class="at">alternative=</span><span class="st">"greater"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                               <span class="at">type=</span><span class="st">"two.sample"</span>)<span class="sc">$</span>n</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The assumptions set in this analysis are:</p>
+<ul>
+<li>The desired effect size is 5. This is what we want to power our analysis to be able to detect.</li>
+<li>The standard deviation of the measurement is 3, in the same units as the effect size.</li>
+<li>Therefore Cohen’s <em>d</em> is 1.6666667 or the number of standard deviations we want to be able to detect.</li>
+<li>The acceptable false positive rate is 0.05. This is the percent chance that we observe something that is not actually true.</li>
+<li>The acceptable false negative rate is 0.2. This is the percent chance that we miss something that is actually true.</li>
+<li>The power of our analysis is set at 0.8.</li>
+</ul>
+<section id="calculate-number-of-animals" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-number-of-animals">Calculate Number of Animals</h2>
+<p>At a standard power of 0.8 with a false positive rate of 0.05 and a desired effect size of a 5 difference in percent fat mass we would need <strong>5.283492</strong> animals in each group.</p>
+</section>
+<section id="calculate-detectable-effect-size" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-detectable-effect-size">Calculate Detectable Effect Size</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>required.animals.effect <span class="ot">&lt;-</span> <span class="fu">round</span>(required.animals)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>effective.d <span class="ot">&lt;-</span> <span class="fu">pwr.t.test</span>(<span class="at">power=</span>power,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n=</span>required.animals.effect,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sig.level=</span>fpr,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">alternative=</span><span class="st">"greater"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">type=</span><span class="st">"two.sample"</span>)<span class="sc">$</span>d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Based on the design above we should expect to detect an effect size of 1.7245893 standard deviations with 0.8 power, 5 animals and a FPR of 0.05.</p>
+</section>
+<section id="calculate-effective-power" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-effective-power">Calculate Effective Power</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>required.animals.power <span class="ot">&lt;-</span> <span class="fu">round</span>(required.animals)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>effective.power <span class="ot">&lt;-</span> <span class="fu">pwr.t.test</span>(<span class="at">d=</span>effect.size.sd,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n=</span>required.animals.power,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sig.level=</span>fpr,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">alternative=</span><span class="st">"greater"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">type=</span><span class="st">"two.sample"</span>)<span class="sc">$</span>power</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Based on the design above we have a 77.5993902% chance of seeing a difference of 1.6666667 with 5 animals and a FPR of 0.05.</p>
+<p>The plot below shows how likely we are to detect a difference (the power) as we vary the number of animals (x-axis) and the desired effect size.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>animals <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="co">#animal range to test</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>effect.sizes <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">9</span>,<span class="at">by=</span><span class="dv">1</span>) <span class="co"># effect size range to test</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>power.table <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">animals=</span>animals,<span class="at">effect.sizes=</span>effect.sizes)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>power.table<span class="sc">$</span>effect.sizes.sd <span class="ot">&lt;-</span> power.table<span class="sc">$</span>effect.sizes<span class="sc">/</span>assay.sd</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (effect.size.sd <span class="cf">in</span> power.table<span class="sc">$</span>effect.sizes.sd){</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (n.test <span class="cf">in</span> power.table<span class="sc">$</span>animals){</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  power.table[power.table<span class="sc">$</span>animals<span class="sc">==</span>n.test<span class="sc">&amp;</span>power.table<span class="sc">$</span>effect.sizes.sd<span class="sc">==</span>effect.size.sd,<span class="st">'power'</span>] <span class="ot">&lt;-</span> </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pwr.t.test</span>(<span class="at">d=</span>effect.size.sd,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">n=</span>n.test,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">sig.level=</span>fpr,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">alternative=</span><span class="st">"greater"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">type=</span><span class="st">"two.sample"</span>)<span class="sc">$</span>power</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>power.table<span class="sc">$</span>effect.sizes.sd <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">format</span>(<span class="fu">round</span>(power.table<span class="sc">$</span>effect.sizes.sd,<span class="dv">2</span>),<span class="at">nsmall=</span><span class="dv">2</span>))</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(power.table, <span class="fu">aes</span>(<span class="at">y=</span>power,<span class="at">x=</span>animals))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">col=</span>effect.sizes.sd)) <span class="sc">+</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Power"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Animals"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Effective power relative to animal numbers"</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle=</span><span class="fu">paste</span>(<span class="st">"Based on false positive rate of "</span>, fpr)) <span class="sc">+</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fl">0.8</span>, <span class="at">lty=</span><span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="st">"Effect Sizes </span><span class="sc">\n</span><span class="st">(Number of SD)"</span>, <span class="at">values=</span><span class="fu">brewer.pal</span>(<span class="dv">10</span>,<span class="st">'Blues'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="power-analysis_files/figure-html/effect-size-plot-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="session-information" class="level1">
+<h1>Session Information</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-apple-darwin20
+Running under: macOS Monterey 12.7.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Detroit
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] RColorBrewer_1.1-3 ggplot2_3.5.1      pwr_1.3-0         
+
+loaded via a namespace (and not attached):
+ [1] vctrs_0.6.5       cli_3.6.3         knitr_1.48        rlang_1.1.4      
+ [5] xfun_0.46         generics_0.1.3    jsonlite_1.8.8    labeling_0.4.3   
+ [9] glue_1.7.0        colorspace_2.1-1  htmltools_0.5.8.1 scales_1.3.0     
+[13] fansi_1.0.6       rmarkdown_2.27    grid_4.4.1        evaluate_0.24.0  
+[17] munsell_0.5.1     tibble_3.2.1      fastmap_1.2.0     yaml_2.3.10      
+[21] lifecycle_1.0.4   compiler_4.4.1    dplyr_1.1.4       pkgconfig_2.0.3  
+[25] farver_2.1.2      digest_0.6.36     R6_2.5.1          tidyselect_1.2.1 
+[29] utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3    withr_3.0.0      
+[33] tools_4.4.1       gtable_0.3.5     </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
