@@ -7,8 +7,7 @@ balloon.data <- data.frame(color=c(rep("green",6), rep("red",12), rep("blue",6))
                           size = rpois(24, lambda=5)*abs(rnorm(24)))
 ```
 
-Check Distribution of Your Data
----------------------------------
+# Check Distribution of Your Data
 
 First check the distribution of your groups of data using a Shapiro-Wilk Test and then then the presumption of equal variance with a Levene's Test
 
@@ -18,8 +17,8 @@ with(balloon.data, tapply(size, shape, FUN=function(x)shapiro.test(x)$p.value))
 with(balloon.data, tapply(size, list(color,shape), FUN=function(x)shapiro.test(x)$p.value))
 ```
 
-One Way ANOVA
---------------
+# One Way ANOVA
+
 This is used when you have one variable, with several types.  In this example you have several colors of balloons and are testing the hypothesis that size is affected by balloon color.
 
 ```{r one-way-anova}
@@ -32,8 +31,8 @@ t.test(size~shape, data=balloon.data, var.equal=T)
 summary(aov(size~color, data=balloon.data))
 ```
 
-Two-Way ANOVA
----------------
+# Two-Way ANOVA
+
 This is used when you have two (or more) potential variables which affect your dependent variable.
 
 ```{r two-way-anova}
@@ -44,8 +43,14 @@ summary(aov(size~color*shape, data=balloon.data))
 summary(aov(size~color+shape, data=balloon.data))
 ```
 
-Assumptions of ANOVA Analyses
--------------------------------
+## Interactions
+
+For interpreting interactions, if the interaction term is significant then the two main effects are not useful  For a more detailed discussion of interpreting interactions see:
+
+Nieuwenhuis, S., Forstmann, B. U. & Wagenmakers, E.-J. J. Erroneous analyses of interactions in neuroscience: A problem of significance. Nat. Neurosci. 14, 1105–1107 (2011). http://dx.doi.org/10.1038/nn.2886
+
+# Assumptions of ANOVA Analyses
+
 Although when group sizes are equal, ANOVA is quite robust to non-normality and non-equal variance, you should test these assumptions.  Normality was tested above.  If the data is not normal, you could transform your dependent variable (ie look at log(size) rather than size).  You could also use a non-parametric test such as a Kruskal-Wallis test
 
 ```{r non-parametric-tests}
@@ -96,8 +101,8 @@ pairwise.t.test(balloon.data$size, balloon.data$color, p.adjust.method="BH")
 pairwise.t.test(balloon.data$size, balloon.data$color, p.adjust.method="none")
 ```
 
-Session Information
---------------------
+# Session Information
+
 
 ```{r session-info, echo=FALSE}
 sessionInfo()

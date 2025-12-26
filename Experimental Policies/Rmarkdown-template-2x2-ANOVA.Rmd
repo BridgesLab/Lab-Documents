@@ -1,0 +1,145 @@
+---
+title: "Informative title"
+author: "Authors"
+date: "Date script was first written"
+output:
+  pdf_document:
+    highlight: tango
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
+  html_document:
+    highlight: tango
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+#figures makde will go to directory called figures, will make them as both png and pdf files 
+opts_chunk$set(fig.path='figures/',
+               echo=FALSE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
+options(scipen = 2, digits = 3)
+# set echo and message to TRUE if you want to display code blocks and code output respectively
+
+knitr::knit_hooks$set(inline = function(x) {
+  knitr:::format_sci(x, 'md')
+})
+
+
+superpose.eb <- function (x, y, ebl, ebu = ebl, length = 0.08, ...)
+  arrows(x, y + ebu, x, y - ebl, angle = 90, code = 3,
+  length = length, ...)
+
+  
+se <- function(x) sd(x, na.rm=T)/sqrt(length(x))
+
+#load these packages, nearly always needed
+library(tidyr)
+library(dplyr)
+
+# sets maize and blue color scheme
+color.scheme <- c('#00274c', '#ffcb05')
+```
+
+# Purpose
+
+# Experimental Details
+
+Link to the protocol used (permalink preferred) for the experiment and include any notes relevant to your analysis.  This might include specifics not in the general protocol such as cell lines, treatment doses etc.
+
+# Raw Data
+
+Describe your raw data files, including what the columns mean (and what units they are in).
+
+```{r data-input}
+library(readxl) #loads the readr package
+filename <- 'ITT.xlsx' #make this a separate line, you can use any variable you want
+
+#this loads whatever the file is into a dataframe called exp.data if it exists
+if(filename %in% dir()){
+  exp.data <- read_excel(filename, sheet = "FBG")
+}
+
+exp.data <- mutate(exp.data, Treatment = relevel(as.factor(Treatment),ref='Water'),
+                   Diet = relevel(as.factor(Diet),ref='NCD'))
+```
+
+These data can be found in **`r getwd()`** in a file named **`r ifelse(filename %in% dir(), filename, "no file found")`**.  This script was most recently updated on **`r date()`**.
+
+# Analysis
+
+## 2x2 ANOVA with Interaction
+
+```{r anova}
+anova.result <- aov(FBG ~ Treatment * Diet, data=exp.data)
+library(broom)
+tidy(anova.result) %>% kable(caption="Two-Way ANOVA with Interaction")
+```
+
+## Boxplots
+
+```{r boxplot}
+library(ggplot2)
+ggplot(data=exp.data,
+       aes(y=FBG,
+           x=Diet,
+           fill=Treatment)) +
+  geom_boxplot() +
+  geom_point(position=position_dodge(width=0.75),aes(group=Treatment)) +
+  expand_limits(y=0) +
+  labs(title="Fasting Blood Glucose",
+       y="Blood Glucose (mg/dL)")
+```
+
+
+## Boxplots
+
+```{r boxplot, fig.cap="Boxplot"}
+ggplot(exp.data,
+       aes(y=FBG, x=Diet, color=Treatment)))
+p + geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge()) +
+  labs(y="Relative Expression",x="Diet")
+
+```
+
+## Barplots
+
+```{r barplot, fig.cap="Barplot"}
+
+exp.summary <-
+  exp.data %>%
+  group_by(Treatment, Diet) %>%
+  summarize(Mean = mean(FBG),
+            Error = se(FBG),
+            N = length(FBG),
+            Shapiro = shapiro.test(FBG)$p.value)
+
+ggplot(data=exp.summary,
+       aes(y=Mean,
+           ymin=Mean-Error,
+           ymax=Mean+Error,
+           x=Diet,
+           fill=Treatment)) +
+  geom_bar(stat='identity', position='dodge', width=0.75) +
+  geom_errorbar(position=position_dodge(width=0.75),aes(group=Treatment), width=0.5) +
+  expand_limits(y=0) +
+  labs(title="Fasting Blood Glucose",
+       y="Blood Glucose (mg/dL)")
+```
+
+# Interpretation
+
+A brief summary of what the interpretation of these results were
+
+# Session Information
+
+```{r session-information, echo=T}
+sessionInfo()
+```
+
+# References
+
+If needed, using Rmarkdown citation tools (see this link for more information: http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)

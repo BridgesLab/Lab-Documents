@@ -8,54 +8,51 @@ widest potential audience with the least number of restrictions.
 Data Sharing
 ------------
 
-Publications arising from these studies where we are the corresponding
+Publications arising from these studies where the PI is the corresponding
 author will be published in journals meeting the gold open access
 standards of free availability, and a permissive re-use license (CC-BY
 or the like). All published data will be submitted to journals indexed
 by the major biomedical indexing sites including PubMed and PubMed
 Central. Typically pre-prints will be made available at or before the
 time of submission through bioRxiv. At this point all data will be
-shared.
+shared publicly.
 
-For all studies the raw data, as well as the relevant metadata and
-computational algorithms used to generate statistical and graphical
+For all studies the raw data (as well as the relevant metadata) and
+the computational algorithms used to generate statistical and graphical
 summaries which were used to generate the final research data will be
-provided. This data will be provided with a permissive (CC0 or CC-BY)
-use license. These data tables of 3-star or higher quality (as defined
-by Open Data Standards see [link]{http://5stardata.info/}). All raw
-data, processed data and analysis code will be made available on Github
+made public. This data will be provided with a permissive (CC0 or CC-BY)
+use license. All raw data, processed data and analysis code will be made available on Github
 with the version at time of publication archived to the web-accessible
-data repositories `Zenodo <http://zenodo.com>`__ with a minted DOI. All
+data repositories `Zenodo <http://zenodo.com>`__ with a unique DOI. All
 next generation sequence files will be deposited into the `Short Read
 Archive <https://www.ncbi.nlm.nih.gov/sra>`__ and `Gene Expression
 Omnibus <http://http://www.ncbi.nlm.nih.gov/geo/%7D>`__ and the
 accession number will be quoted in the manuscript(s). Finally data will
-be posted on, or linked to, from the principal investigator's website.
+be posted on (or linked to) the principal investigator's website.
 If further data is obtained relevant to these studies, which can be
 combined with thepublished data sets, these evolving data sets will be
-added to the available online repositories, separately from the
-published data sets.
+added to the available online repositories.
 
 Resource Sharing
 ----------------
 
 All commercially purchased antibodies, reagents or kits will be clearly
 described in publications, including catalog or stock numbers and RRID's
-if permissible. DNA constructs will be deposited with Adgene and also
-made available from the PI without restrictions upon request. Reagents,
+if permissible. DNA constructs will be deposited with Addgene and also
+made available by the PI without restrictions upon request. Reagents,
 fruit fly, cell or mouse transgenic lines generated during these studies
 will be maintained in the principal investigator's laboratory and made
 available freely and without restriction to any scientists, providing
 sufficient amounts are available. The only exception to this is if a
 reagent or line was provided to us with a restrictive materials transfer
 agreement, in which case the recipient investigator will be directed to
-the primary source of the reagent.
+the original source of the reagent.
 
 Notes
 -----
 
--  **Version 1.4.1**
--  Updated on April 6, 2016 by Dave Bridges <dave.bridges@gmail.com>
+-  **Version 1.5.1**
+-  Updated on January 29, 2019 by Dave Bridges <dave.bridges@gmail.com>
 -  The version numbering for this document is described in the `Lab
    Policies
    README <https://github.com/BridgesLab/Lab-Documents/blob/master/Lab%20Policies/README.rst>`__.

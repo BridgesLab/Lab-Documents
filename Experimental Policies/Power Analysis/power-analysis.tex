@@ -29,6 +29,46 @@
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
 \usepackage{graphicx,grffile}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -47,7 +87,7 @@
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
+\setcounter{secnumdepth}{0}
 % Redefines (sub)paragraphs to behave more like sections
 \ifx\paragraph\undefined\else
 \let\oldparagraph\paragraph
@@ -73,15 +113,16 @@
 }
 
 \setlength{\droptitle}{-2em}
+
   \title{Power Analysis Sample}
-  \pretitle{\vspace{\droptitle}\centering\huge}
+    \pretitle{\vspace{\droptitle}\centering\huge}
   \posttitle{\par}
-  \author{Dave Bridges}
-  \preauthor{\centering\large\emph}
+    \author{Dave Bridges}
+    \preauthor{\centering\large\emph}
   \postauthor{\par}
-  \predate{\centering\large\emph}
+      \predate{\centering\large\emph}
   \postdate{\par}
-  \date{February 18, 2018}
+    \date{February 18, 2018}
 
 
 \begin{document}
@@ -93,10 +134,30 @@
 }
 These data can be found in
 /Users/davebrid/Documents/GitHub/Lab-Documents/Experimental
-Policies/Power Analysis and this script was most recently run on Sun Feb
-18 14:57:40 2018.
+Policies/Power Analysis and this script was most recently run on Thu May
+30 14:23:17 2019.
 
 \section{Power Analysis}\label{power-analysis}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(pwr)}
+\CommentTok{#desired effect size in standard deviations}
+\NormalTok{effect.size <-}\StringTok{ }\DecValTok{5} \CommentTok{# expected difference in absolute terms}
+\NormalTok{assay.sd <-}\StringTok{ }\DecValTok{3} \CommentTok{# the standard deviation of the assay, in the same units as the effect size}
+\NormalTok{effect.size.sd <-}\StringTok{ }\NormalTok{effect.size}\OperatorTok{/}\NormalTok{assay.sd}
+\CommentTok{#desired false positive rate}
+\NormalTok{fpr <-}\StringTok{ }\FloatTok{0.05}
+\CommentTok{#desired power (inverse of false negative rate)}
+\NormalTok{power <-}\StringTok{ }\FloatTok{0.8}
+\CommentTok{#calculate required n}
+\NormalTok{required.animals <-}\StringTok{ }\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{d=}\NormalTok{effect.size.sd,}
+                               \DataTypeTok{power=}\NormalTok{power,}
+                               \DataTypeTok{sig.level=}\NormalTok{fpr,}
+                               \DataTypeTok{alternative=}\StringTok{"greater"}\NormalTok{,}
+                               \DataTypeTok{type=}\StringTok{"two.sample"}\NormalTok{)}\OperatorTok{$}\NormalTok{n}
+\end{Highlighting}
+\end{Shaded}
 
 The assumptions set in this analysis are:
 
@@ -128,24 +189,95 @@ At a standard power of 0.8 with a false positive rate of 0.05 and a
 desired effect size of a 5 difference in percent fat mass we would need
 \textbf{5.283} animals in each group.
 
+\subsection{Calculate Detectable Effect
+Size}\label{calculate-detectable-effect-size}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{required.animals.effect <-}\StringTok{ }\KeywordTok{round}\NormalTok{(required.animals)}
+\NormalTok{effective.d <-}\StringTok{ }\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{power=}\NormalTok{power,}
+                               \DataTypeTok{n=}\NormalTok{required.animals.effect,}
+                               \DataTypeTok{sig.level=}\NormalTok{fpr,}
+                               \DataTypeTok{alternative=}\StringTok{"greater"}\NormalTok{,}
+                               \DataTypeTok{type=}\StringTok{"two.sample"}\NormalTok{)}\OperatorTok{$}\NormalTok{d}
+\end{Highlighting}
+\end{Shaded}
+
+Based on the design above we should expect to detect an effect size of
+1.725 standard deviations with 0.8 power, 5 animals and a FPR of 0.05.
+
 \subsection{Calculate Effective Power}\label{calculate-effective-power}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{required.animals.power <-}\StringTok{ }\KeywordTok{round}\NormalTok{(required.animals)}
+\NormalTok{effective.power <-}\StringTok{ }\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{d=}\NormalTok{effect.size.sd,}
+                               \DataTypeTok{n=}\NormalTok{required.animals.power,}
+                               \DataTypeTok{sig.level=}\NormalTok{fpr,}
+                               \DataTypeTok{alternative=}\StringTok{"greater"}\NormalTok{,}
+                               \DataTypeTok{type=}\StringTok{"two.sample"}\NormalTok{)}\OperatorTok{$}\NormalTok{power}
+\end{Highlighting}
+\end{Shaded}
+
+Based on the design above we have a 77.599\% chance of seeing a
+difference of 1.667 with 5 animals and a FPR of 0.05.
 
 The plot below shows how likely we are to detect a difference (the
 power) as we vary the number of animals (x-axis) and the desired effect
 size.
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{animals <-}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{20}\NormalTok{) }\CommentTok{#animal range to test}
+\NormalTok{effect.sizes <-}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DataTypeTok{by=}\DecValTok{1}\NormalTok{) }\CommentTok{# effect size range to test}
+\NormalTok{power.table <-}\StringTok{ }\KeywordTok{expand.grid}\NormalTok{(}\DataTypeTok{animals=}\NormalTok{animals,}\DataTypeTok{effect.sizes=}\NormalTok{effect.sizes)}
+\NormalTok{power.table}\OperatorTok{$}\NormalTok{effect.sizes.sd <-}\StringTok{ }\NormalTok{power.table}\OperatorTok{$}\NormalTok{effect.sizes}\OperatorTok{/}\NormalTok{assay.sd}
+
+\ControlFlowTok{for}\NormalTok{ (effect.size.sd }\ControlFlowTok{in}\NormalTok{ power.table}\OperatorTok{$}\NormalTok{effect.sizes.sd)\{}
+\ControlFlowTok{for}\NormalTok{ (n.test }\ControlFlowTok{in}\NormalTok{ power.table}\OperatorTok{$}\NormalTok{animals)\{}
+\NormalTok{  power.table[power.table}\OperatorTok{$}\NormalTok{animals}\OperatorTok{==}\NormalTok{n.test}\OperatorTok{&}\NormalTok{power.table}\OperatorTok{$}\NormalTok{effect.sizes.sd}\OperatorTok{==}\NormalTok{effect.size.sd,}\StringTok{'power'}\NormalTok{] <-}\StringTok{ }
+\StringTok{    }\KeywordTok{pwr.t.test}\NormalTok{(}\DataTypeTok{d=}\NormalTok{effect.size.sd,}
+               \DataTypeTok{n=}\NormalTok{n.test,}
+               \DataTypeTok{sig.level=}\NormalTok{fpr,}
+               \DataTypeTok{alternative=}\StringTok{"greater"}\NormalTok{,}
+               \DataTypeTok{type=}\StringTok{"two.sample"}\NormalTok{)}\OperatorTok{$}\NormalTok{power}
+\NormalTok{\}}
+\NormalTok{\}}
+
+
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(RColorBrewer)}
+
+\NormalTok{power.table}\OperatorTok{$}\NormalTok{effect.sizes.sd <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(}\KeywordTok{format}\NormalTok{(}\KeywordTok{round}\NormalTok{(power.table}\OperatorTok{$}\NormalTok{effect.sizes.sd,}\DecValTok{2}\NormalTok{),}\DataTypeTok{nsmall=}\DecValTok{2}\NormalTok{))}
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(power.table, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y=}\NormalTok{power,}\DataTypeTok{x=}\NormalTok{animals))}
+\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_line}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{col=}\NormalTok{effect.sizes.sd)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{y=}\StringTok{"Power"}\NormalTok{,}
+       \DataTypeTok{x=}\StringTok{"Animals"}\NormalTok{,}
+       \DataTypeTok{title=}\StringTok{"Effective power relative to animal numbers"}\NormalTok{,}
+       \DataTypeTok{subtitle=}\KeywordTok{paste}\NormalTok{(}\StringTok{"Based on false positive rate of "}\NormalTok{, fpr)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_hline}\NormalTok{(}\DataTypeTok{yintercept=}\FloatTok{0.8}\NormalTok{, }\DataTypeTok{lty=}\DecValTok{2}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale_colour_manual}\NormalTok{(}\StringTok{"Effect Sizes }\CharTok{\textbackslash{}n}\StringTok{(Number of SD)"}\NormalTok{, }\DataTypeTok{values=}\KeywordTok{brewer.pal}\NormalTok{(}\DecValTok{10}\NormalTok{,}\StringTok{'Blues'}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
 \includegraphics{figures/effect-size-plot-1.png}
 
 \section{Session Information}\label{session-information}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sessionInfo}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{verbatim}
-## R version 3.4.2 (2017-09-28)
+## R version 3.5.0 (2018-04-23)
 ## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS High Sierra 10.13.3
+## Running under: macOS  10.14.5
 ## 
 ## Matrix products: default
-## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -154,18 +286,19 @@ size.
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] RColorBrewer_1.1-2 pwr_1.2-1          ggplot2_2.2.1     
-## [4] dplyr_0.7.4        tidyr_0.7.2        knitr_1.17        
+## [1] RColorBrewer_1.1-2 pwr_1.2-2          ggplot2_3.1.0     
+## [4] dplyr_0.7.8        tidyr_0.8.2        knitr_1.21        
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14     bindr_0.1        magrittr_1.5     munsell_0.4.3   
-##  [5] colorspace_1.3-2 R6_2.2.2         rlang_0.1.4      plyr_1.8.4      
-##  [9] stringr_1.2.0    tools_3.4.2      grid_3.4.2       gtable_0.2.0    
-## [13] htmltools_0.3.6  lazyeval_0.2.1   yaml_2.1.15      rprojroot_1.2   
-## [17] digest_0.6.12    assertthat_0.2.0 tibble_1.3.4     bindrcpp_0.2    
-## [21] purrr_0.2.4      glue_1.2.0       evaluate_0.10.1  rmarkdown_1.8   
-## [25] labeling_0.3     stringi_1.1.6    compiler_3.4.2   scales_0.5.0    
-## [29] backports_1.1.1  pkgconfig_2.0.1
+##  [1] Rcpp_1.0.0       bindr_0.1.1      magrittr_1.5     munsell_0.5.0   
+##  [5] tidyselect_0.2.5 colorspace_1.3-2 R6_2.3.0         rlang_0.3.1     
+##  [9] plyr_1.8.4       stringr_1.3.1    tools_3.5.0      grid_3.5.0      
+## [13] gtable_0.2.0     xfun_0.4         withr_2.1.2      htmltools_0.3.6 
+## [17] lazyeval_0.2.1   yaml_2.2.0       digest_0.6.18    assertthat_0.2.0
+## [21] tibble_2.0.0     crayon_1.3.4     bindrcpp_0.2.2   purrr_0.2.5     
+## [25] glue_1.3.0       evaluate_0.12    rmarkdown_1.11   labeling_0.3    
+## [29] stringi_1.2.4    compiler_3.5.0   pillar_1.3.1     scales_1.0.0    
+## [33] pkgconfig_2.0.2
 \end{verbatim}
 
 

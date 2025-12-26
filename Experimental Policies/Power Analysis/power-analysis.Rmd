@@ -7,12 +7,12 @@ output:
   html_document:
     highlight: tango
     keep_md: yes
-    number_sections: yes
+    number_sections: no
     toc: yes
   pdf_document:
     highlight: tango
     keep_tex: yes
-    number_sections: yes
+    number_sections: no
     toc: yes
 ---
 
@@ -20,7 +20,7 @@ output:
 library(knitr)
 #figures made will go to directory called figures, will make them as both png and pdf files 
 opts_chunk$set(fig.path='figures/',
-               echo=FALSE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
+               echo=TRUE, warning=FALSE, message=FALSE,dev=c('png','pdf'))
 options(scipen = 2, digits = 3)
 # set echo and message to TRUE if you want to display code blocks and code output respectively
 
@@ -87,7 +87,31 @@ The assumptions set in this analysis are:
 
 At a standard power of `r power` with a false positive rate of `r fpr` and a desired effect size of a `r effect.size` difference in percent fat mass we would need **`r required.animals`** animals in each group.
 
+## Calculate Detectable Effect Size
+
+```{r calculate-effect}
+required.animals.effect <- round(required.animals)
+effective.d <- pwr.t.test(power=power,
+                               n=required.animals.effect,
+                               sig.level=fpr,
+                               alternative="greater",
+                               type="two.sample")$d
+```
+
+Based on the design above we should expect to detect an effect size of `r effective.d` standard deviations with `r power` power, `r required.animals.effect` animals and a FPR of `r fpr`.
+
 ## Calculate Effective Power
+
+```{r calculate-power}
+required.animals.power <- round(required.animals)
+effective.power <- pwr.t.test(d=effect.size.sd,
+                               n=required.animals.power,
+                               sig.level=fpr,
+                               alternative="greater",
+                               type="two.sample")$power
+```
+
+Based on the design above we have a `r effective.power*100`% chance of seeing a difference of `r effect.size.sd` with `r required.animals.power` animals and a FPR of `r fpr`.
 
 The plot below shows how likely we are to detect a difference (the power) as we vary the number of animals (x-axis) and the desired effect size.
 
@@ -109,17 +133,6 @@ for (n.test in power.table$animals){
 }
 }
 
-# with(filter(power.table, effect.sizes==effect.sizes[1]),
-#      plot(animals,power,
-#           type="l",
-#           las=1,
-#           main="Desired Effect Sizes from 1-10",
-#           ylim=c(0,1)))
-# #draw lines for each sample effect size
-# for (effect.size in effect.sizes) {
-#   with(filter(power.table, effect.sizes==effect.size), lines(animals,power))
-# }
-# abline(h=0.8, lty=2)
 
 library(ggplot2)
 library(RColorBrewer)
@@ -130,9 +143,9 @@ p + geom_line(aes(col=effect.sizes.sd)) +
   labs(y="Power",
        x="Animals",
        title="Effective power relative to animal numbers",
-       subtitle=paste("Assumes a standard deviation of", assay.sd)) +
+       subtitle=paste("Based on false positive rate of ", fpr)) +
   geom_hline(yintercept=0.8, lty=2) + 
-  scale_colour_manual("Effect Sizes", values=brewer.pal(10,'Blues'))
+  scale_colour_manual("Effect Sizes \n(Number of SD)", values=brewer.pal(10,'Blues'))
 ```
 
 # Session Information

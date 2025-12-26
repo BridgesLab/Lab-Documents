@@ -1,8 +1,2 @@
 #automatically generated files
 .DS_STORE
-
-#pdf files 
-*.pdf
-
-#html files generated from restructured text files
-*.html

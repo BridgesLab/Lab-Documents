@@ -3,7 +3,11 @@ Lab Policies Repository Notes
 =============================
 
 
-These files are generated via ReStructuredText.  For syntax details see http://docutils.sourceforge.net/docs/user/rst/quickref.html
+These files are generated via ReStructuredText.  For syntax details see http://docutils.sourceforge.net/docs/user/rst/quickref.html.  Edit the rst file and then use pandoc to make the tex and md files.  Commands are:
+
+    pandoc -o data-resource-sharing.md data-resource-sharing.rst
+    pandoc -o data-resource-sharing.tex data-resource-sharing.rst
+
 
 Files are converted to html by the docutils python function rst2html::
 
