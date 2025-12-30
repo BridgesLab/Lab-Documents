@@ -292,7 +292,7 @@ By this logic, the posterior probability should be $Beta(\alpha+y_o,beta+n-y_o)$
 ::: {.cell}
 
 ```{.r .cell-code}
-data.frame(probability=seq(0,1,by=0.01)) |>
+data.frame(probability=seq(0,0.2,by=0.001)) |>
   mutate(prior = dbeta(probability,11,991),
          posterior = dbeta(probability,18,1037)) |>
   pivot_longer(c(prior,posterior),names_to="type",values_to = "density") |>
@@ -402,6 +402,33 @@ data.frame(variance=seq(0,100,by=1)) |>
 :::
 
 The updated $\sigma^2$ values are then $E(\sigma^2)=\frac{\beta}{\alpha-1}$,  $Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$, and $\text{Mode}=\frac{\beta}{\alpha+1}$ so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727.  As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected.  The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5.  The probability that the value is below 5 is 0.7984651.  Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in `pinvgamma`.
+
+### Summary of Conjugate Priors
+
+| Distribution | Prior | Posterior | Mean | Mode | Variance |
+| --- | --- | --- | --- | --- | ----| 
+| $Binomial(n,\theta)$ | $Beta(\alpha, \beta)$ | $Beta(\alpha + y_o, \beta+n-y_o)$ | $\frac{\alpha}{\alpha + \beta}$  | $\frac{\alpha-1}{\alpha + \beta - 2}$ |$\frac{\alpha \cdot \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}$ |
+| $N(\mu,\sigma^2)$ known mean | $InvGamma(\alpha,\beta)$ | $InvGamma(\alpha + \frac{n}{2},\beta + \frac{SS}{2})$ | $\frac{\beta}{\alpha-1}$  | $\frac{\beta}{\alpha+1}$ |$\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$  |
+|$N(\mu,\sigma^2)$ known variance | $N(\mu_o,\tau^2_o)$| $N\left(
+\frac{\frac{\mu_0}{\tau_0^2} + \frac{n \cdot \bar{y}}{\sigma^2}}
+{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}},
+\;
+\frac{1}{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}}
+\right)$ | $\mu$ | $\mu$ | $\sigma^2$|
+| $N(\mu,\sigma^2)$ | $N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)$ | $\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})$$\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)$ | $\mu$ \ $\frac{\beta}{\alpha-1}$| $\mu$ \ $\frac{\beta}{\alpha+1}$ | $\frac{\beta}{(\alpha-1)\cdot\kappa}$ $\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}$|
+
+In these tables:
+
+- $\alpha$ and $\beta$ vary depending on the model:
+    - For inverse gamma distributions $\alpha=\text{successes}+1$ and $\beta=\text{failures}+1$. 
+    - For normal distributions if using existing data, one heuristic could be $\alpha=\frac{\kappa}{2}$ (prior degrees of freedom) and $\beta=\frac{\sigma^2\cdot\kappa}{2}$ (prior total sum of squares)
+- $n$ is the number of new trials.
+- $y_o$ is the number of successes.
+- $SS$ is the sum of squares of the new data.
+- $\mu$ is the (known in some cases) mean, or the prior pseudo observation.
+- $\sigma^2$ is the (known in some cases) variance.
+- $\bar{y}$ is the mean of the new data.
+- $\kappa$ is the strength of the prior belief in $\mu$, or the effective sample size
 
 ## References
 

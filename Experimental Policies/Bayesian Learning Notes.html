@@ -135,6 +135,7 @@ window.Quarto = {
   <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a>
   <ul class="collapse">
   <li><a href="#single-parameter-models" id="toc-single-parameter-models" class="nav-link" data-scroll-target="#single-parameter-models">Single Parameter Models</a></li>
+  <li><a href="#summary-of-conjugate-priors" id="toc-summary-of-conjugate-priors" class="nav-link" data-scroll-target="#summary-of-conjugate-priors">Summary of Conjugate Priors</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
@@ -453,7 +454,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="at">by=</span><span class="fl">0.001</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">11</span>,<span class="dv">991</span>),</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">18</span>,<span class="dv">1037</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
@@ -560,6 +561,83 @@ window.Quarto = {
 <p>The updated <span class="math inline">\(\sigma^2\)</span> values are then <span class="math inline">\(E(\sigma^2)=\frac{\beta}{\alpha-1}\)</span>, <span class="math inline">\(Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}\)</span>, and <span class="math inline">\(\text{Mode}=\frac{\beta}{\alpha+1}\)</span> so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727. As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected. The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5. The probability that the value is below 5 is 0.7984651. Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in <code>pinvgamma</code>.</p>
 </section>
 </section>
+</section>
+<section id="summary-of-conjugate-priors" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-conjugate-priors">Summary of Conjugate Priors</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th>Prior</th>
+<th>Posterior</th>
+<th>Mean</th>
+<th>Mode</th>
+<th>Variance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Binomial(n,\theta)\)</span></td>
+<td><span class="math inline">\(Beta(\alpha, \beta)\)</span></td>
+<td><span class="math inline">\(Beta(\alpha + y_o, \beta+n-y_o)\)</span></td>
+<td><span class="math inline">\(\frac{\alpha}{\alpha + \beta}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha-1}{\alpha + \beta - 2}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha \cdot \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(N(\mu,\sigma^2)\)</span> known mean</td>
+<td><span class="math inline">\(InvGamma(\alpha,\beta)\)</span></td>
+<td><span class="math inline">\(InvGamma(\alpha + \frac{n}{2},\beta + \frac{SS}{2})\)</span></td>
+<td><span class="math inline">\(\frac{\beta}{\alpha-1}\)</span></td>
+<td><span class="math inline">\(\frac{\beta}{\alpha+1}\)</span></td>
+<td><span class="math inline">\(\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(N(\mu,\sigma^2)\)</span> known variance</td>
+<td><span class="math inline">\(N(\mu_o,\tau^2_o)\)</span></td>
+<td><span class="math inline">\(N\left(
+\frac{\frac{\mu_0}{\tau_0^2} + \frac{n \cdot \bar{y}}{\sigma^2}}
+{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}},
+\;
+\frac{1}{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}}
+\right)\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+<td><span class="math inline">\(\sigma^2\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(N(\mu,\sigma^2)\)</span></td>
+<td><span class="math inline">\(N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)\)</span></td>
+<td><span class="math inline">\(\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})\)</span><span class="math inline">\(\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)\)</span></td>
+<td><span class="math inline">\(\mu\)</span> &nbsp;<span class="math inline">\(\frac{\beta}{\alpha-1}\)</span></td>
+<td><span class="math inline">\(\mu\)</span> &nbsp;<span class="math inline">\(\frac{\beta}{\alpha+1}\)</span></td>
+<td><span class="math inline">\(\frac{\beta}{(\alpha-1)\cdot\kappa}\)</span> <span class="math inline">\(\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>In these tables:</p>
+<ul>
+<li><span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> vary depending on the model:
+<ul>
+<li>For inverse gamma distributions <span class="math inline">\(\alpha=\text{successes}+1\)</span> and <span class="math inline">\(\beta=\text{failures}+1\)</span>.</li>
+<li>For normal distributions if using existing data, one heuristic could be <span class="math inline">\(\alpha=\frac{\kappa}{2}\)</span> (prior degrees of freedom) and <span class="math inline">\(\beta=\frac{\sigma^2\cdot\kappa}{2}\)</span> (prior total sum of squares)</li>
+</ul></li>
+<li><span class="math inline">\(n\)</span> is the number of new trials.</li>
+<li><span class="math inline">\(y_o\)</span> is the number of successes.</li>
+<li><span class="math inline">\(SS\)</span> is the sum of squares of the new data.</li>
+<li><span class="math inline">\(\mu\)</span> is the (known in some cases) mean, or the prior pseudo observation.</li>
+<li><span class="math inline">\(\sigma^2\)</span> is the (known in some cases) variance.</li>
+<li><span class="math inline">\(\bar{y}\)</span> is the mean of the new data.</li>
+<li><span class="math inline">\(\kappa\)</span> is the strength of the prior belief in <span class="math inline">\(\mu\)</span>, or the effective sample size</li>
+</ul>
 </section>
 </section>
 <section id="references" class="level2">
