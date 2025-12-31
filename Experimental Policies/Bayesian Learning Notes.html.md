@@ -45,6 +45,21 @@ color_scheme <- c("#00274c", "#ffcb05")
 
 These are notes as I work through and understand the notes from BIOSTAT 682
 
+Bayes theoreom says
+
+$$Pr(\theta|y) = \frac{Pr(y|\theta)\cdot Pr(\theta)}{Pr(y)}$$
+
+Where:
+
+- $Pr(\theta|y)$ is the posterior probability, given the data $y$
+- $Pr(y|\theta)$ is the likelihood function (the probability of getting data $y$ presuming the current hypothesis $\theta$ is correct)
+- $Pr(\theta)$ is the prior probability
+- $Pr(y)$ is probability of observing the data
+
+### Conjugate Priors
+
+Conjugate priors for a distribution are chosen so that the prior and the posterior have the same form.  According to Bayes' theorem $Pr(\theta | y) \propto Pr(y|\theta) \cdot \Pr(\theta)$ where both $Pr(\theta)$ (the prior) and $\Pr(\theta|y)$ (the posterior) are distributions over the parameter $\theta$.  This allows us to do Bayesian updating of models as new data arrives without the computationally expensive computation of the product of the likelihood and the prior.
+
 ### Single Parameter Models
 
 The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people.  The question is whether this incidence is greater than the expected incidence of 4.458% from [@CancerStatisticsNCI2015]
@@ -199,7 +214,7 @@ Table: Summary statistics for prior and posterior distributions
 
 By this model the posterior probability that the incidence is greater than 4.44% is 79.8%.
 
-##### Example of Beta as a Conjugate Prior
+###### Example of Beta as a Conjugate Prior
 
 Imagine there is a mouse that has a rare phenotype, we observe $n=20$ mice, and find $y=4$ have this phenotype. The probability of this occuring can be denoted as $Y | p \sim Bin(20,p)$.  Before noticing this, we believe the phenotype is uncommon but i have low certainty on this hypothesis, given as $p \sim Beta(2,20)$. This was selected because in $Beta(\alpha,\beta)$ this means that
 
@@ -268,7 +283,7 @@ data.frame(probability=seq(0,1,by=0.01)) |>
 
 Given this result of a posterior probability of $Beta(6,36)$ this corresponds to a mean probability of $\frac{6}{6+36}=\frac{6}{42}=$ 0.1428571.  The variance is $Var(p)=\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}= \frac{6\times 36}{(6+36)^2\times(6+36+1)}=$ 0.0028477.  The posterior mode is $MAP=\frac{\alpha-1}{\alpha + \beta - 2}=$ 0.125.
 
-##### Nutrition Example
+###### Nutrition Example
 
 You are studying a rare adverse event from a new dietary supplement.  From prior literature, events are uncommon, but not impossible.  You now run a small pilot study. You observe 7 adverse events out of 50 participants.
 
@@ -338,7 +353,7 @@ For a Normal likelihood with known mean $\mu$, the conjugate prior for the varia
 
 If we use precision $\frac{1}{\sigma^2}$ then the conjugate prior for variance is the Gamma distribution with the same meaning for $\alpha$ and $\beta$ except that $\beta$ is now a rate rather than a scale.
 
-##### Example for Estimating Prior and Posterior Variance
+###### Example for Estimating Prior and Posterior Variance
 
 You are studying a biomarker that is known (from calibration experiments) to have mean $\mu=100$.  You are uncertain about the variance $\sigma^2$.  You have this prior information:
 
@@ -403,9 +418,81 @@ data.frame(variance=seq(0,100,by=1)) |>
 
 The updated $\sigma^2$ values are then $E(\sigma^2)=\frac{\beta}{\alpha-1}$,  $Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$, and $\text{Mode}=\frac{\beta}{\alpha+1}$ so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727.  As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected.  The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5.  The probability that the value is below 5 is 0.7984651.  Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in `pinvgamma`.
 
+##### Poisson Distributions
+
+Poisson distributions work well for independent counts data (*e.g.* 0, 1, 2, 3 ...) and are described by $\text{Poisson}(\gamma)$, which has a probability mass function of $Pr(Y=y_o|\lambda)=\frac{\lambda^{y_o} \cdot e^{-\lambda}}{y_o!}$ where $\lambda$ describes the expected rate of a certain number events and $y_o$ is observed the number of events [@poisson1837probabilite].  $\lambda$ is both the mean and variance of this distribution, with the modal value given by the largest integer less than or equal to $\lambda$ or $\text{floor}(\lambda)$.
+
+The conjugate prior for a Poisson distribution is a **Gamma** distribution ($Gamma(\alpha,\beta)$) where the mean of $\gamma$ is $\frac{\alpha}{\beta}$, the variance is $\frac{\alpha}{\beta^2}$ and the modal value is $\frac{\alpha-1}{\beta}$.  The updated posterior distribution is $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ and the posterior predictive distribution is a negative binomial of the same form.  This is because for predictive purposes rather than exactly knowing $\gamma$ we have a range of possible $\gamma$ given by the updated distributions.  This mixture is now a negative binomial distribution
+
+###### Example Counts-Based Updating
+
+Lets say there is a number of adverse events (in a 30 day period) from a dietary supplement ($Y$) defined by $Pr(Y|\gamma)\sim\text{Poisson}(\gamma)$ where $\gamma$ is the average number of events over a fixed 30 day period.  Historically there are 2 events per month, based on about 10 months of experiences.  Based on this we should set the prior probability to be $Pr(Y)\sim\text{Gamma}(20,10)$ because the mean should be $\frac{\alpha}{\beta}=2=\frac{\alpha}{10}$
+
+
+::: {.cell}
+
+```{.r .cell-code}
+historical.events <- 2
+experiences <- 10
+alpha <- historical.events*experiences
+beta <- experiences
+
+new.months <- 3
+total.new.events <- 10
+```
+:::
+
+
+Now over the next 3 months we observe 10 total new events, a max likelihood estimate of 3.3333333.  This is now updated as $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)=\text{Gamma}(20+10,10+3)=\text{Gamma}(30,13)$.  This indicates that the mean number of events shifts from 2 [1.221652, 2.9670854] to 2.3076923 [1.5569903, 3.2037567], the modal number of events from 1.9 to 2.2307692.  This indicates the average number of events per thirty days. This means that the posterior probability of the true event rate or $\gamma>3$ is low (0.0591173). The variance moved from 0.2 to 0.1775148.  Going forward, using a negative binomial distribution, the probability of observing over 3 events per 30 days is 0.2072399.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+data.frame(observations = seq(0,10,by=1)) |>
+  mutate(prior=dgamma(observations,alpha,beta),
+         posterior =dgamma(observations,
+                           alpha+total.new.events,
+                           beta+new.months)) |>
+  pivot_longer(c(prior,posterior),names_to="type",values_to="probability") |>
+  ggplot(aes(y=probability,x=observations,col=type)) +
+  geom_line() +
+  geom_point() +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.8,0.3))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/poisson-visualization-1.png){width=672}
+:::
+
+```{.r .cell-code}
+data.frame(counts = seq(0,10,by=1)) |>
+  mutate(prior= dnbinom(counts,
+                            size = alpha,
+                            mu = alpha/beta),
+         posterior= dnbinom(counts,
+                            size = alpha+total.new.events,
+                            mu = (alpha+total.new.events) / (beta+new.months))) |>
+  pivot_longer(c(prior,posterior),
+               names_to="type",
+               values_to="probability") |>
+  ggplot(aes(y=probability,x=counts,fill=type)) +
+  geom_bar(stat='identity',position='dodge') +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Predictive Probability")
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/poisson-visualization-2.png){width=672}
+:::
+:::
+
+ 
 ### Summary of Conjugate Priors
 
-| Distribution | Prior | Posterior | Mean | Mode | Variance |
+| Distribution | Prior | Updated Posterior | Mean | Mode | Variance |
 | --- | --- | --- | --- | --- | ----| 
 | $Binomial(n,\theta)$ | $Beta(\alpha, \beta)$ | $Beta(\alpha + y_o, \beta+n-y_o)$ | $\frac{\alpha}{\alpha + \beta}$  | $\frac{\alpha-1}{\alpha + \beta - 2}$ |$\frac{\alpha \cdot \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}$ |
 | $N(\mu,\sigma^2)$ known mean | $InvGamma(\alpha,\beta)$ | $InvGamma(\alpha + \frac{n}{2},\beta + \frac{SS}{2})$ | $\frac{\beta}{\alpha-1}$  | $\frac{\beta}{\alpha+1}$ |$\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$  |
@@ -416,12 +503,14 @@ The updated $\sigma^2$ values are then $E(\sigma^2)=\frac{\beta}{\alpha-1}$,  $V
 \frac{1}{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}}
 \right)$ | $\mu$ | $\mu$ | $\sigma^2$|
 | $N(\mu,\sigma^2)$ | $N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)$ | $\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})$$\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)$ | $\mu$ \ $\frac{\beta}{\alpha-1}$| $\mu$ \ $\frac{\beta}{\alpha+1}$ | $\frac{\beta}{(\alpha-1)\cdot\kappa}$ $\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}$|
+| $\text{Poisson}(\gamma)$ | $\text{Gamma}(\alpha,\beta)$ | $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ | $\frac{\alpha}{\beta}$ | $\frac{\alpha-1}{\beta}$ | $\frac{\alpha}{\beta^2}$ | 
 
 In these tables:
 
 - $\alpha$ and $\beta$ vary depending on the model:
     - For inverse gamma distributions $\alpha=\text{successes}+1$ and $\beta=\text{failures}+1$. 
     - For normal distributions if using existing data, one heuristic could be $\alpha=\frac{\kappa}{2}$ (prior degrees of freedom) and $\beta=\frac{\sigma^2\cdot\kappa}{2}$ (prior total sum of squares)
+    - For poisson distributions, $\beta$ is the number of prior observations and $\alpha$ is the sum of events from those prior observations.
 - $n$ is the number of new trials.
 - $y_o$ is the number of successes.
 - $SS$ is the sum of squares of the new data.

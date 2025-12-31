@@ -134,6 +134,7 @@ window.Quarto = {
   <ul>
   <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a>
   <ul class="collapse">
+  <li><a href="#conjugate-priors" id="toc-conjugate-priors" class="nav-link" data-scroll-target="#conjugate-priors">Conjugate Priors</a></li>
   <li><a href="#single-parameter-models" id="toc-single-parameter-models" class="nav-link" data-scroll-target="#single-parameter-models">Single Parameter Models</a></li>
   <li><a href="#summary-of-conjugate-priors" id="toc-summary-of-conjugate-priors" class="nav-link" data-scroll-target="#summary-of-conjugate-priors">Summary of Conjugate Priors</a></li>
   </ul></li>
@@ -198,6 +199,19 @@ window.Quarto = {
 <section id="purpose" class="level2">
 <h2 class="anchored" data-anchor-id="purpose">Purpose</h2>
 <p>These are notes as I work through and understand the notes from BIOSTAT 682</p>
+<p>Bayes theoreom says</p>
+<p><span class="math display">\[Pr(\theta|y) = \frac{Pr(y|\theta)\cdot Pr(\theta)}{Pr(y)}\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(Pr(\theta|y)\)</span> is the posterior probability, given the data <span class="math inline">\(y\)</span></li>
+<li><span class="math inline">\(Pr(y|\theta)\)</span> is the likelihood function (the probability of getting data <span class="math inline">\(y\)</span> presuming the current hypothesis <span class="math inline">\(\theta\)</span> is correct)</li>
+<li><span class="math inline">\(Pr(\theta)\)</span> is the prior probability</li>
+<li><span class="math inline">\(Pr(y)\)</span> is probability of observing the data</li>
+</ul>
+<section id="conjugate-priors" class="level3">
+<h3 class="anchored" data-anchor-id="conjugate-priors">Conjugate Priors</h3>
+<p>Conjugate priors for a distribution are chosen so that the prior and the posterior have the same form. According to Bayes’ theorem <span class="math inline">\(Pr(\theta | y) \propto Pr(y|\theta) \cdot \Pr(\theta)\)</span> where both <span class="math inline">\(Pr(\theta)\)</span> (the prior) and <span class="math inline">\(\Pr(\theta|y)\)</span> (the posterior) are distributions over the parameter <span class="math inline">\(\theta\)</span>. This allows us to do Bayesian updating of models as new data arrives without the computationally expensive computation of the product of the likelihood and the prior.</p>
+</section>
 <section id="single-parameter-models" class="level3">
 <h3 class="anchored" data-anchor-id="single-parameter-models">Single Parameter Models</h3>
 <p>The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people. The question is whether this incidence is greater than the expected incidence of 4.458% from <span class="citation" data-cites="CancerStatisticsNCI2015">(<a href="#ref-CancerStatisticsNCI2015" role="doc-biblioref"><span>“Cancer <span>Statistics</span> - <span>NCI</span>”</span> 2015</a>)</span></p>
@@ -371,8 +385,8 @@ window.Quarto = {
 </div>
 </div>
 <p>By this model the posterior probability that the incidence is greater than 4.44% is 79.8%.</p>
-<section id="example-of-beta-as-a-conjugate-prior" class="level5">
-<h5 class="anchored" data-anchor-id="example-of-beta-as-a-conjugate-prior">Example of Beta as a Conjugate Prior</h5>
+<section id="example-of-beta-as-a-conjugate-prior" class="level6">
+<h6 class="anchored" data-anchor-id="example-of-beta-as-a-conjugate-prior">Example of Beta as a Conjugate Prior</h6>
 <p>Imagine there is a mouse that has a rare phenotype, we observe <span class="math inline">\(n=20\)</span> mice, and find <span class="math inline">\(y=4\)</span> have this phenotype. The probability of this occuring can be denoted as <span class="math inline">\(Y | p \sim Bin(20,p)\)</span>. Before noticing this, we believe the phenotype is uncommon but i have low certainty on this hypothesis, given as <span class="math inline">\(p \sim Beta(2,20)\)</span>. This was selected because in <span class="math inline">\(Beta(\alpha,\beta)\)</span> this means that</p>
 <ul>
 <li><span class="math inline">\(\alpha-1\)</span> is how often its observed (successes). By that <span class="math inline">\(\alpha=\text{successes}+1\)</span></li>
@@ -437,8 +451,8 @@ window.Quarto = {
 </div>
 <p>Given this result of a posterior probability of <span class="math inline">\(Beta(6,36)\)</span> this corresponds to a mean probability of <span class="math inline">\(\frac{6}{6+36}=\frac{6}{42}=\)</span> 0.1428571. The variance is <span class="math inline">\(Var(p)=\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}= \frac{6\times 36}{(6+36)^2\times(6+36+1)}=\)</span> 0.0028477. The posterior mode is <span class="math inline">\(MAP=\frac{\alpha-1}{\alpha + \beta - 2}=\)</span> 0.125.</p>
 </section>
-<section id="nutrition-example" class="level5">
-<h5 class="anchored" data-anchor-id="nutrition-example">Nutrition Example</h5>
+<section id="nutrition-example" class="level6">
+<h6 class="anchored" data-anchor-id="nutrition-example">Nutrition Example</h6>
 <p>You are studying a rare adverse event from a new dietary supplement. From prior literature, events are uncommon, but not impossible. You now run a small pilot study. You observe 7 adverse events out of 50 participants.</p>
 <p>I think a reasonable prior probability for adverse events would be something like 1% with reasonable certainty (perhaps 1000 prior data points with 10 being affected, so <span class="math inline">\(\alpha=\text{successes}+1=11\)</span> 990 being unaffected so <span class="math inline">\(\beta=\text{failures}+1=991\)</span>), so i think a prior distribution of <span class="math inline">\(Beta(11,991)\)</span> makes sense.</p>
 <div class="cell">
@@ -500,9 +514,8 @@ window.Quarto = {
 <li>With posterior updating (given a new degree of freedom <span class="math inline">\(\frac{n}{2}\)</span> and sum of squares <span class="math inline">\(\frac{S}{2}\)</span>), <span class="math inline">\(\sigma^2|y \sim InvGamma(\alpha + \frac{n}{2},\beta + \frac{S}{2})\)</span></li>
 </ul>
 <p>If we use precision <span class="math inline">\(\frac{1}{\sigma^2}\)</span> then the conjugate prior for variance is the Gamma distribution with the same meaning for <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> except that <span class="math inline">\(\beta\)</span> is now a rate rather than a scale.</p>
-</section>
-<section id="example-for-estimating-prior-and-posterior-variance" class="level5">
-<h5 class="anchored" data-anchor-id="example-for-estimating-prior-and-posterior-variance">Example for Estimating Prior and Posterior Variance</h5>
+<section id="example-for-estimating-prior-and-posterior-variance" class="level6">
+<h6 class="anchored" data-anchor-id="example-for-estimating-prior-and-posterior-variance">Example for Estimating Prior and Posterior Variance</h6>
 <p>You are studying a biomarker that is known (from calibration experiments) to have mean <span class="math inline">\(\mu=100\)</span>. You are uncertain about the variance <span class="math inline">\(\sigma^2\)</span>. You have this prior information:</p>
 <ul>
 <li>From historical data, you believe that the standard deviation is around 5 units (so <span class="math inline">\(\sigma^2=25\)</span>)</li>
@@ -561,6 +574,77 @@ window.Quarto = {
 <p>The updated <span class="math inline">\(\sigma^2\)</span> values are then <span class="math inline">\(E(\sigma^2)=\frac{\beta}{\alpha-1}\)</span>, <span class="math inline">\(Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}\)</span>, and <span class="math inline">\(\text{Mode}=\frac{\beta}{\alpha+1}\)</span> so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727. As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected. The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5. The probability that the value is below 5 is 0.7984651. Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in <code>pinvgamma</code>.</p>
 </section>
 </section>
+<section id="poisson-distributions" class="level5">
+<h5 class="anchored" data-anchor-id="poisson-distributions">Poisson Distributions</h5>
+<p>Poisson distributions work well for independent counts data (<em>e.g.</em> 0, 1, 2, 3 …) and are described by <span class="math inline">\(\text{Poisson}(\gamma)\)</span>, which has a probability mass function of <span class="math inline">\(Pr(Y=y_o|\lambda)=\frac{\lambda^{y_o} \cdot e^{-\lambda}}{y_o!}\)</span> where <span class="math inline">\(\lambda\)</span> describes the expected rate of a certain number events and <span class="math inline">\(y_o\)</span> is observed the number of events <span class="citation" data-cites="poisson1837probabilite">(<a href="#ref-poisson1837probabilite" role="doc-biblioref">Poisson 1837</a>)</span>. <span class="math inline">\(\lambda\)</span> is both the mean and variance of this distribution, with the modal value given by the largest integer less than or equal to <span class="math inline">\(\lambda\)</span> or <span class="math inline">\(\text{floor}(\lambda)\)</span>.</p>
+<p>The conjugate prior for a Poisson distribution is a <strong>Gamma</strong> distribution (<span class="math inline">\(Gamma(\alpha,\beta)\)</span>) where the mean of <span class="math inline">\(\gamma\)</span> is <span class="math inline">\(\frac{\alpha}{\beta}\)</span>, the variance is <span class="math inline">\(\frac{\alpha}{\beta^2}\)</span> and the modal value is <span class="math inline">\(\frac{\alpha-1}{\beta}\)</span>. The updated posterior distribution is <span class="math inline">\(\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)\)</span> and the posterior predictive distribution is a negative binomial of the same form. This is because for predictive purposes rather than exactly knowing <span class="math inline">\(\gamma\)</span> we have a range of possible <span class="math inline">\(\gamma\)</span> given by the updated distributions. This mixture is now a negative binomial distribution</p>
+<section id="example-counts-based-updating" class="level6">
+<h6 class="anchored" data-anchor-id="example-counts-based-updating">Example Counts-Based Updating</h6>
+<p>Lets say there is a number of adverse events (in a 30 day period) from a dietary supplement (<span class="math inline">\(Y\)</span>) defined by <span class="math inline">\(Pr(Y|\gamma)\sim\text{Poisson}(\gamma)\)</span> where <span class="math inline">\(\gamma\)</span> is the average number of events over a fixed 30 day period. Historically there are 2 events per month, based on about 10 months of experiences. Based on this we should set the prior probability to be <span class="math inline">\(Pr(Y)\sim\text{Gamma}(20,10)\)</span> because the mean should be <span class="math inline">\(\frac{\alpha}{\beta}=2=\frac{\alpha}{10}\)</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>historical.events <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>experiences <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> historical.events<span class="sc">*</span>experiences</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> experiences</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>new.months <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>total.new.events <span class="ot">&lt;-</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now over the next 3 months we observe 10 total new events, a max likelihood estimate of 3.3333333. This is now updated as <span class="math inline">\(\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)=\text{Gamma}(20+10,10+3)=\text{Gamma}(30,13)\)</span>. This indicates that the mean number of events shifts from 2 [1.221652, 2.9670854] to 2.3076923 [1.5569903, 3.2037567], the modal number of events from 1.9 to 2.2307692. This indicates the average number of events per thirty days. This means that the posterior probability of the true event rate or <span class="math inline">\(\gamma&gt;3\)</span> is low (0.0591173). The variance moved from 0.2 to 0.1775148. Going forward, using a negative binomial distribution, the probability of observing over 3 events per 30 days is 0.2072399.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">observations =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior=</span><span class="fu">dgamma</span>(observations,alpha,beta),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span><span class="fu">dgamma</span>(observations,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                           alpha<span class="sc">+</span>total.new.events,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                           beta<span class="sc">+</span>new.months)) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to=</span><span class="st">"probability"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>probability,<span class="at">x=</span>observations,<span class="at">col=</span>type)) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/poisson-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">counts =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior=</span> <span class="fu">dnbinom</span>(counts,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">size =</span> alpha,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">mu =</span> alpha<span class="sc">/</span>beta),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior=</span> <span class="fu">dnbinom</span>(counts,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">size =</span> alpha<span class="sc">+</span>total.new.events,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">mu =</span> (alpha<span class="sc">+</span>total.new.events) <span class="sc">/</span> (beta<span class="sc">+</span>new.months))) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"type"</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"probability"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>probability,<span class="at">x=</span>counts,<span class="at">fill=</span>type)) <span class="sc">+</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'identity'</span>,<span class="at">position=</span><span class="st">'dodge'</span>) <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Predictive Probability"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/poisson-visualization-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
 </section>
 <section id="summary-of-conjugate-priors" class="level3">
 <h3 class="anchored" data-anchor-id="summary-of-conjugate-priors">Summary of Conjugate Priors</h3>
@@ -577,7 +661,7 @@ window.Quarto = {
 <tr class="header">
 <th>Distribution</th>
 <th>Prior</th>
-<th>Posterior</th>
+<th>Updated Posterior</th>
 <th>Mean</th>
 <th>Mode</th>
 <th>Variance</th>
@@ -621,6 +705,14 @@ window.Quarto = {
 <td><span class="math inline">\(\mu\)</span> &nbsp;<span class="math inline">\(\frac{\beta}{\alpha+1}\)</span></td>
 <td><span class="math inline">\(\frac{\beta}{(\alpha-1)\cdot\kappa}\)</span> <span class="math inline">\(\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}\)</span></td>
 </tr>
+<tr class="odd">
+<td><span class="math inline">\(\text{Poisson}(\gamma)\)</span></td>
+<td><span class="math inline">\(\text{Gamma}(\alpha,\beta)\)</span></td>
+<td><span class="math inline">\(\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)\)</span></td>
+<td><span class="math inline">\(\frac{\alpha}{\beta}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha-1}{\beta}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha}{\beta^2}\)</span></td>
+</tr>
 </tbody>
 </table>
 <p>In these tables:</p>
@@ -629,6 +721,7 @@ window.Quarto = {
 <ul>
 <li>For inverse gamma distributions <span class="math inline">\(\alpha=\text{successes}+1\)</span> and <span class="math inline">\(\beta=\text{failures}+1\)</span>.</li>
 <li>For normal distributions if using existing data, one heuristic could be <span class="math inline">\(\alpha=\frac{\kappa}{2}\)</span> (prior degrees of freedom) and <span class="math inline">\(\beta=\frac{\sigma^2\cdot\kappa}{2}\)</span> (prior total sum of squares)</li>
+<li>For poisson distributions, <span class="math inline">\(\beta\)</span> is the number of prior observations and <span class="math inline">\(\alpha\)</span> is the sum of events from those prior observations.</li>
 </ul></li>
 <li><span class="math inline">\(n\)</span> is the number of new trials.</li>
 <li><span class="math inline">\(y_o\)</span> is the number of successes.</li>
@@ -646,6 +739,9 @@ window.Quarto = {
 <div id="ref-CancerStatisticsNCI2015" class="csl-entry" role="listitem">
 <span>“Cancer <span>Statistics</span> - <span>NCI</span>.”</span> 2015. {{cgvArticle}}. https://www.cancer.gov/about-cancer/understanding/statistics.
 </div>
+<div id="ref-poisson1837probabilite" class="csl-entry" role="listitem">
+Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mati<span>è</span>re Criminelle Et En Mati<span>è</span>re Civile, Pr<span>é</span>c<span>é</span>d<span>é</span>es Des r<span>è</span>gles g<span>é</span>n<span>é</span>rales Du Calcul Des Probabilit<span>é</span>s</em>. Paris, France: Bachelier.
+</div>
 </div>
 </section>
 <section id="session-information" class="level2">
@@ -653,7 +749,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
