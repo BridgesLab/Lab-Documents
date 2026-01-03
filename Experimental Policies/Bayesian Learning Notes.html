@@ -132,10 +132,19 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a>
-  <ul class="collapse">
-  <li><a href="#conjugate-priors" id="toc-conjugate-priors" class="nav-link" data-scroll-target="#conjugate-priors">Conjugate Priors</a></li>
+  <li><a href="#conjugate-priors" id="toc-conjugate-priors" class="nav-link active" data-scroll-target="#conjugate-priors">Conjugate Priors</a></li>
   <li><a href="#single-parameter-models" id="toc-single-parameter-models" class="nav-link" data-scroll-target="#single-parameter-models">Single Parameter Models</a></li>
+  <li><a href="#multiple-parameter-models" id="toc-multiple-parameter-models" class="nav-link" data-scroll-target="#multiple-parameter-models">Multiple Parameter Models</a>
+  <ul class="collapse">
+  <li><a href="#jeffries-priors" id="toc-jeffries-priors" class="nav-link" data-scroll-target="#jeffries-priors">Jeffries Priors</a></li>
+  </ul></li>
+  <li><a href="#likelihoods-and-jeffreys-priors-for-common-models" id="toc-likelihoods-and-jeffreys-priors-for-common-models" class="nav-link" data-scroll-target="#likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</a>
+  <ul class="collapse">
+  <li><a href="#nuisance-parameters" id="toc-nuisance-parameters" class="nav-link" data-scroll-target="#nuisance-parameters">Nuisance Parameters</a></li>
+  </ul></li>
+  <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
+  <ul class="collapse">
+  <li><a href="#predictive-probability-distributions" id="toc-predictive-probability-distributions" class="nav-link" data-scroll-target="#predictive-probability-distributions">Predictive Probability Distributions</a></li>
   <li><a href="#summary-of-conjugate-priors" id="toc-summary-of-conjugate-priors" class="nav-link" data-scroll-target="#summary-of-conjugate-priors">Summary of Conjugate Priors</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -196,8 +205,6 @@ window.Quarto = {
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>color_scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#00274c"</span>, <span class="st">"#ffcb05"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="purpose" class="level2">
-<h2 class="anchored" data-anchor-id="purpose">Purpose</h2>
 <p>These are notes as I work through and understand the notes from BIOSTAT 682</p>
 <p>Bayes theoreom says</p>
 <p><span class="math display">\[Pr(\theta|y) = \frac{Pr(y|\theta)\cdot Pr(\theta)}{Pr(y)}\]</span></p>
@@ -208,12 +215,12 @@ window.Quarto = {
 <li><span class="math inline">\(Pr(\theta)\)</span> is the prior probability</li>
 <li><span class="math inline">\(Pr(y)\)</span> is probability of observing the data</li>
 </ul>
-<section id="conjugate-priors" class="level3">
-<h3 class="anchored" data-anchor-id="conjugate-priors">Conjugate Priors</h3>
+<section id="conjugate-priors" class="level2">
+<h2 class="anchored" data-anchor-id="conjugate-priors">Conjugate Priors</h2>
 <p>Conjugate priors for a distribution are chosen so that the prior and the posterior have the same form. According to Bayes’ theorem <span class="math inline">\(Pr(\theta | y) \propto Pr(y|\theta) \cdot \Pr(\theta)\)</span> where both <span class="math inline">\(Pr(\theta)\)</span> (the prior) and <span class="math inline">\(\Pr(\theta|y)\)</span> (the posterior) are distributions over the parameter <span class="math inline">\(\theta\)</span>. This allows us to do Bayesian updating of models as new data arrives without the computationally expensive computation of the product of the likelihood and the prior.</p>
 </section>
-<section id="single-parameter-models" class="level3">
-<h3 class="anchored" data-anchor-id="single-parameter-models">Single Parameter Models</h3>
+<section id="single-parameter-models" class="level2">
+<h2 class="anchored" data-anchor-id="single-parameter-models">Single Parameter Models</h2>
 <p>The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people. The question is whether this incidence is greater than the expected incidence of 4.458% from <span class="citation" data-cites="CancerStatisticsNCI2015">(<a href="#ref-CancerStatisticsNCI2015" role="doc-biblioref"><span>“Cancer <span>Statistics</span> - <span>NCI</span>”</span> 2015</a>)</span></p>
 <p>Using the binomial distribution probability mass function for a binomial distribution</p>
 <p><span class="math display">\[P(Y = y | n, \theta) = \binom{n}{y} \theta^y (1 - \theta)^{n-y}\]</span> In this nomenclature <span class="math inline">\(\binom{n}{y}\)</span> expands out to <span class="math inline">\(\frac{n!}{y! \times (1-y)!}\)</span> where <span class="math inline">\(y\)</span> is the number of successes, <span class="math inline">\(n\)</span> is the number of trials. In the overall cuntion <span class="math inline">\(\theta\)</span> is the probability of success on each trial.</p>
@@ -597,7 +604,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">observations =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">observations =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="fl">0.1</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior=</span><span class="fu">dgamma</span>(observations,alpha,beta),</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span><span class="fu">dgamma</span>(observations,</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                           alpha<span class="sc">+</span>total.new.events,</span>
@@ -605,9 +612,8 @@ window.Quarto = {
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to=</span><span class="st">"probability"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>probability,<span class="at">x=</span>observations,<span class="at">col=</span>type)) <span class="sc">+</span></span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -645,6 +651,215 @@ window.Quarto = {
 </section>
 </section>
 </section>
+</section>
+<section id="multiple-parameter-models" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-parameter-models">Multiple Parameter Models</h2>
+<p>Most real world problems require us to estimate more than one parameter, unlike the examples above. That being said we are generally only interested in one or two of them.</p>
+<section id="jeffries-priors" class="level3">
+<h3 class="anchored" data-anchor-id="jeffries-priors">Jeffries Priors</h3>
+<p>One special class of priors are Jeffreys priors. These are defined by the likelihood function (normal, poisson, binomial, <em>et cetera</em>) than by our pre-existing intution or data. This makes them more objective, but perhaps less Bayesian. The Jeffrey’s prior is denoted as <span class="math inline">\(Pr(\theta) \propto \sqrt{I(\theta)}\)</span> where <span class="math inline">\(I(\theta)\)</span> is the Fisher information of <span class="math inline">\(\theta\)</span>. This measures how sensitive the distribution is to changes in the parameter. This is why it is based on the average of differential of the square of the log likelihood <span class="math inline">\((\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2\)</span>. Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.</p>
+</section>
+</section>
+<section id="likelihoods-and-jeffreys-priors-for-common-models" class="level2">
+<h2 class="anchored" data-anchor-id="likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 10%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Likelihood</th>
+<th>Parameter(s)</th>
+<th>Likelihood <span class="math inline">\(p(y \mid \theta)\)</span></th>
+<th>Fisher Information <span class="math inline">\(I(\theta)\)</span></th>
+<th>Jeffreys Prior <span class="math inline">\(\pi_J(\theta)\)</span></th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Bernoulli</strong></td>
+<td><span class="math inline">\(p \in (0,1)\)</span></td>
+<td><span class="math inline">\(p^y (1-p)^{1-y}\)</span></td>
+<td><span class="math inline">\(\frac{1}{p(1-p)}\)</span></td>
+<td><span class="math inline">\(\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}\)</span></td>
+<td>Proper; Beta<span class="math inline">\((\frac{1}{2}, \frac{1}{2})\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Binomial</strong></td>
+<td><span class="math inline">\(p \in (0,1)\)</span></td>
+<td><span class="math inline">\(\binom{n}{y} p^y (1-p)^{n-y}\)</span></td>
+<td><span class="math inline">\(\frac{n}{p(1-p)}\)</span></td>
+<td><span class="math inline">\(\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}\)</span></td>
+<td>Same as Bernoulli (constant drops out)</td>
+</tr>
+<tr class="odd">
+<td><strong>Poisson</strong></td>
+<td><span class="math inline">\(\lambda &gt; 0\)</span></td>
+<td><span class="math inline">\(\frac{\lambda^y e^{-\lambda}}{y!}\)</span></td>
+<td><span class="math inline">\(\frac{1}{\lambda}\)</span></td>
+<td><span class="math inline">\(\pi(\lambda) \propto \lambda^{-1/2}\)</span></td>
+<td>Improper; flat in <span class="math inline">\(\sqrt{\lambda}\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Normal (mean only)</strong></td>
+<td><span class="math inline">\(\mu \in \mathbb{R}\)</span></td>
+<td><span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span></td>
+<td><span class="math inline">\(\frac{1}{\sigma^2}\)</span></td>
+<td><span class="math inline">\(\pi(\mu) \propto 1\)</span></td>
+<td>Location parameter</td>
+</tr>
+<tr class="odd">
+<td><strong>Normal (variance only)</strong></td>
+<td><span class="math inline">\(\sigma &gt; 0\)</span></td>
+<td><span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span></td>
+<td><span class="math inline">\(\frac{2}{\sigma^2}\)</span></td>
+<td><span class="math inline">\(\pi(\sigma) \propto \frac{1}{\sigma}\)</span></td>
+<td>Scale-invariant</td>
+</tr>
+<tr class="even">
+<td><strong>Normal (mean &amp; variance)</strong></td>
+<td><span class="math inline">\((\mu, \sigma)\)</span></td>
+<td><span class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span></td>
+<td>—</td>
+<td><span class="math inline">\(\pi(\mu, \sigma) \propto \frac{1}{\sigma}\)</span></td>
+<td>Joint Jeffreys prior</td>
+</tr>
+<tr class="odd">
+<td><strong>Multinomial</strong></td>
+<td><span class="math inline">\(\mathbf{p} = (p_1, \dots, p_k)\)</span></td>
+<td><span class="math inline">\(\frac{n!}{\prod_i y_i!} \prod_i p_i^{y_i}\)</span></td>
+<td><span class="math inline">\(\mathrm{diag}(1/p_i)\)</span></td>
+<td><span class="math inline">\(\pi(\mathbf{p}) \propto \prod_i p_i^{-1/2}\)</span></td>
+<td>Dirichlet<span class="math inline">\((\frac{1}{2}, \dots, \frac{1}{2})\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> p,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">jeffreys =</span> <span class="fu">dbeta</span>(p, <span class="fl">0.5</span>, <span class="fl">0.5</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">uniform =</span> <span class="fu">dbeta</span>(p, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">informative =</span> <span class="fu">dbeta</span>(p, <span class="dv">14</span>, <span class="dv">6</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>p, <span class="at">names_to =</span> <span class="st">"prior"</span>, <span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> p, <span class="at">y =</span> density, <span class="at">color =</span> prior)) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.3</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Priors for Binomial Probability p"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(p),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  )<span class="ot">-&gt;</span> binomial.plot</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.01</span>, <span class="dv">30</span>, <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">lambda =</span> <span class="fu">seq</span>(<span class="fl">0.01</span>, <span class="dv">30</span>, <span class="at">length.out =</span> <span class="dv">500</span>),</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">jeffreys =</span> lambda<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>),          <span class="co"># unnormalized</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">informative =</span> <span class="fu">dgamma</span>(lambda, <span class="at">shape =</span> <span class="dv">10</span>, <span class="at">rate =</span> <span class="dv">2</span>)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>lambda, <span class="at">names_to =</span> <span class="st">"type"</span>, <span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lambda, <span class="at">y =</span> density, <span class="at">color =</span> type)) <span class="sc">+</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.3</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Jeffreys vs Informative Prior (Poisson)"</span>,</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(lambda),</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Prior density </span><span class="sc">\n</span><span class="st">(unnormalized for Jeffreys)"</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="ot">-&gt;</span> poisson.plot</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">25</span>, <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">mu =</span> mu,</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">jeffreys =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(mu)),                 <span class="co"># flat</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">informative =</span> <span class="fu">dnorm</span>(mu, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">2</span>)</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>mu, <span class="at">names_to =</span> <span class="st">"prior"</span>, <span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mu, <span class="at">y =</span> density, <span class="at">color =</span> prior)) <span class="sc">+</span></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Priors for Normal Mean (σ known)"</span>,</span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(mu),</span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>  ) <span class="ot">-&gt;</span> norm.plot</span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist=</span><span class="fu">c</span>(binomial.plot,poisson.plot,norm.plot),</span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>          <span class="at">nrow=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/jeffries-prior-visualizations-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="nuisance-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="nuisance-parameters">Nuisance Parameters</h3>
+<p>Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters <span class="math inline">\(\theta=(\theta_1,\theta_2)\)</span> of which we only care about <span class="math inline">\(\theta_1\)</span>, that makes <span class="math inline">\(\theta_2\)</span> a nuisance parameter. For example we may only care about the mean but not the variance. In modeling the posterior <span class="math inline">\(Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)\)</span>. To get <span class="math inline">\(\Pr(\theta_1|y)\)</span>, the marginal posterior, we integrate out <span class="math inline">\(\theta_2\)</span>:</p>
+<p><span class="math display">\[Pr(\theta_1|y)=\int Pr(\theta_1,\theta_2|y) d(\theta_2) \\
+=\int \frac{Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2)}{Pr(y)} \cdot d\theta_2\\
+\propto Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2) \cdot d\theta_2\]</span></p>
+</section>
+</section>
+<section id="summary-tables" class="level2">
+<h2 class="anchored" data-anchor-id="summary-tables">Summary Tables</h2>
+<section id="predictive-probability-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="predictive-probability-distributions">Predictive Probability Distributions</h3>
+<p>These are always larger due to the uncertainty in new predictions than the posterior probabilities. They are summarized here:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th>Conjugate Prior</th>
+<th>Predictive Posterior</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Binomial</td>
+<td>Beta</td>
+<td>Beta-Binomial</td>
+</tr>
+<tr class="even">
+<td>Bernoulli</td>
+<td>Beta</td>
+<td>Beta-Bernoulli</td>
+</tr>
+<tr class="odd">
+<td>Normal (known <span class="math inline">\(\sigma\)</span>)</td>
+<td>Normal</td>
+<td>Normal</td>
+</tr>
+<tr class="even">
+<td>Normal (unknown <span class="math inline">\(\sigma\)</span>)</td>
+<td>Normal-Inverse Gamma</td>
+<td><span class="math inline">\(t\)</span></td>
+</tr>
+<tr class="odd">
+<td>Poisson</td>
+<td>Gamma</td>
+<td>Negative Binomial</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="summary-of-conjugate-priors" class="level3">
 <h3 class="anchored" data-anchor-id="summary-of-conjugate-priors">Summary of Conjugate Priors</h3>
@@ -749,7 +964,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -770,9 +985,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] invgamma_1.2    knitr_1.50      lubridate_1.9.4 forcats_1.0.1  
- [5] stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0     readr_2.1.6    
- [9] tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] cowplot_1.2.0   invgamma_1.2    knitr_1.50      lubridate_1.9.4
+ [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
+ [9] readr_2.1.6     tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1  
+[13] tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  

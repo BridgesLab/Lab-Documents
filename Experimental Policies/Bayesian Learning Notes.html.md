@@ -41,8 +41,6 @@ color_scheme <- c("#00274c", "#ffcb05")
 :::
 
 
-## Purpose
-
 These are notes as I work through and understand the notes from BIOSTAT 682
 
 Bayes theoreom says
@@ -56,11 +54,11 @@ Where:
 - $Pr(\theta)$ is the prior probability
 - $Pr(y)$ is probability of observing the data
 
-### Conjugate Priors
+## Conjugate Priors
 
 Conjugate priors for a distribution are chosen so that the prior and the posterior have the same form.  According to Bayes' theorem $Pr(\theta | y) \propto Pr(y|\theta) \cdot \Pr(\theta)$ where both $Pr(\theta)$ (the prior) and $\Pr(\theta|y)$ (the posterior) are distributions over the parameter $\theta$.  This allows us to do Bayesian updating of models as new data arrives without the computationally expensive computation of the product of the likelihood and the prior.
 
-### Single Parameter Models
+## Single Parameter Models
 
 The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people.  The question is whether this incidence is greater than the expected incidence of 4.458% from [@CancerStatisticsNCI2015]
 
@@ -449,7 +447,7 @@ Now over the next 3 months we observe 10 total new events, a max likelihood esti
 ::: {.cell}
 
 ```{.r .cell-code}
-data.frame(observations = seq(0,10,by=1)) |>
+data.frame(observations = seq(0,10,by=0.1)) |>
   mutate(prior=dgamma(observations,alpha,beta),
          posterior =dgamma(observations,
                            alpha+total.new.events,
@@ -457,7 +455,6 @@ data.frame(observations = seq(0,10,by=1)) |>
   pivot_longer(c(prior,posterior),names_to="type",values_to="probability") |>
   ggplot(aes(y=probability,x=observations,col=type)) +
   geom_line() +
-  geom_point() +
   theme_classic(base_size=16) +
   theme(legend.position=c(0.8,0.3))
 ```
@@ -489,6 +486,120 @@ data.frame(counts = seq(0,10,by=1)) |>
 :::
 :::
 
+## Multiple Parameter Models
+
+Most real world problems require us to estimate more than one parameter, unlike the examples above.  That being said we are generally only interested in one or two of them.
+
+### Jeffries Priors
+
+One special class of priors are Jeffreys priors.  These are defined by the likelihood function (normal, poisson, binomial, *et cetera*) than by our pre-existing intution or data.  This makes them more objective, but perhaps less Bayesian.  The Jeffrey's prior is denoted as $Pr(\theta) \propto \sqrt{I(\theta)}$ where $I(\theta)$ is the Fisher information of $\theta$.  This measures how sensitive the distribution is to changes in the parameter.  This is why it is based on the average of differential of the square of the log likelihood $(\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2$.  Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.
+
+## Likelihoods and Jeffreys Priors for Common Models
+
+| Likelihood | Parameter(s) | Likelihood $p(y \mid \theta)$ | Fisher Information $I(\theta)$ | Jeffreys Prior $\pi_J(\theta)$ | Notes |
+|-----------|--------------|---------------------------------|---------------------------------|---------------------------------|-------|
+| **Bernoulli** | $p \in (0,1)$ | $p^y (1-p)^{1-y}$ | $\frac{1}{p(1-p)}$ | $\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}$ | Proper; Beta$(\frac{1}{2}, \frac{1}{2})$ |
+| **Binomial** | $p \in (0,1)$ | $\binom{n}{y} p^y (1-p)^{n-y}$ | $\frac{n}{p(1-p)}$ | $\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}$ | Same as Bernoulli (constant drops out) |
+| **Poisson** | $\lambda > 0$ | $\frac{\lambda^y e^{-\lambda}}{y!}$ | $\frac{1}{\lambda}$ | $\pi(\lambda) \propto \lambda^{-1/2}$ | Improper; flat in $\sqrt{\lambda}$ |
+| **Normal (mean only)** | $\mu \in \mathbb{R}$ | $\mathcal{N}(\mu, \sigma^2)$ | $\frac{1}{\sigma^2}$ | $\pi(\mu) \propto 1$ | Location parameter |
+| **Normal (variance only)** | $\sigma > 0$ | $\mathcal{N}(\mu, \sigma^2)$ | $\frac{2}{\sigma^2}$ | $\pi(\sigma) \propto \frac{1}{\sigma}$ | Scale-invariant |
+| **Normal (mean & variance)** | $(\mu, \sigma)$ | $\mathcal{N}(\mu, \sigma^2)$ | — | $\pi(\mu, \sigma) \propto \frac{1}{\sigma}$ | Joint Jeffreys prior |
+| **Multinomial** | $\mathbf{p} = (p_1, \dots, p_k)$ | $\frac{n!}{\prod_i y_i!} \prod_i p_i^{y_i}$ | $\mathrm{diag}(1/p_i)$ | $\pi(\mathbf{p}) \propto \prod_i p_i^{-1/2}$ | Dirichlet$(\frac{1}{2}, \dots, \frac{1}{2})$ |
+
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+p <- seq(0.001, 0.999, length.out = 500)
+
+tibble(
+  p = p,
+  jeffreys = dbeta(p, 0.5, 0.5),
+  uniform = dbeta(p, 1, 1),
+  informative = dbeta(p, 14, 6)
+) |>
+  pivot_longer(-p, names_to = "prior", values_to = "density") |>
+  ggplot(aes(x = p, y = density, color = prior)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.3,0.8)) +
+  labs(
+    title = "Priors for Binomial Probability p",
+    x = expression(p),
+    y = "Density"
+  )-> binomial.plot
+
+
+lambda_grid <- seq(0.01, 30, length.out = 500)
+
+tibble(
+  lambda = seq(0.01, 30, length.out = 500),
+  jeffreys = lambda^(-1/2),          # unnormalized
+  informative = dgamma(lambda, shape = 10, rate = 2)
+) |>
+  pivot_longer(-lambda, names_to = "type", values_to = "density") |>
+  ggplot(aes(x = lambda, y = density, color = type)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.3,0.5)) +
+  labs(
+    title = "Jeffreys vs Informative Prior (Poisson)",
+    x = expression(lambda),
+    y = "Prior density \n(unnormalized for Jeffreys)"
+  ) -> poisson.plot
+
+mu <- seq(-5, 25, length.out = 500)
+
+tibble(
+  mu = mu,
+  jeffreys = rep(1, length(mu)),                 # flat
+  informative = dnorm(mu, mean = 10, sd = 2)
+) |>
+  pivot_longer(-mu, names_to = "prior", values_to = "density") |>
+  ggplot(aes(x = mu, y = density, color = prior)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.8,0.5)) +
+  labs(
+    title = "Priors for Normal Mean (σ known)",
+    x = expression(mu),
+    y = "Density"
+  ) -> norm.plot
+
+library(cowplot)
+plot_grid(plotlist=c(binomial.plot,poisson.plot,norm.plot),
+          nrow=1)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffries-prior-visualizations-1.png){width=672}
+:::
+:::
+
+
+### Nuisance Parameters
+
+Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$:
+
+$$Pr(\theta_1|y)=\int Pr(\theta_1,\theta_2|y) d(\theta_2) \\
+=\int \frac{Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2)}{Pr(y)} \cdot d\theta_2\\
+\propto Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2) \cdot d\theta_2$$
+
+## Summary Tables
+
+### Predictive Probability Distributions
+
+These are always larger due to the uncertainty in new predictions than the posterior probabilities.  They are summarized here:
+
+| Distribution | Conjugate Prior | Predictive Posterior |
+| -- | -- | -- |
+| Binomial | Beta | Beta-Binomial |
+| Bernoulli | Beta | Beta-Bernoulli |
+| Normal (known $\sigma$) | Normal |Normal |
+| Normal (unknown $\sigma$) | Normal-Inverse Gamma |$t$ |
+| Poisson | Gamma | Negative Binomial | 
  
 ### Summary of Conjugate Priors
 
@@ -554,9 +665,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] invgamma_1.2    knitr_1.50      lubridate_1.9.4 forcats_1.0.1  
- [5] stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0     readr_2.1.6    
- [9] tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] cowplot_1.2.0   invgamma_1.2    knitr_1.50      lubridate_1.9.4
+ [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
+ [9] readr_2.1.6     tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1  
+[13] tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
