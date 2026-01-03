@@ -494,7 +494,7 @@ Most real world problems require us to estimate more than one parameter, unlike 
 
 One special class of priors are Jeffreys priors.  These are defined by the likelihood function (normal, poisson, binomial, *et cetera*) than by our pre-existing intution or data.  This makes them more objective, but perhaps less Bayesian.  The Jeffrey's prior is denoted as $Pr(\theta) \propto \sqrt{I(\theta)}$ where $I(\theta)$ is the Fisher information of $\theta$.  This measures how sensitive the distribution is to changes in the parameter.  This is why it is based on the average of differential of the square of the log likelihood $(\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2$.  Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.
 
-## Likelihoods and Jeffreys Priors for Common Models
+#### Likelihoods and Jeffreys Priors for Common Models
 
 | Likelihood | Parameter(s) | Likelihood $p(y \mid \theta)$ | Fisher Information $I(\theta)$ | Jeffreys Prior $\pi_J(\theta)$ | Notes |
 |-----------|--------------|---------------------------------|---------------------------------|---------------------------------|-------|

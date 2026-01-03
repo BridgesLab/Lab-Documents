@@ -137,9 +137,6 @@ window.Quarto = {
   <li><a href="#multiple-parameter-models" id="toc-multiple-parameter-models" class="nav-link" data-scroll-target="#multiple-parameter-models">Multiple Parameter Models</a>
   <ul class="collapse">
   <li><a href="#jeffries-priors" id="toc-jeffries-priors" class="nav-link" data-scroll-target="#jeffries-priors">Jeffries Priors</a></li>
-  </ul></li>
-  <li><a href="#likelihoods-and-jeffreys-priors-for-common-models" id="toc-likelihoods-and-jeffreys-priors-for-common-models" class="nav-link" data-scroll-target="#likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</a>
-  <ul class="collapse">
   <li><a href="#nuisance-parameters" id="toc-nuisance-parameters" class="nav-link" data-scroll-target="#nuisance-parameters">Nuisance Parameters</a></li>
   </ul></li>
   <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
@@ -658,10 +655,8 @@ window.Quarto = {
 <section id="jeffries-priors" class="level3">
 <h3 class="anchored" data-anchor-id="jeffries-priors">Jeffries Priors</h3>
 <p>One special class of priors are Jeffreys priors. These are defined by the likelihood function (normal, poisson, binomial, <em>et cetera</em>) than by our pre-existing intution or data. This makes them more objective, but perhaps less Bayesian. The Jeffrey’s prior is denoted as <span class="math inline">\(Pr(\theta) \propto \sqrt{I(\theta)}\)</span> where <span class="math inline">\(I(\theta)\)</span> is the Fisher information of <span class="math inline">\(\theta\)</span>. This measures how sensitive the distribution is to changes in the parameter. This is why it is based on the average of differential of the square of the log likelihood <span class="math inline">\((\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2\)</span>. Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.</p>
-</section>
-</section>
-<section id="likelihoods-and-jeffreys-priors-for-common-models" class="level2">
-<h2 class="anchored" data-anchor-id="likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</h2>
+<section id="likelihoods-and-jeffreys-priors-for-common-models" class="level4">
+<h4 class="anchored" data-anchor-id="likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</h4>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 8%">
@@ -811,6 +806,8 @@ window.Quarto = {
 </div>
 </div>
 </div>
+</section>
+</section>
 <section id="nuisance-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="nuisance-parameters">Nuisance Parameters</h3>
 <p>Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters <span class="math inline">\(\theta=(\theta_1,\theta_2)\)</span> of which we only care about <span class="math inline">\(\theta_1\)</span>, that makes <span class="math inline">\(\theta_2\)</span> a nuisance parameter. For example we may only care about the mean but not the variance. In modeling the posterior <span class="math inline">\(Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)\)</span>. To get <span class="math inline">\(\Pr(\theta_1|y)\)</span>, the marginal posterior, we integrate out <span class="math inline">\(\theta_2\)</span>:</p>
