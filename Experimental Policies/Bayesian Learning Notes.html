@@ -654,7 +654,7 @@ window.Quarto = {
 <p>Most real world problems require us to estimate more than one parameter, unlike the examples above. That being said we are generally only interested in one or two of them.</p>
 <section id="jeffries-priors" class="level3">
 <h3 class="anchored" data-anchor-id="jeffries-priors">Jeffries Priors</h3>
-<p>One special class of priors are Jeffreys priors. These are defined by the likelihood function (normal, poisson, binomial, <em>et cetera</em>) than by our pre-existing intution or data. This makes them more objective, but perhaps less Bayesian. The Jeffrey’s prior is denoted as <span class="math inline">\(Pr(\theta) \propto \sqrt{I(\theta)}\)</span> where <span class="math inline">\(I(\theta)\)</span> is the Fisher information of <span class="math inline">\(\theta\)</span>. This measures how sensitive the distribution is to changes in the parameter. This is why it is based on the average of differential of the square of the log likelihood <span class="math inline">\((\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2\)</span>. Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.</p>
+<p>One special class of priors are Jeffreys priors. These are defined by the likelihood function (normal, poisson, binomial, <em>et cetera</em>) than by our pre-existing intution or data. This makes them more objective, but perhaps less Bayesian. The Jeffrey’s prior is denoted as <span class="math inline">\(Pr(\theta) \propto \sqrt{I(\theta)}\)</span> where <span class="math inline">\(I(\theta)\)</span> is the Fisher information of <span class="math inline">\(\theta\)</span>. This measures how sensitive the distribution is to changes in the parameter. This is why it is based on the average of differential of the square of the log likelihood <span class="math inline">\((\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2\)</span>. Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves <span class="citation" data-cites="jeffreys1961theory">(<a href="#ref-jeffreys1961theory" role="doc-biblioref">Jeffreys 1961</a>)</span>.</p>
 <section id="likelihoods-and-jeffreys-priors-for-common-models" class="level4">
 <h4 class="anchored" data-anchor-id="likelihoods-and-jeffreys-priors-for-common-models">Likelihoods and Jeffreys Priors for Common Models</h4>
 <table class="caption-top table">
@@ -807,6 +807,56 @@ window.Quarto = {
 </div>
 </div>
 </section>
+<section id="example-using-jeffreys-priors" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-jeffreys-priors">Example Using Jeffrey’s Priors</h4>
+<p>Considering ultraprocessed foods, asking whether a food recommends the FDA recommendation for sodium in a single serving. This is based on a survey of foods in a cafeteria. The question (binomial) is whether a product exceeds or does not exceed the limit.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>products.sampled <span class="ot">&lt;-</span> <span class="dv">12</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>exceeded <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># based on 90% estimate</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>informed.alpha <span class="ot">&lt;-</span> <span class="dv">90</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#observed + 1</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>informed.beta <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#not-observed +1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We sampled 12 products, finding that 9 of them exceeded the limits. This is denoted by <span class="math inline">\(Binomial(n=12,p)\)</span>. For the binomial distribution, the Jeffreys prior for a binomial distribution is <span class="math inline">\(Beta(\frac{1}{2},\frac{1}{2})\)</span>, which makes sense as we have no preferred parameterization. The posterior probability in this case is <span class="math inline">\(Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)\)</span>. The MLE is 0.75. We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 <span class="math inline">\(\pm\)</span> [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a slightly more informed prior <span class="math inline">\(Binomial(91,11)\)</span> which gives a posterior mean of 0.877193 <span class="math inline">\(\pm\)</span> [0.8113073, 0.9305813]. These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">p=</span><span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">200</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">jeffreys_prior=</span><span class="fu">dbeta</span>(p,<span class="fl">0.5</span>,<span class="fl">0.5</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">jeffreys_posterior=</span><span class="fu">dbeta</span>(p,<span class="fl">0.5</span><span class="sc">+</span>exceeded,<span class="fl">0.5</span><span class="sc">-</span>exceeded<span class="sc">+</span>products.sampled),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">informed_prior=</span><span class="fu">dbeta</span>(p,informed.alpha,informed.beta),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">informed_posterior=</span><span class="fu">dbeta</span>(p,informed.alpha<span class="sc">+</span>exceeded,informed.beta<span class="sc">-</span>exceeded<span class="sc">+</span>products.sampled)) <span class="sc">|&gt;</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>p,<span class="at">names_sep=</span><span class="st">"_"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="fu">c</span>(<span class="st">"prior"</span>,<span class="st">"type"</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">'density'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>density,<span class="at">x=</span>p,<span class="at">col=</span>type,<span class="at">lty=</span>prior)) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept=</span>exceeded<span class="sc">/</span>products.sampled, <span class="at">lty=</span><span class="dv">2</span>, <span class="at">col=</span><span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">geom  =</span> <span class="st">"text"</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x     =</span> exceeded<span class="sc">/</span>products.sampled<span class="fl">-0.01</span>,           <span class="co"># ← your chosen x-position</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y     =</span> <span class="dv">12</span>,            <span class="co"># ← your chosen y-position</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Observed"</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">1</span>,            <span class="co"># 0 = left justified (most important part)</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="fl">0.5</span>,          <span class="co"># optional: 0.5 = vertically centered</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.2</span>,<span class="fl">0.7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/jeffreys-upf-example-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="nuisance-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="nuisance-parameters">Nuisance Parameters</h3>
@@ -951,6 +1001,9 @@ window.Quarto = {
 <div id="ref-CancerStatisticsNCI2015" class="csl-entry" role="listitem">
 <span>“Cancer <span>Statistics</span> - <span>NCI</span>.”</span> 2015. {{cgvArticle}}. https://www.cancer.gov/about-cancer/understanding/statistics.
 </div>
+<div id="ref-jeffreys1961theory" class="csl-entry" role="listitem">
+Jeffreys, Harold. 1961. <em>Theory of Probability</em>. 3rd ed. Oxford: Oxford University Press.
+</div>
 <div id="ref-poisson1837probabilite" class="csl-entry" role="listitem">
 Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mati<span>è</span>re Criminelle Et En Mati<span>è</span>re Civile, Pr<span>é</span>c<span>é</span>d<span>é</span>es Des r<span>è</span>gles g<span>é</span>n<span>é</span>rales Du Calcul Des Probabilit<span>é</span>s</em>. Paris, France: Bachelier.
 </div>
@@ -961,7 +1014,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)

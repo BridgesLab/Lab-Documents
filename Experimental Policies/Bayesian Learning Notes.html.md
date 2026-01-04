@@ -486,13 +486,14 @@ data.frame(counts = seq(0,10,by=1)) |>
 :::
 :::
 
+
 ## Multiple Parameter Models
 
 Most real world problems require us to estimate more than one parameter, unlike the examples above.  That being said we are generally only interested in one or two of them.
 
 ### Jeffries Priors
 
-One special class of priors are Jeffreys priors.  These are defined by the likelihood function (normal, poisson, binomial, *et cetera*) than by our pre-existing intution or data.  This makes them more objective, but perhaps less Bayesian.  The Jeffrey's prior is denoted as $Pr(\theta) \propto \sqrt{I(\theta)}$ where $I(\theta)$ is the Fisher information of $\theta$.  This measures how sensitive the distribution is to changes in the parameter.  This is why it is based on the average of differential of the square of the log likelihood $(\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2$.  Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves.
+One special class of priors are Jeffreys priors.  These are defined by the likelihood function (normal, poisson, binomial, *et cetera*) than by our pre-existing intution or data.  This makes them more objective, but perhaps less Bayesian.  The Jeffrey's prior is denoted as $Pr(\theta) \propto \sqrt{I(\theta)}$ where $I(\theta)$ is the Fisher information of $\theta$.  This measures how sensitive the distribution is to changes in the parameter.  This is why it is based on the average of differential of the square of the log likelihood $(\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2$.  Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves [@jeffreys1961theory].
 
 #### Likelihoods and Jeffreys Priors for Common Models
 
@@ -505,8 +506,6 @@ One special class of priors are Jeffreys priors.  These are defined by the likel
 | **Normal (variance only)** | $\sigma > 0$ | $\mathcal{N}(\mu, \sigma^2)$ | $\frac{2}{\sigma^2}$ | $\pi(\sigma) \propto \frac{1}{\sigma}$ | Scale-invariant |
 | **Normal (mean & variance)** | $(\mu, \sigma)$ | $\mathcal{N}(\mu, \sigma^2)$ | — | $\pi(\mu, \sigma) \propto \frac{1}{\sigma}$ | Joint Jeffreys prior |
 | **Multinomial** | $\mathbf{p} = (p_1, \dots, p_k)$ | $\frac{n!}{\prod_i y_i!} \prod_i p_i^{y_i}$ | $\mathrm{diag}(1/p_i)$ | $\pi(\mathbf{p}) \propto \prod_i p_i^{-1/2}$ | Dirichlet$(\frac{1}{2}, \dots, \frac{1}{2})$ |
-
-
 
 
 ::: {.cell}
@@ -575,6 +574,60 @@ plot_grid(plotlist=c(binomial.plot,poisson.plot,norm.plot),
 
 ::: {.cell-output-display}
 ![](Bayesian-Learning-Notes_files/figure-html/jeffries-prior-visualizations-1.png){width=672}
+:::
+:::
+
+
+#### Example Using Jeffrey's Priors 
+
+Considering ultraprocessed foods, asking whether a food recommends the FDA recommendation for sodium in a single serving.  This is based on a survey of foods in a cafeteria.  The question (binomial) is whether a product exceeds or does not exceed the limit.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+products.sampled <- 12
+exceeded <- 9
+
+# based on 90% estimate
+informed.alpha <- 90+1 #observed + 1
+informed.beta <- 10+1 #not-observed +1
+```
+:::
+
+
+We sampled 12 products, finding that 9 of them exceeded the limits.  This is denoted by $Binomial(n=12,p)$.  For the binomial distribution, the Jeffreys prior for a binomial distribution is $Beta(\frac{1}{2},\frac{1}{2})$, which makes sense as we have no preferred parameterization.  The posterior probability in this case is $Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)$.  The MLE is 0.75.  We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 $\pm$ [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a slightly more informed prior $Binomial(91,11)$ which gives a posterior mean of 0.877193 $\pm$ [0.8113073, 0.9305813].  These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
+  mutate(jeffreys_prior=dbeta(p,0.5,0.5),
+         jeffreys_posterior=dbeta(p,0.5+exceeded,0.5-exceeded+products.sampled),
+         informed_prior=dbeta(p,informed.alpha,informed.beta),
+         informed_posterior=dbeta(p,informed.alpha+exceeded,informed.beta-exceeded+products.sampled)) |> 
+  pivot_longer(-p,names_sep="_",
+               names_to=c("prior","type"),
+               values_to='density') |>
+  ggplot(aes(y=density,x=p,col=type,lty=prior)) +
+  geom_line() +
+    geom_vline(xintercept=exceeded/products.sampled, lty=2, col="grey") +
+  annotate(
+    geom  = "text",
+    x     = exceeded/products.sampled-0.01,           # ← your chosen x-position
+    y     = 12,            # ← your chosen y-position
+    label = "Observed",
+    hjust = 1,            # 0 = left justified (most important part)
+    vjust = 0.5,          # optional: 0.5 = vertically centered
+    size  = 5, color = "grey"
+  ) +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.2,0.7))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-upf-example-1.png){width=672}
 :::
 :::
 
