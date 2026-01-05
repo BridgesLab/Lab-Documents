@@ -596,7 +596,7 @@ informed.beta <- 10+1 #not-observed +1
 :::
 
 
-We sampled 12 products, finding that 9 of them exceeded the limits.  This is denoted by $Binomial(n=12,p)$.  For the binomial distribution, the Jeffreys prior for a binomial distribution is $Beta(\frac{1}{2},\frac{1}{2})$, which makes sense as we have no preferred parameterization.  The posterior probability in this case is $Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)$.  The MLE is 0.75.  We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 $\pm$ [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a slightly more informed prior $Binomial(91,11)$ which gives a posterior mean of 0.877193 $\pm$ [0.8113073, 0.9305813].  These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.
+We sampled 12 products, finding that 9 of them exceeded the limits.  This is denoted by $Binomial(n=12,p)$.  For the binomial distribution, the Jeffreys prior for a binomial distribution is $Beta(\frac{1}{2},\frac{1}{2})$, which makes sense as we have no preferred parameterization.  The posterior probability in this case is $Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)$.  The MLE is 0.75.  We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 $\pm$ [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a much more informed prior $Binomial(91,11)$ which gives a posterior mean of 0.877193 $\pm$ [0.8113073, 0.9305813].  These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.
 
 
 ::: {.cell}
@@ -634,11 +634,7 @@ data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
 
 ### Nuisance Parameters
 
-Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$:
-
-$$Pr(\theta_1|y)=\int Pr(\theta_1,\theta_2|y) d(\theta_2) \\
-=\int \frac{Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2)}{Pr(y)} \cdot d\theta_2\\
-\propto Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2) \cdot d\theta_2$$
+Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$.  This can give you the marginal distribution of $\theta_1$.  Another approach is to use the Jeffreys priors and only keep terms that include $\theta_1$.  For example for a normal distribution, using a Jeffreys prior the posterior probability is $Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}$ where $n$ is the number of new observations $SS$ is the new sum of squares and $\bar{y}$ is the new mean.
 
 ## Summary Tables
 
@@ -653,6 +649,7 @@ These are always larger due to the uncertainty in new predictions than the poste
 | Normal (known $\sigma$) | Normal |Normal |
 | Normal (unknown $\sigma$) | Normal-Inverse Gamma |$t$ |
 | Poisson | Gamma | Negative Binomial | 
+| Multinomial | Dirichlet | Dirichlet-Multinomial |
  
 ### Summary of Conjugate Priors
 
@@ -668,6 +665,7 @@ These are always larger due to the uncertainty in new predictions than the poste
 \right)$ | $\mu$ | $\mu$ | $\sigma^2$|
 | $N(\mu,\sigma^2)$ | $N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)$ | $\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})$$\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)$ | $\mu$ \ $\frac{\beta}{\alpha-1}$| $\mu$ \ $\frac{\beta}{\alpha+1}$ | $\frac{\beta}{(\alpha-1)\cdot\kappa}$ $\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}$|
 | $\text{Poisson}(\gamma)$ | $\text{Gamma}(\alpha,\beta)$ | $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ | $\frac{\alpha}{\beta}$ | $\frac{\alpha-1}{\beta}$ | $\frac{\alpha}{\beta^2}$ | 
+| Multinomial | $\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)$| $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ | $\frac{\alpha_i}{\alpha_o}$| $\frac{\alpha_i-1}{\alpha_o-K}$| $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ |
 
 In these tables:
 
@@ -675,6 +673,7 @@ In these tables:
     - For inverse gamma distributions $\alpha=\text{successes}+1$ and $\beta=\text{failures}+1$. 
     - For normal distributions if using existing data, one heuristic could be $\alpha=\frac{\kappa}{2}$ (prior degrees of freedom) and $\beta=\frac{\sigma^2\cdot\kappa}{2}$ (prior total sum of squares)
     - For poisson distributions, $\beta$ is the number of prior observations and $\alpha$ is the sum of events from those prior observations.
+    - For dirichlet, $alpha_i$ is the prior pseudo-count for category $i$ and $alpha_o$ is $\alpha_0 = \sum\limits_{i=1}^{K}$, the sum of all the alphas from 1 to k, the prior sample size.
 - $n$ is the number of new trials.
 - $y_o$ is the number of successes.
 - $SS$ is the sum of squares of the new data.

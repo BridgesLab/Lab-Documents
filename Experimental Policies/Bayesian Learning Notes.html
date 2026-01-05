@@ -821,7 +821,7 @@ window.Quarto = {
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>informed.beta <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#not-observed +1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>We sampled 12 products, finding that 9 of them exceeded the limits. This is denoted by <span class="math inline">\(Binomial(n=12,p)\)</span>. For the binomial distribution, the Jeffreys prior for a binomial distribution is <span class="math inline">\(Beta(\frac{1}{2},\frac{1}{2})\)</span>, which makes sense as we have no preferred parameterization. The posterior probability in this case is <span class="math inline">\(Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)\)</span>. The MLE is 0.75. We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 <span class="math inline">\(\pm\)</span> [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a slightly more informed prior <span class="math inline">\(Binomial(91,11)\)</span> which gives a posterior mean of 0.877193 <span class="math inline">\(\pm\)</span> [0.8113073, 0.9305813]. These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.</p>
+<p>We sampled 12 products, finding that 9 of them exceeded the limits. This is denoted by <span class="math inline">\(Binomial(n=12,p)\)</span>. For the binomial distribution, the Jeffreys prior for a binomial distribution is <span class="math inline">\(Beta(\frac{1}{2},\frac{1}{2})\)</span>, which makes sense as we have no preferred parameterization. The posterior probability in this case is <span class="math inline">\(Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)\)</span>. The MLE is 0.75. We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 <span class="math inline">\(\pm\)</span> [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a much more informed prior <span class="math inline">\(Binomial(91,11)\)</span> which gives a posterior mean of 0.877193 <span class="math inline">\(\pm\)</span> [0.8113073, 0.9305813]. These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -860,10 +860,7 @@ window.Quarto = {
 </section>
 <section id="nuisance-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="nuisance-parameters">Nuisance Parameters</h3>
-<p>Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters <span class="math inline">\(\theta=(\theta_1,\theta_2)\)</span> of which we only care about <span class="math inline">\(\theta_1\)</span>, that makes <span class="math inline">\(\theta_2\)</span> a nuisance parameter. For example we may only care about the mean but not the variance. In modeling the posterior <span class="math inline">\(Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)\)</span>. To get <span class="math inline">\(\Pr(\theta_1|y)\)</span>, the marginal posterior, we integrate out <span class="math inline">\(\theta_2\)</span>:</p>
-<p><span class="math display">\[Pr(\theta_1|y)=\int Pr(\theta_1,\theta_2|y) d(\theta_2) \\
-=\int \frac{Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2)}{Pr(y)} \cdot d\theta_2\\
-\propto Pr(y|\theta_1,\theta_2)\cdot Pr(\theta_1,\theta_2) \cdot d\theta_2\]</span></p>
+<p>Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters <span class="math inline">\(\theta=(\theta_1,\theta_2)\)</span> of which we only care about <span class="math inline">\(\theta_1\)</span>, that makes <span class="math inline">\(\theta_2\)</span> a nuisance parameter. For example we may only care about the mean but not the variance. In modeling the posterior <span class="math inline">\(Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)\)</span>. To get <span class="math inline">\(\Pr(\theta_1|y)\)</span>, the marginal posterior, we integrate out <span class="math inline">\(\theta_2\)</span>. This can give you the marginal distribution of <span class="math inline">\(\theta_1\)</span>. Another approach is to use the Jeffreys priors and only keep terms that include <span class="math inline">\(\theta_1\)</span>. For example for a normal distribution, using a Jeffreys prior the posterior probability is <span class="math inline">\(Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}\)</span> where <span class="math inline">\(n\)</span> is the number of new observations <span class="math inline">\(SS\)</span> is the new sum of squares and <span class="math inline">\(\bar{y}\)</span> is the new mean.</p>
 </section>
 </section>
 <section id="summary-tables" class="level2">
@@ -904,6 +901,11 @@ window.Quarto = {
 <td>Poisson</td>
 <td>Gamma</td>
 <td>Negative Binomial</td>
+</tr>
+<tr class="even">
+<td>Multinomial</td>
+<td>Dirichlet</td>
+<td>Dirichlet-Multinomial</td>
 </tr>
 </tbody>
 </table>
@@ -975,6 +977,14 @@ window.Quarto = {
 <td><span class="math inline">\(\frac{\alpha-1}{\beta}\)</span></td>
 <td><span class="math inline">\(\frac{\alpha}{\beta^2}\)</span></td>
 </tr>
+<tr class="even">
+<td>Multinomial</td>
+<td><span class="math inline">\(\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)\)</span></td>
+<td><span class="math inline">\(\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha_i}{\alpha_o}\)</span></td>
+<td><span class="math inline">\(\frac{\alpha_i-1}{\alpha_o-K}\)</span></td>
+<td><span class="math inline">\(\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}\)</span></td>
+</tr>
 </tbody>
 </table>
 <p>In these tables:</p>
@@ -984,6 +994,7 @@ window.Quarto = {
 <li>For inverse gamma distributions <span class="math inline">\(\alpha=\text{successes}+1\)</span> and <span class="math inline">\(\beta=\text{failures}+1\)</span>.</li>
 <li>For normal distributions if using existing data, one heuristic could be <span class="math inline">\(\alpha=\frac{\kappa}{2}\)</span> (prior degrees of freedom) and <span class="math inline">\(\beta=\frac{\sigma^2\cdot\kappa}{2}\)</span> (prior total sum of squares)</li>
 <li>For poisson distributions, <span class="math inline">\(\beta\)</span> is the number of prior observations and <span class="math inline">\(\alpha\)</span> is the sum of events from those prior observations.</li>
+<li>For dirichlet, <span class="math inline">\(alpha_i\)</span> is the prior pseudo-count for category <span class="math inline">\(i\)</span> and <span class="math inline">\(alpha_o\)</span> is <span class="math inline">\(\alpha_0 = \sum\limits_{i=1}^{K}\)</span>, the sum of all the alphas from 1 to k, the prior sample size.</li>
 </ul></li>
 <li><span class="math inline">\(n\)</span> is the number of new trials.</li>
 <li><span class="math inline">\(y_o\)</span> is the number of successes.</li>
