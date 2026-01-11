@@ -638,25 +638,106 @@ Perhaps there are several parameters that are required in a model, but we only c
 
 ### Using Jeffreys Prior to Define a Marginal Posterior
 
-For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution:
+For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution and multiplying by a Jeffreys prior.  Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n\cdot(n-1)})$ with a marginal predictive posterior probability of $y_{new}|y \sim t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$
 
-$$
-Pr(y|\mu,\sigma) = (\frac{\tau}{2\pi})^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
-Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+#### Example Using Jeffrey's Derived Marginal Probabilities
 
-Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)
-$$
 
-this multiplied by the Jeffreys prior is:
+::: {.cell}
 
-$$
-Pr(\mu,\sigma|y) \propto(Pr(y|\mu,\sigma) \times Pr_j(\mu,\sigma)) \\
+```{.r .cell-code}
+observations <- c(4.2,5.1,6.3,5.4,4.8)
+observations.ss <- sum((observations-mean(observations))^2)
+library(extraDistr)
+```
+:::
 
-Pr(\mu,\sigma|y) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2) \times \tau \\
 
-Pr(\mu,\sigma|y) \propto Pr(y|\mu,\sigma) \propto \tau^{1+\frac{n}{2}}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)  \\
-$$
-Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})$
+We observe the following values 4.2, 5.1, 6.3, 5.4, 4.8.  Based on this $n=5$, $\bar{y}=5.16$ and $SS=2.412$.  Based on this the probability that $Pr(5.0<\mu<5.5∣y)$ is based on the difference between the two t-distributions for 5 and 5.5 $t_{n-1}(\bar{y},\frac{SS}{n\cdot(n-1)})$ or 0.4740412 as visualized below:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+n <- length(observations)
+mu_hat <- mean(observations)
+sigma_mu <- sqrt(observations.ss / (n * (n - 1)))
+
+df_plot <- data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    density = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    )
+  )
+
+ggplot(df_plot, aes(x = values, y = density)) +
+  geom_line(linewidth = 1) +
+  geom_area(
+    data = subset(df_plot, values >= 5 & values <= 5.5),
+    aes(x = values, y = density),
+    fill = "grey70",
+    alpha = 0.6
+  ) +
+  geom_vline(xintercept = c(5, 5.5), linetype = 2, color = "grey40") +
+  theme_classic(base_size = 16) +
+  labs(
+    x = expression(mu),
+    y = "Posterior density",
+    title = expression(paste("Posterior for ", mu, " under Jeffreys prior"))
+  )
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-visualization-1.png){width=672}
+:::
+:::
+
+
+The predictive probability of a new value being between 4.5 and 6 is given by the differnce between the distributions $t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$ or 0.5697764.  This is a wider range because the scale parameter is larger due to the uncertainty in predicting a new value 0.3472751 vs 0.8506468.  This is shown here:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+sigma_mu <- sqrt(observations.ss / (length(observations) * (length(observations) - 1)))
+sigma_mu.pred <- sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))
+
+data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    posterior = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    ),
+    predictive= dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu.pred
+    ),
+  ) |>
+  pivot_longer(c(posterior, predictive),
+               names_to="type",
+               values_to="density") |>
+  ggplot(aes(x = values, y = density, color=type)) +
+  geom_line()+
+  theme_classic(base_size = 16) +
+  theme(legend.position=c(0.8,0.8)) 
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-predictive-visualization-1.png){width=672}
+:::
+:::
+
 
 ## Summary Tables
 
@@ -739,22 +820,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] cowplot_1.2.0   invgamma_1.2    knitr_1.51      lubridate_1.9.4
- [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
- [9] readr_2.1.6     tidyr_1.3.2     tibble_3.3.0    ggplot2_4.0.1  
-[13] tidyverse_2.0.0
+ [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
+ [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
+ [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.0        
+[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.0       
+[13] ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
- [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
- [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
-[13] tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.6       
-[17] stringi_1.8.7      xfun_0.55          S7_0.2.1           otel_0.2.0        
-[21] timechange_0.3.0   cli_3.6.5          withr_3.0.2        magrittr_2.0.4    
-[25] digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4         
-[29] lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0        
-[33] farver_2.1.2       rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3   
-[37] htmltools_0.5.9   
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.0        
+ [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
+ [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
+[13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
+[17] rlang_1.1.6        stringi_1.8.7      xfun_0.55          S7_0.2.1          
+[21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
+[25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
+[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    
+[33] glue_1.8.0         farver_2.1.2       rmarkdown_2.30     tools_4.5.2       
+[37] pkgconfig_2.0.3    htmltools_0.5.9   
 ```
 
 

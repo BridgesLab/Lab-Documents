@@ -866,13 +866,102 @@ window.Quarto = {
 </section>
 <section id="using-jeffreys-prior-to-define-a-marginal-posterior" class="level3">
 <h3 class="anchored" data-anchor-id="using-jeffreys-prior-to-define-a-marginal-posterior">Using Jeffreys Prior to Define a Marginal Posterior</h3>
-<p>For a normal distribution the Jeffreys prior is <span class="math inline">\(Pr(\mu,\sigma) \propto \frac{1}{\sigma}\)</span> or <span class="math inline">\(\tau\)</span>. We can derive the posterior probability using that and the likelihood function for the normal distribution:</p>
-<p>$$ Pr(y|,) = ()<sup>(-<em>{i=1}<sup>{n}(y_i-)</sup>2) \ Pr(y|,) ^(-</em>{i=1}</sup>{n}(y_i-)^2) \</p>
-<p>Pr(y|,) ^(-SS +n(-{y})^2) $$</p>
-<p>this multiplied by the Jeffreys prior is:</p>
-<p>$$ Pr(,|y) (Pr(y|,) Pr_j(,)) \</p>
-<p>Pr(,|y) ^(-SS +n(-{y})^2) \</p>
-<p>Pr(,|y) Pr(y|,) ^{1+}(-SS +n(-{y})^2) \ $$ Integrating out <span class="math inline">\(\tau\)</span> gives the marginal posterior for <span class="math inline">\(\mu\)</span> gives me the <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(n-1\)</span> degrees of freedom or <span class="math inline">\(\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})\)</span></p>
+<p>For a normal distribution the Jeffreys prior is <span class="math inline">\(Pr(\mu,\sigma) \propto \frac{1}{\sigma}\)</span> or <span class="math inline">\(\tau\)</span>. We can derive the posterior probability using that and the likelihood function for the normal distribution and multiplying by a Jeffreys prior. Integrating out <span class="math inline">\(\tau\)</span> gives the marginal posterior for <span class="math inline">\(\mu\)</span> gives me the <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(n-1\)</span> degrees of freedom or <span class="math inline">\(\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n\cdot(n-1)})\)</span> with a marginal predictive posterior probability of <span class="math inline">\(y_{new}|y \sim t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})\)</span></p>
+<section id="example-using-jeffreys-derived-marginal-probabilities" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-jeffreys-derived-marginal-probabilities">Example Using Jeffrey’s Derived Marginal Probabilities</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>observations <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">4.2</span>,<span class="fl">5.1</span>,<span class="fl">6.3</span>,<span class="fl">5.4</span>,<span class="fl">4.8</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>observations.ss <span class="ot">&lt;-</span> <span class="fu">sum</span>((observations<span class="sc">-</span><span class="fu">mean</span>(observations))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(extraDistr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>We observe the following values 4.2, 5.1, 6.3, 5.4, 4.8. Based on this <span class="math inline">\(n=5\)</span>, <span class="math inline">\(\bar{y}=5.16\)</span> and <span class="math inline">\(SS=2.412\)</span>. Based on this the probability that <span class="math inline">\(Pr(5.0&lt;\mu&lt;5.5∣y)\)</span> is based on the difference between the two t-distributions for 5 and 5.5 <span class="math inline">\(t_{n-1}(\bar{y},\frac{SS}{n\cdot(n-1)})\)</span> or 0.4740412 as visualized below:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(observations)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>mu_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(observations)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>sigma_mu <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(observations.ss <span class="sc">/</span> (n <span class="sc">*</span> (n <span class="sc">-</span> <span class="dv">1</span>)))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df_plot <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">density =</span> <span class="fu">dlst</span>(</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      values,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">df    =</span> n <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">mu    =</span> mu_hat,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">sigma =</span> sigma_mu</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_plot, <span class="fu">aes</span>(<span class="at">x =</span> values, <span class="at">y =</span> density)) <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_area</span>(</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">subset</span>(df_plot, values <span class="sc">&gt;=</span> <span class="dv">5</span> <span class="sc">&amp;</span> values <span class="sc">&lt;=</span> <span class="fl">5.5</span>),</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> values, <span class="at">y =</span> density),</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"grey70"</span>,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.6</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="fl">5.5</span>), <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"grey40"</span>) <span class="sc">+</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(mu),</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Posterior density"</span>,</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">"Posterior for "</span>, mu, <span class="st">" under Jeffreys prior"</span>))</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The predictive probability of a new value being between 4.5 and 6 is given by the differnce between the distributions <span class="math inline">\(t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})\)</span> or 0.5697764. This is a wider range because the scale parameter is larger due to the uncertainty in predicting a new value 0.3472751 vs 0.8506468. This is shown here:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sigma_mu <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(observations.ss <span class="sc">/</span> (<span class="fu">length</span>(observations) <span class="sc">*</span> (<span class="fu">length</span>(observations) <span class="sc">-</span> <span class="dv">1</span>)))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>sigma_mu.pred <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(observations.ss <span class="sc">*</span> (<span class="fu">length</span>(observations) <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span> (<span class="fu">length</span>(observations) <span class="sc">*</span> (<span class="fu">length</span>(observations) <span class="sc">-</span> <span class="dv">1</span>)))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">posterior =</span> <span class="fu">dlst</span>(</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>      values,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">df    =</span> n <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">mu    =</span> mu_hat,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">sigma =</span> sigma_mu</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">predictive=</span> <span class="fu">dlst</span>(</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>      values,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">df    =</span> n <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">mu    =</span> mu_hat,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">sigma =</span> sigma_mu.pred</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(posterior, predictive),</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">"type"</span>,</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> values, <span class="at">y =</span> density, <span class="at">color=</span>type)) <span class="sc">+</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-predictive-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 </section>
 <section id="summary-tables" class="level2">
@@ -1037,7 +1126,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -1058,22 +1147,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] cowplot_1.2.0   invgamma_1.2    knitr_1.51      lubridate_1.9.4
- [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
- [9] readr_2.1.6     tidyr_1.3.2     tibble_3.3.0    ggplot2_4.0.1  
-[13] tidyverse_2.0.0
+ [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
+ [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
+ [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.0        
+[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.0       
+[13] ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
- [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
- [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
-[13] tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.6       
-[17] stringi_1.8.7      xfun_0.55          S7_0.2.1           otel_0.2.0        
-[21] timechange_0.3.0   cli_3.6.5          withr_3.0.2        magrittr_2.0.4    
-[25] digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4         
-[29] lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0        
-[33] farver_2.1.2       rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3   
-[37] htmltools_0.5.9   </code></pre>
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.0        
+ [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
+ [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
+[13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
+[17] rlang_1.1.6        stringi_1.8.7      xfun_0.55          S7_0.2.1          
+[21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
+[25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
+[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    
+[33] glue_1.8.0         farver_2.1.2       rmarkdown_2.30     tools_4.5.2       
+[37] pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
 </div>
 </div>
 </section>

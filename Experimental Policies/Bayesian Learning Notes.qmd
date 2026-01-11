@@ -498,25 +498,102 @@ Perhaps there are several parameters that are required in a model, but we only c
 
 ### Using Jeffreys Prior to Define a Marginal Posterior
 
-For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution:
+For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution and multiplying by a Jeffreys prior.  Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n\cdot(n-1)})$ with a marginal predictive posterior probability of $y_{new}|y \sim t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$
 
-$$
-Pr(y|\mu,\sigma) = (\frac{\tau}{2\pi})^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
-Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+#### Example Using Jeffrey's Derived Marginal Probabilities
 
-Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)
-$$
+```{r jeffreys-marginal-setup}
+observations <- c(4.2,5.1,6.3,5.4,4.8)
+observations.ss <- sum((observations-mean(observations))^2)
+library(extraDistr)
+```
 
-this multiplied by the Jeffreys prior is:
+We observe the following values `r paste(observations,sep=",")`.  Based on this $n=`r length(observations)`$, $\bar{y}=`r mean(observations)`$ and $SS=`r sum((observations-mean(observations))^2)`$.  Based on this the probability that $Pr(5.0<\mu<5.5∣y)$ is based on the difference between the two t-distributions for 5 and 5.5 $t_{n-1}(\bar{y},\frac{SS}{n\cdot(n-1)})$ or `r plst(5.5,
+  df    = length(observations) - 1,
+  mu    = mean(observations),
+  sigma = sqrt(observations.ss / (length(observations) * (length(observations) - 1)))
+) -
+plst(
+  5.0,
+  df    = length(observations) - 1,
+  mu    = mean(observations),
+  sigma = sqrt(observations.ss / (length(observations) * (length(observations) - 1)))
+)` as visualized below:
 
-$$
-Pr(\mu,\sigma|y) \propto(Pr(y|\mu,\sigma) \times Pr_j(\mu,\sigma)) \\
+```{r jeffreys-marginal-visualization}
+n <- length(observations)
+mu_hat <- mean(observations)
+sigma_mu <- sqrt(observations.ss / (n * (n - 1)))
 
-Pr(\mu,\sigma|y) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2) \times \tau \\
+df_plot <- data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    density = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    )
+  )
 
-Pr(\mu,\sigma|y) \propto Pr(y|\mu,\sigma) \propto \tau^{1+\frac{n}{2}}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)  \\
-$$
-Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})$
+ggplot(df_plot, aes(x = values, y = density)) +
+  geom_line(linewidth = 1) +
+  geom_area(
+    data = subset(df_plot, values >= 5 & values <= 5.5),
+    aes(x = values, y = density),
+    fill = "grey70",
+    alpha = 0.6
+  ) +
+  geom_vline(xintercept = c(5, 5.5), linetype = 2, color = "grey40") +
+  theme_classic(base_size = 16) +
+  labs(
+    x = expression(mu),
+    y = "Posterior density",
+    title = expression(paste("Posterior for ", mu, " under Jeffreys prior"))
+  )
+```
+
+The predictive probability of a new value being between 4.5 and 6 is given by the differnce between the distributions $t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$ or `r plst(6,
+  df    = length(observations) - 1,
+  mu    = mean(observations),
+  sigma = sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))
+) -plst(4.5,
+  df    = length(observations) - 1,
+  mu    = mean(observations),
+  sigma = sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))
+)`.  This is a wider range because the scale parameter is larger due to the uncertainty in predicting a new value `r sqrt(observations.ss / (length(observations) * (length(observations) - 1)))` vs `r sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))`.  This is shown here:
+
+```{r jeffreys-marginal-predictive-visualization}
+
+sigma_mu <- sqrt(observations.ss / (length(observations) * (length(observations) - 1)))
+sigma_mu.pred <- sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))
+
+data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    posterior = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    ),
+    predictive= dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu.pred
+    ),
+  ) |>
+  pivot_longer(c(posterior, predictive),
+               names_to="type",
+               values_to="density") |>
+  ggplot(aes(x = values, y = density, color=type)) +
+  geom_line()+
+  theme_classic(base_size = 16) +
+  theme(legend.position=c(0.8,0.8)) 
+```
 
 ## Summary Tables
 
