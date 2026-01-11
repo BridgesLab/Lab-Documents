@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -83,14 +83,15 @@ div.csl-indent {
 <script src="Bayesian Learning Notes_files/libs/clipboard/clipboard.min.js"></script>
 <script src="Bayesian Learning Notes_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="Bayesian Learning Notes_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Bayesian Learning Notes_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="Bayesian Learning Notes_files/libs/quarto-html/popper.min.js"></script>
 <script src="Bayesian Learning Notes_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="Bayesian Learning Notes_files/libs/quarto-html/anchor.min.js"></script>
 <link href="Bayesian Learning Notes_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Bayesian Learning Notes_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="Bayesian Learning Notes_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Bayesian Learning Notes_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Bayesian Learning Notes_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Bayesian Learning Notes_files/libs/bootstrap/bootstrap-ff7067f47e26017551bec3c0280d8ab3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Bayesian Learning Notes_files/libs/bootstrap/bootstrap-75002b1d8148a6ce22b7ae2bfa1c577b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -106,7 +107,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -138,6 +139,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#jeffries-priors" id="toc-jeffries-priors" class="nav-link" data-scroll-target="#jeffries-priors">Jeffries Priors</a></li>
   <li><a href="#nuisance-parameters" id="toc-nuisance-parameters" class="nav-link" data-scroll-target="#nuisance-parameters">Nuisance Parameters</a></li>
+  <li><a href="#using-jeffreys-prior-to-define-a-marginal-posterior" id="toc-using-jeffreys-prior-to-define-a-marginal-posterior" class="nav-link" data-scroll-target="#using-jeffreys-prior-to-define-a-marginal-posterior">Using Jeffreys Prior to Define a Marginal Posterior</a></li>
   </ul></li>
   <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
   <ul class="collapse">
@@ -185,7 +187,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hide this code chunk</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hide this code chunk</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -199,7 +201,7 @@ window.Quarto = {
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># sets maize and blue color scheme</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>color_scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#00274c"</span>, <span class="st">"#ffcb05"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>color_scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#00274c"</span>, <span class="st">"#ffcb05"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>These are notes as I work through and understand the notes from BIOSTAT 682</p>
@@ -235,7 +237,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">145</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">145</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cases <span class="ot">&lt;-</span> <span class="dv">8</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.03</span>, <span class="fl">0.04</span>, <span class="fl">0.05</span>, <span class="fl">0.06</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>priors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fu">rep</span>(<span class="fl">0.5</span><span class="sc">/</span><span class="dv">3</span>,<span class="dv">3</span>))</span>
@@ -246,7 +248,7 @@ window.Quarto = {
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rel.likelihood =</span> likelihood <span class="sc">/</span> <span class="fu">min</span>(likelihood)) <span class="sc">|&gt;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">posterior =</span> priors <span class="sc">*</span> likelihood <span class="sc">/</span> <span class="fu">sum</span>(priors <span class="sc">*</span> likelihood)) <span class="sc">|&gt;</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="fu">paste0</span>(<span class="st">"Probability of observing "</span>, cases, <span class="st">" cases out of "</span>,n, <span class="st">" trials"</span>),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">digits=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">digits=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -294,7 +296,7 @@ window.Quarto = {
 </div>
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#this does not give the same results as the notes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#this does not give the same results as the notes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>This means that hypotheses 4 and 5 explain the data approximately the same times better than hypothesis 1.</p>
@@ -314,7 +316,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mean = alpha / (alpha + beta) so to guestimate 0.444 is 4/85</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mean = alpha / (alpha + beta) so to guestimate 0.444 is 4/85</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span>  <span class="dv">1</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -334,7 +336,7 @@ window.Quarto = {
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Value"</span>,</span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Likelihood"</span>) <span class="sc">+</span></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.85</span>,<span class="fl">0.85</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.85</span>,<span class="fl">0.85</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -345,7 +347,7 @@ window.Quarto = {
 </div>
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#these are defined from the conjugate prior/posterior relationship</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#these are defined from the conjugate prior/posterior relationship</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>prior_mean <span class="ot">=</span> alpha<span class="sc">/</span>(alpha<span class="sc">+</span>beta)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>prior_ci_lower <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.025</span>, alpha, beta)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>prior_ci_upper <span class="ot">=</span> <span class="fu">qbeta</span>(<span class="fl">0.975</span>, alpha, beta)</span>
@@ -358,7 +360,7 @@ window.Quarto = {
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">CI_Lower=</span><span class="fu">c</span>(prior_ci_lower,posterior_ci_lower),</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">CI_Upper=</span><span class="fu">c</span>(prior_ci_upper,posterior_ci_upper)) <span class="sc">|&gt;</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits=</span><span class="dv">3</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption=</span><span class="st">"Summary statistics for prior and posterior distributions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption=</span><span class="st">"Summary statistics for prior and posterior distributions"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -402,7 +404,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>prior.data.frame <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>prior.data.frame <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_grid</span>(<span class="at">observed=</span><span class="dv">1</span>, <span class="at">attempts=</span><span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">5</span>,<span class="dv">30</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">alpha =</span> observed <span class="sc">+</span> <span class="dv">1</span>,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">beta =</span> attempts <span class="sc">-</span> observed <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
@@ -412,7 +414,7 @@ window.Quarto = {
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(prior.data.frame, <span class="fu">aes</span>(<span class="at">y=</span>density,<span class="at">x=</span>probability,<span class="at">col=</span>prior)) <span class="sc">+</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -426,7 +428,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">2</span>,<span class="dv">18</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">6</span>,<span class="dv">36</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
@@ -443,7 +445,7 @@ window.Quarto = {
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -462,17 +464,17 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>observed <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>observed <span class="ot">&lt;-</span> <span class="dv">7</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tested <span class="ot">&lt;-</span> <span class="dv">50</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">18</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">1037</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">1037</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>By this logic, the posterior probability should be <span class="math inline">\(Beta(\alpha+y_o,beta+n-y_o)\)</span> or <span class="math inline">\(Beta(18,1037)\)</span>. This computes to a posterior mean of 0.0170616 [0.010152, 0.0256989] in comparison to an observed maximum likelihood estimator (MLE) of 0.14. The modal observation is <span class="math inline">\(MAP=\frac{\alpha-1}{\alpha + \beta - 2}=\)</span> or 0.0161443 with a variance of <span class="math inline">\(\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}\)</span> or 1.5881167^{-5}. This is visualized below, illustrating the effect of a strong prior</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="at">by=</span><span class="fl">0.001</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">probability=</span><span class="fu">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="at">by=</span><span class="fl">0.001</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">11</span>,<span class="dv">991</span>),</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span> <span class="fu">dbeta</span>(probability,<span class="dv">18</span>,<span class="dv">1037</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(prior,posterior),<span class="at">names_to=</span><span class="st">"type"</span>,<span class="at">values_to =</span> <span class="st">"density"</span>) <span class="sc">|&gt;</span></span>
@@ -489,7 +491,7 @@ window.Quarto = {
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -529,7 +531,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>new.values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">101</span>,<span class="dv">96</span>,<span class="dv">98</span>,<span class="dv">103</span>,<span class="dv">99</span>,<span class="dv">100</span>,<span class="dv">97</span>,<span class="dv">102</span>,<span class="dv">104</span>,<span class="dv">95</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>new.values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">101</span>,<span class="dv">96</span>,<span class="dv">98</span>,<span class="dv">103</span>,<span class="dv">99</span>,<span class="dv">100</span>,<span class="dv">97</span>,<span class="dv">102</span>,<span class="dv">104</span>,<span class="dv">95</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>You now collect 10 new measurements 101, 96, 98, 103, 99, 100, 97, 102, 104, 95. The sum of squares of these new values is 85. The posterior distribution of <span class="math inline">\(\sigma^2\)</span> is therefore</p>
@@ -539,7 +541,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>alpha_prior <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>alpha_prior <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>beta_prior <span class="ot">&lt;-</span> <span class="dv">250</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>alpha_posterior <span class="ot">&lt;-</span> alpha_prior <span class="sc">+</span> <span class="fu">length</span>(new.values)<span class="sc">/</span><span class="dv">2</span></span>
@@ -565,7 +567,7 @@ window.Quarto = {
 <span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
 <span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -588,20 +590,20 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>historical.events <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>historical.events <span class="ot">&lt;-</span> <span class="dv">2</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>experiences <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> historical.events<span class="sc">*</span>experiences</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> experiences</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>new.months <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>total.new.events <span class="ot">&lt;-</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>total.new.events <span class="ot">&lt;-</span> <span class="dv">10</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Now over the next 3 months we observe 10 total new events, a max likelihood estimate of 3.3333333. This is now updated as <span class="math inline">\(\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)=\text{Gamma}(20+10,10+3)=\text{Gamma}(30,13)\)</span>. This indicates that the mean number of events shifts from 2 [1.221652, 2.9670854] to 2.3076923 [1.5569903, 3.2037567], the modal number of events from 1.9 to 2.2307692. This indicates the average number of events per thirty days. This means that the posterior probability of the true event rate or <span class="math inline">\(\gamma&gt;3\)</span> is low (0.0591173). The variance moved from 0.2 to 0.1775148. Going forward, using a negative binomial distribution, the probability of observing over 3 events per 30 days is 0.2072399.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">observations =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="fl">0.1</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">observations =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="fl">0.1</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior=</span><span class="fu">dgamma</span>(observations,alpha,beta),</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span><span class="fu">dgamma</span>(observations,</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                           alpha<span class="sc">+</span>total.new.events,</span>
@@ -610,7 +612,7 @@ window.Quarto = {
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y=</span>probability,<span class="at">x=</span>observations,<span class="at">col=</span>type)) <span class="sc">+</span></span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -621,7 +623,7 @@ window.Quarto = {
 </div>
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">counts =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">counts =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>,<span class="at">by=</span><span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prior=</span> <span class="fu">dnbinom</span>(counts,</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">size =</span> alpha,</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">mu =</span> alpha<span class="sc">/</span>beta),</span>
@@ -635,7 +637,7 @@ window.Quarto = {
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">'identity'</span>,<span class="at">position=</span><span class="st">'dodge'</span>) <span class="sc">+</span></span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Predictive Probability"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Predictive Probability"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -738,7 +740,7 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">500</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">500</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> p,</span>
@@ -796,7 +798,7 @@ window.Quarto = {
 <span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
 <span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist=</span><span class="fu">c</span>(binomial.plot,poisson.plot,norm.plot),</span>
-<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>          <span class="at">nrow=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>          <span class="at">nrow=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -813,19 +815,19 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>products.sampled <span class="ot">&lt;-</span> <span class="dv">12</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>products.sampled <span class="ot">&lt;-</span> <span class="dv">12</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>exceeded <span class="ot">&lt;-</span> <span class="dv">9</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># based on 90% estimate</span></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>informed.alpha <span class="ot">&lt;-</span> <span class="dv">90</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#observed + 1</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>informed.beta <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#not-observed +1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>informed.beta <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">+</span><span class="dv">1</span> <span class="co">#not-observed +1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>We sampled 12 products, finding that 9 of them exceeded the limits. This is denoted by <span class="math inline">\(Binomial(n=12,p)\)</span>. For the binomial distribution, the Jeffreys prior for a binomial distribution is <span class="math inline">\(Beta(\frac{1}{2},\frac{1}{2})\)</span>, which makes sense as we have no preferred parameterization. The posterior probability in this case is <span class="math inline">\(Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)\)</span>. The MLE is 0.75. We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 <span class="math inline">\(\pm\)</span> [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a much more informed prior <span class="math inline">\(Binomial(91,11)\)</span> which gives a posterior mean of 0.877193 <span class="math inline">\(\pm\)</span> [0.8113073, 0.9305813]. These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">p=</span><span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">200</span>)) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">p=</span><span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, <span class="at">length.out =</span> <span class="dv">200</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">jeffreys_prior=</span><span class="fu">dbeta</span>(p,<span class="fl">0.5</span>,<span class="fl">0.5</span>),</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">jeffreys_posterior=</span><span class="fu">dbeta</span>(p,<span class="fl">0.5</span><span class="sc">+</span>exceeded,<span class="fl">0.5</span><span class="sc">-</span>exceeded<span class="sc">+</span>products.sampled),</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">informed_prior=</span><span class="fu">dbeta</span>(p,informed.alpha,informed.beta),</span>
@@ -846,7 +848,7 @@ window.Quarto = {
 <span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">size  =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">"grey"</span></span>
 <span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.2</span>,<span class="fl">0.7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.2</span>,<span class="fl">0.7</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -861,6 +863,16 @@ window.Quarto = {
 <section id="nuisance-parameters" class="level3">
 <h3 class="anchored" data-anchor-id="nuisance-parameters">Nuisance Parameters</h3>
 <p>Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters <span class="math inline">\(\theta=(\theta_1,\theta_2)\)</span> of which we only care about <span class="math inline">\(\theta_1\)</span>, that makes <span class="math inline">\(\theta_2\)</span> a nuisance parameter. For example we may only care about the mean but not the variance. In modeling the posterior <span class="math inline">\(Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)\)</span>. To get <span class="math inline">\(\Pr(\theta_1|y)\)</span>, the marginal posterior, we integrate out <span class="math inline">\(\theta_2\)</span>. This can give you the marginal distribution of <span class="math inline">\(\theta_1\)</span>. Another approach is to use the Jeffreys priors and only keep terms that include <span class="math inline">\(\theta_1\)</span>. For example for a normal distribution, using a Jeffreys prior the posterior probability is <span class="math inline">\(Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}\)</span> where <span class="math inline">\(n\)</span> is the number of new observations <span class="math inline">\(SS\)</span> is the new sum of squares and <span class="math inline">\(\bar{y}\)</span> is the new mean.</p>
+</section>
+<section id="using-jeffreys-prior-to-define-a-marginal-posterior" class="level3">
+<h3 class="anchored" data-anchor-id="using-jeffreys-prior-to-define-a-marginal-posterior">Using Jeffreys Prior to Define a Marginal Posterior</h3>
+<p>For a normal distribution the Jeffreys prior is <span class="math inline">\(Pr(\mu,\sigma) \propto \frac{1}{\sigma}\)</span> or <span class="math inline">\(\tau\)</span>. We can derive the posterior probability using that and the likelihood function for the normal distribution:</p>
+<p>$$ Pr(y|,) = ()<sup>(-<em>{i=1}<sup>{n}(y_i-)</sup>2) \ Pr(y|,) ^(-</em>{i=1}</sup>{n}(y_i-)^2) \</p>
+<p>Pr(y|,) ^(-SS +n(-{y})^2) $$</p>
+<p>this multiplied by the Jeffreys prior is:</p>
+<p>$$ Pr(,|y) (Pr(y|,) Pr_j(,)) \</p>
+<p>Pr(,|y) ^(-SS +n(-{y})^2) \</p>
+<p>Pr(,|y) Pr(y|,) ^{1+}(-SS +n(-{y})^2) \ $$ Integrating out <span class="math inline">\(\tau\)</span> gives the marginal posterior for <span class="math inline">\(\mu\)</span> gives me the <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(n-1\)</span> degrees of freedom or <span class="math inline">\(\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})\)</span></p>
 </section>
 </section>
 <section id="summary-tables" class="level2">
@@ -978,7 +990,7 @@ window.Quarto = {
 <td><span class="math inline">\(\frac{\alpha}{\beta^2}\)</span></td>
 </tr>
 <tr class="even">
-<td>Multinomial</td>
+<td><span class="math inline">\(\text{Multinomial}(N,\pi)\)</span></td>
 <td><span class="math inline">\(\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)\)</span></td>
 <td><span class="math inline">\(\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}\)</span></td>
 <td><span class="math inline">\(\frac{\alpha_i}{\alpha_o}\)</span></td>
@@ -1025,7 +1037,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -1046,21 +1058,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] cowplot_1.2.0   invgamma_1.2    knitr_1.50      lubridate_1.9.4
+ [1] cowplot_1.2.0   invgamma_1.2    knitr_1.51      lubridate_1.9.4
  [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
- [9] readr_2.1.6     tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1  
+ [9] readr_2.1.6     tidyr_1.3.2     tibble_3.3.0    ggplot2_4.0.1  
 [13] tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
  [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
  [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
-[13] pillar_1.11.1      RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.1.6       
-[17] stringi_1.8.7      xfun_0.54          S7_0.2.1           timechange_0.3.0  
-[21] cli_3.6.5          withr_3.0.2        magrittr_2.0.4     digest_0.6.39     
-[25] grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.4   
-[29] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2      
-[33] rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
+[13] tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.6       
+[17] stringi_1.8.7      xfun_0.55          S7_0.2.1           otel_0.2.0        
+[21] timechange_0.3.0   cli_3.6.5          withr_3.0.2        magrittr_2.0.4    
+[25] digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4         
+[29] lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0        
+[33] farver_2.1.2       rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3   
+[37] htmltools_0.5.9   </code></pre>
 </div>
 </div>
 </section>
@@ -1118,13 +1131,14 @@ loaded via a namespace (and not attached):
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

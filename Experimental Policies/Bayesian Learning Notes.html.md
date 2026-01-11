@@ -636,6 +636,28 @@ data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
 
 Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$.  This can give you the marginal distribution of $\theta_1$.  Another approach is to use the Jeffreys priors and only keep terms that include $\theta_1$.  For example for a normal distribution, using a Jeffreys prior the posterior probability is $Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}$ where $n$ is the number of new observations $SS$ is the new sum of squares and $\bar{y}$ is the new mean.
 
+### Using Jeffreys Prior to Define a Marginal Posterior
+
+For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution:
+
+$$
+Pr(y|\mu,\sigma) = (\frac{\tau}{2\pi})^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+
+Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)
+$$
+
+this multiplied by the Jeffreys prior is:
+
+$$
+Pr(\mu,\sigma|y) \propto(Pr(y|\mu,\sigma) \times Pr_j(\mu,\sigma)) \\
+
+Pr(\mu,\sigma|y) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2) \times \tau \\
+
+Pr(\mu,\sigma|y) \propto Pr(y|\mu,\sigma) \propto \tau^{1+\frac{n}{2}}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)  \\
+$$
+Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})$
+
 ## Summary Tables
 
 ### Predictive Probability Distributions
@@ -665,7 +687,7 @@ These are always larger due to the uncertainty in new predictions than the poste
 \right)$ | $\mu$ | $\mu$ | $\sigma^2$|
 | $N(\mu,\sigma^2)$ | $N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)$ | $\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})$$\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)$ | $\mu$ \ $\frac{\beta}{\alpha-1}$| $\mu$ \ $\frac{\beta}{\alpha+1}$ | $\frac{\beta}{(\alpha-1)\cdot\kappa}$ $\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}$|
 | $\text{Poisson}(\gamma)$ | $\text{Gamma}(\alpha,\beta)$ | $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ | $\frac{\alpha}{\beta}$ | $\frac{\alpha-1}{\beta}$ | $\frac{\alpha}{\beta^2}$ | 
-| Multinomial | $\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)$| $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ | $\frac{\alpha_i}{\alpha_o}$| $\frac{\alpha_i-1}{\alpha_o-K}$| $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ |
+| $\text{Multinomial}(N,\pi)$ | $\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)$| $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ | $\frac{\alpha_i}{\alpha_o}$| $\frac{\alpha_i-1}{\alpha_o-K}$| $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ |
 
 In these tables:
 
@@ -717,21 +739,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] cowplot_1.2.0   invgamma_1.2    knitr_1.50      lubridate_1.9.4
+ [1] cowplot_1.2.0   invgamma_1.2    knitr_1.51      lubridate_1.9.4
  [5] forcats_1.0.1   stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0    
- [9] readr_2.1.6     tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1  
+ [9] readr_2.1.6     tidyr_1.3.2     tibble_3.3.0    ggplot2_4.0.1  
 [13] tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
  [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
  [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
-[13] pillar_1.11.1      RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.1.6       
-[17] stringi_1.8.7      xfun_0.54          S7_0.2.1           timechange_0.3.0  
-[21] cli_3.6.5          withr_3.0.2        magrittr_2.0.4     digest_0.6.39     
-[25] grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.4   
-[29] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2      
-[33] rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   
+[13] tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.6       
+[17] stringi_1.8.7      xfun_0.55          S7_0.2.1           otel_0.2.0        
+[21] timechange_0.3.0   cli_3.6.5          withr_3.0.2        magrittr_2.0.4    
+[25] digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4         
+[29] lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0        
+[33] farver_2.1.2       rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3   
+[37] htmltools_0.5.9   
 ```
 
 

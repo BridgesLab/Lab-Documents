@@ -496,6 +496,28 @@ data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
 
 Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$.  This can give you the marginal distribution of $\theta_1$.  Another approach is to use the Jeffreys priors and only keep terms that include $\theta_1$.  For example for a normal distribution, using a Jeffreys prior the posterior probability is $Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}$ where $n$ is the number of new observations $SS$ is the new sum of squares and $\bar{y}$ is the new mean.
 
+### Using Jeffreys Prior to Define a Marginal Posterior
+
+For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution:
+
+$$
+Pr(y|\mu,\sigma) = (\frac{\tau}{2\pi})^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\sum_{i=1}^{n}(y_i-\mu)^2) \\
+
+Pr(y|\mu,\sigma) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)
+$$
+
+this multiplied by the Jeffreys prior is:
+
+$$
+Pr(\mu,\sigma|y) \propto(Pr(y|\mu,\sigma) \times Pr_j(\mu,\sigma)) \\
+
+Pr(\mu,\sigma|y) \propto \tau^\frac{n}{2}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2) \times \tau \\
+
+Pr(\mu,\sigma|y) \propto Pr(y|\mu,\sigma) \propto \tau^{1+\frac{n}{2}}\cdot \exp(-\frac{\tau}{2}\times SS +n(\mu-\bar{y})^2)  \\
+$$
+Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n})$
+
 ## Summary Tables
 
 ### Predictive Probability Distributions
