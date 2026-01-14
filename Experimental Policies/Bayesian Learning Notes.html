@@ -145,6 +145,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#predictive-probability-distributions" id="toc-predictive-probability-distributions" class="nav-link" data-scroll-target="#predictive-probability-distributions">Predictive Probability Distributions</a></li>
   <li><a href="#summary-of-conjugate-priors" id="toc-summary-of-conjugate-priors" class="nav-link" data-scroll-target="#summary-of-conjugate-priors">Summary of Conjugate Priors</a></li>
+  <li><a href="#posterior-and-predictive-probabilities-with-jeffreys-priors" id="toc-posterior-and-predictive-probabilities-with-jeffreys-priors" class="nav-link" data-scroll-target="#posterior-and-predictive-probabilities-with-jeffreys-priors">Posterior and Predictive Probabilities with Jeffreys Priors</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
@@ -1105,6 +1106,71 @@ window.Quarto = {
 <li><span class="math inline">\(\bar{y}\)</span> is the mean of the new data.</li>
 <li><span class="math inline">\(\kappa\)</span> is the strength of the prior belief in <span class="math inline">\(\mu\)</span>, or the effective sample size</li>
 </ul>
+</section>
+<section id="posterior-and-predictive-probabilities-with-jeffreys-priors" class="level3">
+<h3 class="anchored" data-anchor-id="posterior-and-predictive-probabilities-with-jeffreys-priors">Posterior and Predictive Probabilities with Jeffreys Priors</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 22%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Distribution</th>
+<th>Likelihood</th>
+<th>Jeffreys prior</th>
+<th>Posterior (parameters)</th>
+<th>Predictive (new data)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bernoulli / Binomial</td>
+<td><span class="math inline">\(y \sim \mathrm{Binomial}(n,p)\)</span></td>
+<td><span class="math inline">\(p(p)\propto [p(1-p)]^{-1/2}\)</span></td>
+<td><span class="math inline">\(p\mid y \sim \mathrm{Beta}(y+1/2,;n-y+1/2)\)</span></td>
+<td><span class="math inline">\(y_{\text{new}}\mid y \sim \mathrm{Beta\text{-}Binomial}\)</span></td>
+</tr>
+<tr class="even">
+<td>Poisson</td>
+<td><span class="math inline">\(y_i \sim \mathrm{Poisson}(\lambda)\)</span></td>
+<td><span class="math inline">\(p(\lambda)\propto \lambda^{-1/2}\)</span></td>
+<td><span class="math inline">\(\lambda\mid y \sim \mathrm{Gamma}(\sum y_i+1/2,;n)\)</span></td>
+<td><span class="math inline">\(y_{\text{new}}\mid y \sim \mathrm{Neg.\ Binomial}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Multinomial</td>
+<td><span class="math inline">\(\mathbf y \sim \mathrm{Multinomial}(n,\boldsymbol\pi)\)</span></td>
+<td><span class="math inline">\(\boldsymbol\pi \sim \mathrm{Dirichlet}(1/2,\dots,1/2)\)</span></td>
+<td><span class="math inline">\(\boldsymbol\pi\mid y \sim \mathrm{Dirichlet}(y_1+1/2,\dots)\)</span></td>
+<td><span class="math inline">\(\mathbf y_{\text{new}}\mid y \sim \mathrm{Dirichlet\text{-}Multinomial}\)</span></td>
+</tr>
+<tr class="even">
+<td>Normal (μ unknown, σ known)</td>
+<td><span class="math inline">\(y_i\sim\mathcal N(\mu,\sigma^2)\)</span></td>
+<td><span class="math inline">\(p(\mu)\propto 1\)</span></td>
+<td><span class="math inline">\(\mu\mid y \sim \mathcal N(\bar y,\sigma^2/n)\)</span></td>
+<td><span class="math inline">\(y_{\text{new}}\mid y \sim \mathcal N(\bar y,\sigma^2(1+1/n))\)</span></td>
+</tr>
+<tr class="odd">
+<td>Normal (μ known, σ unknown)</td>
+<td><span class="math inline">\(y_i\sim\mathcal N(\mu,\sigma^2)\)</span></td>
+<td><span class="math inline">\(p(\sigma^2)\propto 1/\sigma^2\)</span></td>
+<td><span class="math inline">\(\sigma^2\mid y \sim \mathrm{Inv\text{-}Gamma}(n/2,;SS/2)\)</span></td>
+<td><span class="math inline">\(y_{\text{new}}\mid y \sim t_n(\mu,\sqrt{SS/n})\)</span></td>
+</tr>
+<tr class="even">
+<td>Normal (μ, σ unknown)</td>
+<td><span class="math inline">\(y_i\sim\mathcal N(\mu,\sigma^2)\)</span></td>
+<td><span class="math inline">\(p(\mu,\sigma^2)\propto 1/\sigma^2\)</span></td>
+<td><span class="math inline">\(\mu\mid y \sim t_{n-1}(\bar y,;s/\sqrt n)\)</span></td>
+<td><span class="math inline">\(y_{\text{new}}\mid y \sim t_{n-1}(\bar y,;s\sqrt{1+1/n})\)</span></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 <section id="references" class="level2">

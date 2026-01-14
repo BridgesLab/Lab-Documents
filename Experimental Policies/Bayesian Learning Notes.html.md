@@ -785,6 +785,18 @@ In these tables:
 - $\bar{y}$ is the mean of the new data.
 - $\kappa$ is the strength of the prior belief in $\mu$, or the effective sample size
 
+### Posterior and Predictive Probabilities with Jeffreys Priors
+
+| Distribution                | Likelihood                                              | Jeffreys prior                                          | Posterior (parameters)                                        | Predictive (new data)                                                     |
+| --------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Bernoulli / Binomial        | $y \sim \mathrm{Binomial}(n,p)$                         | $p(p)\propto [p(1-p)]^{-1/2}$                           | $p\mid y \sim \mathrm{Beta}(y+1/2,;n-y+1/2)$                  | $y_{\text{new}}\mid y \sim \mathrm{Beta\text{-}Binomial}$                 |
+| Poisson                     | $y_i \sim \mathrm{Poisson}(\lambda)$                    | $p(\lambda)\propto \lambda^{-1/2}$                      | $\lambda\mid y \sim \mathrm{Gamma}(\sum y_i+1/2,;n)$          | $y_{\text{new}}\mid y \sim \mathrm{Neg.\ Binomial}$                       |
+| Multinomial                 | $\mathbf y \sim \mathrm{Multinomial}(n,\boldsymbol\pi)$ | $\boldsymbol\pi \sim \mathrm{Dirichlet}(1/2,\dots,1/2)$ | $\boldsymbol\pi\mid y \sim \mathrm{Dirichlet}(y_1+1/2,\dots)$ | $\mathbf y_{\text{new}}\mid y \sim \mathrm{Dirichlet\text{-}Multinomial}$ |
+| Normal (μ unknown, σ known) | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\mu)\propto 1$                                       | $\mu\mid y \sim \mathcal N(\bar y,\sigma^2/n)$                | $y_{\text{new}}\mid y \sim \mathcal N(\bar y,\sigma^2(1+1/n))$            |
+| Normal (μ known, σ unknown) | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\sigma^2)\propto 1/\sigma^2$                         | $\sigma^2\mid y \sim \mathrm{Inv\text{-}Gamma}(n/2,;SS/2)$    | $y_{\text{new}}\mid y \sim t_n(\mu,\sqrt{SS/n})$                          |
+| Normal (μ, σ unknown)       | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\mu,\sigma^2)\propto 1/\sigma^2$                     | $\mu\mid y \sim t_{n-1}(\bar y,;s/\sqrt n)$                   | $y_{\text{new}}\mid y \sim t_{n-1}(\bar y,;s\sqrt{1+1/n})$                |
+
+
 ## References
 
 ::: {#refs}
