@@ -739,6 +739,73 @@ data.frame(
 :::
 
 
+### Multinomial Models
+
+What if there are more than one outcome, rather than a binary outcome that can be modelled with binomial/bernoulli distributions.  In this case there is a multinomial model $Multinomial(N,\pi)$ where $N$ is the number of trials and $\pi=(\pi_1,\pi_2,...\pi_k)$ is the vector of probabilities for each of the $k$ categories.  The conjugate prior for this is a Dirichlet distribution $Dirichlet(\alpha_1,\alpha_2,...\alpha_k)$ where $\alpha_i$ is the prior pseudo-count for category $i$.  The posterior distribution is then $Dirichlet(\alpha_1+y_1,\alpha_2+y_2,...\alpha_k+y_k)$ where $y_i$ is the observed count for category $i$.  The mean of $\pi_i$ is then $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ and the variance is $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ where $\bar{\alpha_i}=\frac{\alpha_i}{\alpha_o}$ and $\alpha_o=\sum_j \alpha_j$.  The Jeffreys prior for a multinomial model is the $Dirichlet(\frac{1}{2},\frac{1}{2},...,\frac{1}{2})$.
+
+For each category, $i$, we can model a Gamma distribution $Gamma(\alpha_i+y_i,1)$ and then normalize across these to get the Dirichlet over probabilities  This is useful for sampling from the posterior distribution.  This can be interpreted such that the prior mean $E_i=\frac{\alpha_i}{\sum \alpha_i}$.  The posterior mean therefore is $E(\theta_i|y)=\frac{\alpha_i+Y_i}{\sum_{j}(\alpha_j+y_j)}$.  
+
+#### Example using a multinomial distribution
+
+
+::: {.cell}
+
+```{.r .cell-code}
+counts <- c(4,2,0)
+```
+:::
+
+
+Lets say we have three categories with observed counts 4, 2, 0.  We set a prior of $Dirichlet(\frac{1}{2},\frac{1}{2},\frac{1}{2})$. Using this, our updated posterior is $Dirichlet(\frac{1}{2}+4,\frac{1}{2}+2,\frac{1}{2}+0)=Dirichlet(4.5, 2.5, 0.5)$.  Based on this, the posterior mean is 0.6, 0.3333333, 0.0666667 with a variance of 0.0282353, 0.0261438, 0.0073203.  This is visualized here:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+set.seed(1)
+N <- 50000
+
+mn.data <- data.frame(Gamma_A = rgamma(N, shape = 0.5+counts[1], rate = 1),
+                      Gamma_B = rgamma(N, shape = 0.5+counts[2], rate = 1),
+                      Gamma_C = rgamma(N, shape = 0.5+counts[3], rate = 1)) |>
+  mutate(
+    Dirichlet_A = Gamma_A / (Gamma_A + Gamma_B + Gamma_C),
+    Dirichlet_B = Gamma_B / (Gamma_A + Gamma_B + Gamma_C),
+    Dirichlet_C = Gamma_C / (Gamma_A + Gamma_B + Gamma_C)
+  ) |>
+  pivot_longer(everything(),
+               names_to = c('distribution',"variable"),
+               names_sep = "_",
+               values_to = "value")
+  
+mn.data |>
+  filter(distribution=="Gamma") |>
+  ggplot(aes(col = variable,x=value)) +
+  geom_density() +
+  theme_classic(base_size=16)+
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Gamma draws \n(unnormalized)",
+       y='density') -> gamma.plot
+
+mn.data |>
+  filter(distribution=="Dirichlet") |>
+  ggplot(aes(col = variable,x=value)) +
+  geom_density() +
+  theme_classic(base_size=16)+
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Dirichlet marginals",
+       y='density') -> dirichlet.plot
+
+library(cowplot)
+plot_grid(gamma.plot,dirichlet.plot,nrow=1)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/multinomial-distribution-1.png){width=672}
+:::
+:::
+
+
 ## Summary Tables
 
 ### Predictive Probability Distributions
@@ -776,7 +843,7 @@ In these tables:
     - For inverse gamma distributions $\alpha=\text{successes}+1$ and $\beta=\text{failures}+1$. 
     - For normal distributions if using existing data, one heuristic could be $\alpha=\frac{\kappa}{2}$ (prior degrees of freedom) and $\beta=\frac{\sigma^2\cdot\kappa}{2}$ (prior total sum of squares)
     - For poisson distributions, $\beta$ is the number of prior observations and $\alpha$ is the sum of events from those prior observations.
-    - For dirichlet, $alpha_i$ is the prior pseudo-count for category $i$ and $alpha_o$ is $\alpha_0 = \sum\limits_{i=1}^{K}$, the sum of all the alphas from 1 to k, the prior sample size.
+    - For dirichlet, $\alpha_i$ is the prior pseudo-count for category $i$ and $\alpha_o$ is $\alpha_0 = \sum\limits_{i=1}^{K}$, the sum of all the alphas from 1 to k, the prior sample size.
 - $n$ is the number of new trials.
 - $y_o$ is the number of successes.
 - $SS$ is the sum of squares of the new data.
@@ -834,16 +901,16 @@ attached base packages:
 other attached packages:
  [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
  [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
- [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.0        
-[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.0       
+ [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.1        
+[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.1       
 [13] ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.0        
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.1        
  [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
  [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
 [13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
-[17] rlang_1.1.6        stringi_1.8.7      xfun_0.55          S7_0.2.1          
+[17] rlang_1.1.7        stringi_1.8.7      xfun_0.55          S7_0.2.1          
 [21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
 [25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
 [29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    

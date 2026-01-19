@@ -140,6 +140,7 @@ window.Quarto = {
   <li><a href="#jeffries-priors" id="toc-jeffries-priors" class="nav-link" data-scroll-target="#jeffries-priors">Jeffries Priors</a></li>
   <li><a href="#nuisance-parameters" id="toc-nuisance-parameters" class="nav-link" data-scroll-target="#nuisance-parameters">Nuisance Parameters</a></li>
   <li><a href="#using-jeffreys-prior-to-define-a-marginal-posterior" id="toc-using-jeffreys-prior-to-define-a-marginal-posterior" class="nav-link" data-scroll-target="#using-jeffreys-prior-to-define-a-marginal-posterior">Using Jeffreys Prior to Define a Marginal Posterior</a></li>
+  <li><a href="#multinomial-models" id="toc-multinomial-models" class="nav-link" data-scroll-target="#multinomial-models">Multinomial Models</a></li>
   </ul></li>
   <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
   <ul class="collapse">
@@ -964,6 +965,69 @@ window.Quarto = {
 </div>
 </section>
 </section>
+<section id="multinomial-models" class="level3">
+<h3 class="anchored" data-anchor-id="multinomial-models">Multinomial Models</h3>
+<p>What if there are more than one outcome, rather than a binary outcome that can be modelled with binomial/bernoulli distributions. In this case there is a multinomial model <span class="math inline">\(Multinomial(N,\pi)\)</span> where <span class="math inline">\(N\)</span> is the number of trials and <span class="math inline">\(\pi=(\pi_1,\pi_2,...\pi_k)\)</span> is the vector of probabilities for each of the <span class="math inline">\(k\)</span> categories. The conjugate prior for this is a Dirichlet distribution <span class="math inline">\(Dirichlet(\alpha_1,\alpha_2,...\alpha_k)\)</span> where <span class="math inline">\(\alpha_i\)</span> is the prior pseudo-count for category <span class="math inline">\(i\)</span>. The posterior distribution is then <span class="math inline">\(Dirichlet(\alpha_1+y_1,\alpha_2+y_2,...\alpha_k+y_k)\)</span> where <span class="math inline">\(y_i\)</span> is the observed count for category <span class="math inline">\(i\)</span>. The mean of <span class="math inline">\(\pi_i\)</span> is then <span class="math inline">\(\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}\)</span> and the variance is <span class="math inline">\(\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}\)</span> where <span class="math inline">\(\bar{\alpha_i}=\frac{\alpha_i}{\alpha_o}\)</span> and <span class="math inline">\(\alpha_o=\sum_j \alpha_j\)</span>. The Jeffreys prior for a multinomial model is the <span class="math inline">\(Dirichlet(\frac{1}{2},\frac{1}{2},...,\frac{1}{2})\)</span>.</p>
+<p>For each category, <span class="math inline">\(i\)</span>, we can model a Gamma distribution <span class="math inline">\(Gamma(\alpha_i+y_i,1)\)</span> and then normalize across these to get the Dirichlet over probabilities This is useful for sampling from the posterior distribution. This can be interpreted such that the prior mean <span class="math inline">\(E_i=\frac{\alpha_i}{\sum \alpha_i}\)</span>. The posterior mean therefore is <span class="math inline">\(E(\theta_i|y)=\frac{\alpha_i+Y_i}{\sum_{j}(\alpha_j+y_j)}\)</span>.</p>
+<section id="example-using-a-multinomial-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-a-multinomial-distribution">Example using a multinomial distribution</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Lets say we have three categories with observed counts 4, 2, 0. We set a prior of <span class="math inline">\(Dirichlet(\frac{1}{2},\frac{1}{2},\frac{1}{2})\)</span>. Using this, our updated posterior is <span class="math inline">\(Dirichlet(\frac{1}{2}+4,\frac{1}{2}+2,\frac{1}{2}+0)=Dirichlet(4.5, 2.5, 0.5)\)</span>. Based on this, the posterior mean is 0.6, 0.3333333, 0.0666667 with a variance of 0.0282353, 0.0261438, 0.0073203. This is visualized here:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">50000</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>mn.data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Gamma_A =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">1</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_B =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">2</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_C =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">3</span>], <span class="at">rate =</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_A =</span> Gamma_A <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_B =</span> Gamma_B <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_C =</span> Gamma_C <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'distribution'</span>,<span class="st">"variable"</span>),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep =</span> <span class="st">"_"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Gamma"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Gamma draws </span><span class="sc">\n</span><span class="st">(unnormalized)"</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> gamma.plot</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Dirichlet"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Dirichlet marginals"</span>,</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> dirichlet.plot</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(gamma.plot,dirichlet.plot,<span class="at">nrow=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/multinomial-distribution-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
 </section>
 <section id="summary-tables" class="level2">
 <h2 class="anchored" data-anchor-id="summary-tables">Summary Tables</h2>
@@ -1096,7 +1160,7 @@ window.Quarto = {
 <li>For inverse gamma distributions <span class="math inline">\(\alpha=\text{successes}+1\)</span> and <span class="math inline">\(\beta=\text{failures}+1\)</span>.</li>
 <li>For normal distributions if using existing data, one heuristic could be <span class="math inline">\(\alpha=\frac{\kappa}{2}\)</span> (prior degrees of freedom) and <span class="math inline">\(\beta=\frac{\sigma^2\cdot\kappa}{2}\)</span> (prior total sum of squares)</li>
 <li>For poisson distributions, <span class="math inline">\(\beta\)</span> is the number of prior observations and <span class="math inline">\(\alpha\)</span> is the sum of events from those prior observations.</li>
-<li>For dirichlet, <span class="math inline">\(alpha_i\)</span> is the prior pseudo-count for category <span class="math inline">\(i\)</span> and <span class="math inline">\(alpha_o\)</span> is <span class="math inline">\(\alpha_0 = \sum\limits_{i=1}^{K}\)</span>, the sum of all the alphas from 1 to k, the prior sample size.</li>
+<li>For dirichlet, <span class="math inline">\(\alpha_i\)</span> is the prior pseudo-count for category <span class="math inline">\(i\)</span> and <span class="math inline">\(\alpha_o\)</span> is <span class="math inline">\(\alpha_0 = \sum\limits_{i=1}^{K}\)</span>, the sum of all the alphas from 1 to k, the prior sample size.</li>
 </ul></li>
 <li><span class="math inline">\(n\)</span> is the number of new trials.</li>
 <li><span class="math inline">\(y_o\)</span> is the number of successes.</li>
@@ -1192,7 +1256,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -1215,16 +1279,16 @@ attached base packages:
 other attached packages:
  [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
  [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
- [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.0        
-[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.0       
+ [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.1        
+[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.1       
 [13] ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.0        
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.1        
  [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
  [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
 [13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
-[17] rlang_1.1.6        stringi_1.8.7      xfun_0.55          S7_0.2.1          
+[17] rlang_1.1.7        stringi_1.8.7      xfun_0.55          S7_0.2.1          
 [21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
 [25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
 [29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    
