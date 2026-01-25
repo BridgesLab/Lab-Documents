@@ -12,7 +12,9 @@ First lets consider the counterfactual, that mTORC1 promotes primarily anabolic 
 
 This is a test [^1].  So is this [^bensahra2017]
 
-The anabolic roles of mTORC1 are very well established (See [^ben-sahraMTORC1SignalingMetabolic2017] for a review).  These include promoting protein synthesis
+The anabolic roles of mTORC1 are very well established (See [^ben-sahraMTORC1SignalingMetabolic2017] for a review).  These include promoting:
+
+- **Protein synthesis**, particularly protein translation via 4EBP phosphorylation, S6K-dependent eIF4B phosphorylation, and eEF2-kinase phosphorylation and activation.  mTORC1 also enhances ribosome biogenesis.
 
 ### Models of Activated mTORC1 are often Anti-Anabolic
 
