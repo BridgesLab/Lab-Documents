@@ -1,6 +1,6 @@
 The obesity pandemic is a leading cause of ill health, and is a risk factor for many chronic diseases including diabetes, liver disease and cardiovascular disease. While most approved anti-obesity therapies focus on reducing energy intake, the other way to promote negative energy balance is to elevate energy expenditure and nutrient dissipation. But how is nutritional status sensed?  In one framing, the center of nutrient sensing is the protein kinase complex mTORC1. While mTORC1 is widely appreciated to mediate nutrient storage, I think of mTORC1 as responding to nutrient and energy excess by engaging _both anabolic and catabolic pathways_.
 
-![Schematic demonstrating mTORC1 driving both anabolic and catabolic negative feedback](images/mtorc1-aims-schematic.png)
+![Schematic demonstrating mTORC1 driving both anabolic and catabolic negative feedback](https://github.com/BridgesLab/Lab-Documents/blob/a68f7a141d51bc3efe26a82978d80c1d66c7f73a/Posts/Images/mtorc1-aims-schematic.png)
 
 First lets consider the counterfactual, that mTORC1 promotes primarily anabolic pathways, what might we expect from that framing:
 
