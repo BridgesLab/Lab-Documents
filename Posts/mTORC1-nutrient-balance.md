@@ -49,8 +49,7 @@ mTORC1 is an evolutionarily conserved nutrient sensing complex that is activated
 
 # References
 
-[^ben-sahraMTORC1SignalingMetabolic2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
-[^bensahra2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
-[^1]: Test reference.
+[^bensahra2017]: Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
+[^ben-sahraMTORC1SignalingMetabolic2017]: Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
 
 
