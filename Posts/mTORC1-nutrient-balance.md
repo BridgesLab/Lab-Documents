@@ -10,11 +10,14 @@ First lets consider the counterfactual, that mTORC1 promotes primarily anabolic 
 
 ## Physiological processes governed by mTORC1 are a combination of catabolic and anabolic responses
 
-This is a test [^1].  So is this [^bensahra2017]
-
 The anabolic roles of mTORC1 are very well established (See [^ben-sahraMTORC1SignalingMetabolic2017] for a review).  These include promoting:
 
-- **Protein synthesis**, particularly protein translation via 4EBP phosphorylation, S6K-dependent eIF4B phosphorylation, and eEF2-kinase phosphorylation and activation.  mTORC1 also enhances ribosome biogenesis.
+- **Protein synthesis**: particularly protein translation via 4EBP phosphorylation, S6K-dependent eIF4B phosphorylation, and eEF2-kinase phosphorylation and activation.  mTORC1 also enhances ribosome biogenesis via both promoting rRNA transcription and translation of ribosomal mRNAs.  mTORC1 also enhances m<sup>6</sup>A‑dependent post‑transcriptional control.  This selectively increases the translation and stability of specific (usually growth‑promoting) mRNAs [^meyerDynamicEpitranscriptomeN6methyladenosine2014].
+- **Nucleotide synthesis**: promoting the synthesis of purine and pyrimidine biosynthesis both via activation of the pentose phosphate pathway and promoting folate flux via ATF4-dependent transcriptional activation.  There is also evidence of mTORC1–S6K–CAD–mediated activation of *de novo* pyrimidine synthesis and mTORC1‑dependent regulation of SAM synthesis (the major methyl donor required for nucleotide synthesis via Myc-dependent transcriptional activation of MAT2A [^villaMTORC1StimulatesCell2021]).
+- **Lipid synthesis**: activating SREBP1c to promote *de novo* lipogenesis and triglyceride synthesis.  A recent paper also shows that cholesterol biosynthesis is promoted via USP20 dependent stabilization of HMGCR, the rate limiting enzyme of cholesterol synthesis [^luFeedingInducesCholesterol2020]. 
+- **Preventing autophagy**: The catabolism of proteins via autophagy is also strongly attenuated by mTORC1 activity, in part by phosphorylation of ULK1 and Atg13.  In this way mTORC1 functions to prevent protein catabolism.
+
+What these anabolic processes have in common is that they are all dependent on the presence of available nutrients (amino acids, folates, fatty acids) as well as are all generally very energetically costly.  These processes may be framed as being licensed only in conditions of nutritional excess.  
 
 ### Models of Activated mTORC1 are often Anti-Anabolic
 
@@ -23,6 +26,9 @@ Insulin resistance at a cellular level.
 ### Amino acid oxidation is promoted by mTORC1 activation
 
 excess amino acid catabolism @Csibi2013 @Csibi2014. 
+Glutaminolysis is also activated 
+
+### Glycolysis is promoted via HIF1 activation
 
 ### mTORC1 activation causes reduced liver fat
 
@@ -49,9 +55,11 @@ mTORC1 is an evolutionarily conserved nutrient sensing complex that is activated
 
 ## Implications for Aging and Chronic Disease
 
+## How does this square with mTORC1's effects on immune function
+
 # References
 
-[^bensahra2017]: Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
 [^ben-sahraMTORC1SignalingMetabolic2017]: Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
-
-
+[^meyerDynamicEpitranscriptomeN6methyladenosine2014]:Meyer, Kate D., and Samie R. Jaffrey. 2014. “The Dynamic Epitranscriptome: N6-Methyladenosine and Gene Expression Control.” Nature Reviews Molecular Cell Biology 15(5):313–26. doi:10.1038/nrm3785.
+[^villaMTORC1StimulatesCell2021]: Villa, Elodie, Umakant Sahu, Brendan P. O’Hara, Eunus S. Ali, Kathryn A. Helmin, John M. Asara, Peng Gao, Benjamin D. Singer, and Issam Ben-Sahra. 2021. “mTORC1 Stimulates Cell Growth through SAM Synthesis and m6A mRNA-Dependent Control of Protein Synthesis.” Molecular Cell 81(10):2076-2093.e9. doi:10.1016/j.molcel.2021.03.009.
+[^luFeedingInducesCholesterol2020]: Lu, Xiao-Yi, Xiong-Jie Shi, Ao Hu, Ju-Qiong Wang, Yi Ding, Wei Jiang, Ming Sun, Xiaolu Zhao, Jie Luo, Wei Qi, and Bao-Liang Song. 2020. “Feeding Induces Cholesterol Biosynthesis via the mTORC1–USP20–HMGCR Axis.” Nature 588(7838):479–84. doi:10.1038/s41586-020-2928-y.
