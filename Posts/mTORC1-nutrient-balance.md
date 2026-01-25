@@ -10,6 +10,8 @@ First lets consider the counterfactual, that mTORC1 promotes primarily anabolic 
 
 ## Physiological processes governed by mTORC1 are a combination of catabolic and anabolic responses
 
+The anabolic roles of mTORC1 are very well established (See [^ben-sahraMTORC1SignalingMetabolic2017] for a review).  These include promoting protein synthesis
+
 ### Models of Activated mTORC1 are often Anti-Anabolic
 
 Insulin resistance at a cellular level.
@@ -32,6 +34,7 @@ Several papers demonstrate a role for mTORC1 in promoting BAT thermogenesis @Liu
 
 mTORC1 is an evolutionarily conserved nutrient sensing complex that is activated in response to elevated nutrients and energy in all eukaryotic cells (reviewed in @Efeyan2015). In muscle tissue, mTORC1 is activated by obesity @Khamzina2005b @Tremblay2007, concordant with a switch towards oxidative muscle fibers @Lexell1995a @Goodpaster2001 @Dube2008. Cell and animal models of mTORC1 activation have been developed via deletion of its negative regulators TSC1 and TSC2. These studies show that mTORC1 activation is sufficient for mitochondrial biogenesis, ATP production and whole-body energy expenditure @Cunningham2007 @Ramanathan2009 @Koyanagi2011 @Bentzinger2013 @Guridi2015. 
 
+
 ### Effects on Appetite and Energy Intake
 
 ### Role of mTORC1 on Nutrient Absorption
@@ -41,3 +44,10 @@ mTORC1 is an evolutionarily conserved nutrient sensing complex that is activated
 ## Is this About Nutrient Excess, and if so Which Nutrients?
 
 ## Implications for Aging and Chronic Disease
+
+# References
+
+[^ben-sahraMTORC1SignalingMetabolic2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
+
+
+
