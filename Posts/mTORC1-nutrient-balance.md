@@ -10,7 +10,7 @@ First lets consider the counterfactual, that mTORC1 promotes primarily anabolic 
 
 ## Physiological processes governed by mTORC1 are a combination of catabolic and anabolic responses
 
-This is a test [^1].  So is this [^bensahraMTORC1SignalingMetabolic2017]
+This is a test [^1].  So is this [^bensahra2017]
 
 The anabolic roles of mTORC1 are very well established (See [^ben-sahraMTORC1SignalingMetabolic2017] for a review).  These include promoting protein synthesis
 
@@ -50,7 +50,7 @@ mTORC1 is an evolutionarily conserved nutrient sensing complex that is activated
 # References
 
 [^ben-sahraMTORC1SignalingMetabolic2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
-[^bensahraMTORC1SignalingMetabolic2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
+[^bensahra2017] Ben-Sahra, Issam, and Brendan D. Manning. 2017. “mTORC1 Signaling and the Metabolic Control of Cell Growth.” Current Opinion in Cell Biology 45:72–82. doi:10.1016/j.ceb.2017.02.012.
 [^1]: Test reference.
 
 
