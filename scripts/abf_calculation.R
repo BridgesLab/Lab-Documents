@@ -65,6 +65,48 @@ calculate_posterior <- function(abf, prior_prob) {
   return(ppa)
 }
 
+#' Calculate Directional ABF
+#'
+#' @param beta Estimated effect size
+#' @param se Standard error
+#' @param W Prior variance
+#' @param direction The alternative hypothesis: "two.sided", "less" (<0), or "greater" (>0)
+#'
+calculate_abf_directional <- function(beta, se, W, direction = "two.sided") {
+  
+  # 1. Calculate Standard Two-Sided ABF
+  V <- se^2
+  abf_two_sided <- sqrt(V / (V + W)) * exp((beta^2 / 2) * (1 / V - 1 / (V + W)))
+  
+  if (direction == "two.sided") {
+    return(abf_two_sided)
+  }
+  
+  # 2. Calculate Posterior Parameters (Shrinkage)
+  r <- W / (V + W)               # Shrinkage factor
+  mu_post <- r * beta            # Posterior Mean
+  var_post <- r * V              # Posterior Variance
+  sd_post <- sqrt(var_post)
+  
+  # 3. Calculate Area in the Direction of Interest (using pnorm)
+  # We test the area relative to 0
+  if (direction == "less") {
+    # Area of posterior below 0
+    area <- pnorm(0, mean = mu_post, sd = sd_post)
+  } else if (direction == "greater") {
+    # Area of posterior above 0
+    area <- 1 - pnorm(0, mean = mu_post, sd = sd_post)
+  } else {
+    stop("Direction must be 'two.sided', 'less', or 'greater'")
+  }
+  
+  # 4. Apply Directional Adjustment
+  # BF_dir = 2 * BF_two_sided * Probability_of_direction
+  abf_dir <- 2 * abf_two_sided * area
+  
+  return(abf_dir)
+}
+
 # --- Example Usage based on your scenario ---
 # You can uncomment the lines below to run the specific example
 #
