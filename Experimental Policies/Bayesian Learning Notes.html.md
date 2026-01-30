@@ -632,6 +632,7 @@ data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
 :::
 
 
+
 ### Nuisance Parameters
 
 Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$.  This can give you the marginal distribution of $\theta_1$.  Another approach is to use the Jeffreys priors and only keep terms that include $\theta_1$.  For example for a normal distribution, using a Jeffreys prior the posterior probability is $Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}$ where $n$ is the number of new observations $SS$ is the new sum of squares and $\bar{y}$ is the new mean.
@@ -735,6 +736,69 @@ data.frame(
 
 ::: {.cell-output-display}
 ![](Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-predictive-visualization-1.png){width=672}
+:::
+:::
+
+
+### Wakefield's Approximate Bayes Factors
+
+Lets say from a study we have an estimate of an effect size $\hat{\beta}$ and its standard error $SE(\hat{\beta})$.  We want to test the null hypothesis that $\beta=0$ versus the alternative that $\beta \neq 0$.  We can use Wakefield's approximate Bayes factors to do this [@wakefield2009bayes].  This requires us to set a prior distribution for $\beta \sim N(0,W)$ where $W$ is the prior variance of the effect size.  We are presuming (often with good reason) that $\beta$ follows a normal distribution.  This is still a *single-parameter model* in that we are trying to solve for $\beta$, but where we algebraicly model out nuisance parameters.  So the likelihood of $\hat{\beta}$ given $\beta$ is given by $Pr(\hat{\beta}|\beta) \sim N(\beta,SE_{\beta}^2)$.  For the null hypothesis ($H_0$) of $\beta = 0$ the likelihood is  $Pr(\hat{\beta}|H_0) \sim N(0,SE^2)$ and for the alternate hypothesis ($H_1$) the marginal likelihood is calculated as
+
+$$Pr(\hat{\beta}|H_1) = \int{Pr(\hat{\beta}|\beta)\cdot p(\beta) \cdot d \beta} \sim \int{N(\hat{\beta}|\beta,SE^2)\cdot N(\beta|0,W)}\sim N(0,SE^2+W)$$
+
+This means that under the null hypothesis $H_o$ the marginal likelihood is $Pr(\hat{\beta}|H_0) \sim N(0,SE_{\hat{\beta}}^2)$ and this is compared to $Pr(\hat{\beta}|H_1)\sim N(0,SE^2+W)$.  The Bayes factor is then given by $BF_{1,0}=\frac{Pr(\hat{\beta}|H_1)}{Pr(\hat{\beta}|H_0)}=\frac{ N(0,SE^2+W)}{N(0,SE_{\hat{\beta}}^2)}$.  After a lot of alegebra this "simplifies" to this approximate bayes factor where W is the estimated prior variance, $\hat{\beta}$ is the estimated effect size and $SE^2$ is the estimated variance:
+
+$$ABF=\sqrt{\frac{SE^2}{SE^2+W}}\cdot \exp{(\frac{\hat{\beta}^2}{2}\cdot [\frac{1}{SE^2}-\frac{1}{SE^2+W}])}$$
+
+This can be used to calculate a posterior probability of $Pr(\hat{\beta}|H1) = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + Pr(H_0)} = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + 1-Pr(H_1)}$.  You can set the prior probabilities to anything, but if you set them to be equal ($H_1=H_0=0.5$ then this simplifies to $Pr(H_1|\hat{\beta})=\frac{BF_{1,0}}{BF_{1,0}+1}$.
+
+#### Example Using Wakefield's ABF
+
+
+::: {.cell}
+
+```{.r .cell-code}
+beta = 0.12
+se_beta = 0.14
+W = 0.16
+prior_H1 = 0.05
+prior_H1_alt = 0.95
+
+ABF = sqrt(se_beta^2/(se_beta^2+W))*
+  exp((beta^2/2)*((1/se_beta^2)-(1/(se_beta^2+W))))
+```
+:::
+
+
+You are analyzing data from a large cohort study investigating the association between processed meat consumption (exposure) and systolic blood pressure (outcome). You are looking at the standardized effect size (standardized beta), which tells you how many standard deviations blood pressure changes for every standard deviation increase in meat consumption.  You have calculated $\hat{\beta}=0.12 \pm 0.14$.  The prior variance is estimated at $W=0.16$ meaning $SD=0.4$ or the true effect is between -0.784 and +0.784 (95% CI).  Your are generally skeptical of an effect so your prior probability is $Pr(H_1)=0.05$. The only decision you would have to make is how big to make $W$, one way to think about it is what is the maximum plausible effect size you would estimate and convert from that (*e.g.* $W=(\frac{\text{Maximum Effect}}{1.96})^2$).
+
+This calculates out as an approximate Bayes Factor of 0.4582486.  Based on my prior belief (0.05), the posterior probability is 0.0235504.  This indicates that there is a low probability that there is a true effect of processed meat consumption on systolic blood pressure based on this data and my prior belief.  On the other hand, if my prior belief was very strong ($Pr(H_1)=0.95$) this would mean a posterior probability of 0.8969786.  This indicates that with a strong prior belief in an effect, the data supports that belief.  For ease of use this can be done using the `calculate_abf` and `calculate_posterior` functions loaded from [/scripts/abf_calculation.R](scripts/abf_calculation.R).
+
+
+::: {.cell}
+
+```{.r .cell-code}
+source('../scripts/abf_calculation.R')
+priors <- seq(0,1,by=0.01)
+ABF <- calculate_abf(beta, se_beta, W)
+
+abf.data <- data.frame(
+  prior_H1 = priors) |>
+  mutate(posterior_H1 = calculate_posterior(ABF, priors))
+
+ggplot(abf.data, aes(x=prior_H1,y=posterior_H1)) +
+  geom_line() +
+  geom_hline(yintercept=0.95, lty=2, col="grey") +
+  theme_classic(base_size=16) +
+  labs(x="Prior probability",
+       y="Posterior probability",
+       title="Probability of a non-null effect",
+       subtitle=paste0("Effects of an ABF of ",round(ABF,3))
+  )
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/wakefield-abf-visualization-1.png){width=672}
 :::
 :::
 

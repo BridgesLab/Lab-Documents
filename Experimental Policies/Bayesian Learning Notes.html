@@ -140,6 +140,7 @@ window.Quarto = {
   <li><a href="#jeffries-priors" id="toc-jeffries-priors" class="nav-link" data-scroll-target="#jeffries-priors">Jeffries Priors</a></li>
   <li><a href="#nuisance-parameters" id="toc-nuisance-parameters" class="nav-link" data-scroll-target="#nuisance-parameters">Nuisance Parameters</a></li>
   <li><a href="#using-jeffreys-prior-to-define-a-marginal-posterior" id="toc-using-jeffreys-prior-to-define-a-marginal-posterior" class="nav-link" data-scroll-target="#using-jeffreys-prior-to-define-a-marginal-posterior">Using Jeffreys Prior to Define a Marginal Posterior</a></li>
+  <li><a href="#wakefields-approximate-bayes-factors" id="toc-wakefields-approximate-bayes-factors" class="nav-link" data-scroll-target="#wakefields-approximate-bayes-factors">Wakefield’s Approximate Bayes Factors</a></li>
   <li><a href="#multinomial-models" id="toc-multinomial-models" class="nav-link" data-scroll-target="#multinomial-models">Multinomial Models</a></li>
   </ul></li>
   <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
@@ -965,6 +966,61 @@ window.Quarto = {
 </div>
 </section>
 </section>
+<section id="wakefields-approximate-bayes-factors" class="level3">
+<h3 class="anchored" data-anchor-id="wakefields-approximate-bayes-factors">Wakefield’s Approximate Bayes Factors</h3>
+<p>Lets say from a study we have an estimate of an effect size <span class="math inline">\(\hat{\beta}\)</span> and its standard error <span class="math inline">\(SE(\hat{\beta})\)</span>. We want to test the null hypothesis that <span class="math inline">\(\beta=0\)</span> versus the alternative that <span class="math inline">\(\beta \neq 0\)</span>. We can use Wakefield’s approximate Bayes factors to do this <span class="citation" data-cites="wakefield2009bayes">(<a href="#ref-wakefield2009bayes" role="doc-biblioref">Wakefield 2009</a>)</span>. This requires us to set a prior distribution for <span class="math inline">\(\beta \sim N(0,W)\)</span> where <span class="math inline">\(W\)</span> is the prior variance of the effect size. We are presuming (often with good reason) that <span class="math inline">\(\beta\)</span> follows a normal distribution. This is still a <em>single-parameter model</em> in that we are trying to solve for <span class="math inline">\(\beta\)</span>, but where we algebraicly model out nuisance parameters. So the likelihood of <span class="math inline">\(\hat{\beta}\)</span> given <span class="math inline">\(\beta\)</span> is given by <span class="math inline">\(Pr(\hat{\beta}|\beta) \sim N(\beta,SE_{\beta}^2)\)</span>. For the null hypothesis (<span class="math inline">\(H_0\)</span>) of <span class="math inline">\(\beta = 0\)</span> the likelihood is <span class="math inline">\(Pr(\hat{\beta}|H_0) \sim N(0,SE^2)\)</span> and for the alternate hypothesis (<span class="math inline">\(H_1\)</span>) the marginal likelihood is calculated as</p>
+<p><span class="math display">\[Pr(\hat{\beta}|H_1) = \int{Pr(\hat{\beta}|\beta)\cdot p(\beta) \cdot d \beta} \sim \int{N(\hat{\beta}|\beta,SE^2)\cdot N(\beta|0,W)}\sim N(0,SE^2+W)\]</span></p>
+<p>This means that under the null hypothesis <span class="math inline">\(H_o\)</span> the marginal likelihood is <span class="math inline">\(Pr(\hat{\beta}|H_0) \sim N(0,SE_{\hat{\beta}}^2)\)</span> and this is compared to <span class="math inline">\(Pr(\hat{\beta}|H_1)\sim N(0,SE^2+W)\)</span>. The Bayes factor is then given by <span class="math inline">\(BF_{1,0}=\frac{Pr(\hat{\beta}|H_1)}{Pr(\hat{\beta}|H_0)}=\frac{ N(0,SE^2+W)}{N(0,SE_{\hat{\beta}}^2)}\)</span>. After a lot of alegebra this “simplifies” to this approximate bayes factor where W is the estimated prior variance, <span class="math inline">\(\hat{\beta}\)</span> is the estimated effect size and <span class="math inline">\(SE^2\)</span> is the estimated variance:</p>
+<p><span class="math display">\[ABF=\sqrt{\frac{SE^2}{SE^2+W}}\cdot \exp{(\frac{\hat{\beta}^2}{2}\cdot [\frac{1}{SE^2}-\frac{1}{SE^2+W}])}\]</span></p>
+<p>This can be used to calculate a posterior probability of <span class="math inline">\(Pr(\hat{\beta}|H1) = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + Pr(H_0)} = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + 1-Pr(H_1)}\)</span>. You can set the prior probabilities to anything, but if you set them to be equal (<span class="math inline">\(H_1=H_0=0.5\)</span> then this simplifies to <span class="math inline">\(Pr(H_1|\hat{\beta})=\frac{BF_{1,0}}{BF_{1,0}+1}\)</span>.</p>
+<section id="example-using-wakefields-abf" class="level4">
+<h4 class="anchored" data-anchor-id="example-using-wakefields-abf">Example Using Wakefield’s ABF</h4>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">=</span> <span class="fl">0.12</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>se_beta <span class="ot">=</span> <span class="fl">0.14</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>W <span class="ot">=</span> <span class="fl">0.16</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>prior_H1 <span class="ot">=</span> <span class="fl">0.05</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>prior_H1_alt <span class="ot">=</span> <span class="fl">0.95</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>ABF <span class="ot">=</span> <span class="fu">sqrt</span>(se_beta<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(se_beta<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>W))<span class="sc">*</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">exp</span>((beta<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span>((<span class="dv">1</span><span class="sc">/</span>se_beta<span class="sc">^</span><span class="dv">2</span>)<span class="sc">-</span>(<span class="dv">1</span><span class="sc">/</span>(se_beta<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>W))))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>You are analyzing data from a large cohort study investigating the association between processed meat consumption (exposure) and systolic blood pressure (outcome). You are looking at the standardized effect size (standardized beta), which tells you how many standard deviations blood pressure changes for every standard deviation increase in meat consumption. You have calculated <span class="math inline">\(\hat{\beta}=0.12 \pm 0.14\)</span>. The prior variance is estimated at <span class="math inline">\(W=0.16\)</span> meaning <span class="math inline">\(SD=0.4\)</span> or the true effect is between -0.784 and +0.784 (95% CI). Your are generally skeptical of an effect so your prior probability is <span class="math inline">\(Pr(H_1)=0.05\)</span>. The only decision you would have to make is how big to make <span class="math inline">\(W\)</span>, one way to think about it is what is the maximum plausible effect size you would estimate and convert from that (<em>e.g.</em> <span class="math inline">\(W=(\frac{\text{Maximum Effect}}{1.96})^2\)</span>).</p>
+<p>This calculates out as an approximate Bayes Factor of 0.4582486. Based on my prior belief (0.05), the posterior probability is 0.0235504. This indicates that there is a low probability that there is a true effect of processed meat consumption on systolic blood pressure based on this data and my prior belief. On the other hand, if my prior belief was very strong (<span class="math inline">\(Pr(H_1)=0.95\)</span>) this would mean a posterior probability of 0.8969786. This indicates that with a strong prior belief in an effect, the data supports that belief. For ease of use this can be done using the <code>calculate_abf</code> and <code>calculate_posterior</code> functions loaded from <a href="scripts/abf_calculation.R">/scripts/abf_calculation.R</a>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">'../scripts/abf_calculation.R'</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>priors <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>ABF <span class="ot">&lt;-</span> <span class="fu">calculate_abf</span>(beta, se_beta, W)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>abf.data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_H1 =</span> priors) <span class="sc">|&gt;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">posterior_H1 =</span> <span class="fu">calculate_posterior</span>(ABF, priors))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(abf.data, <span class="fu">aes</span>(<span class="at">x=</span>prior_H1,<span class="at">y=</span>posterior_H1)) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fl">0.95</span>, <span class="at">lty=</span><span class="dv">2</span>, <span class="at">col=</span><span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="sc">+</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Prior probability"</span>,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Posterior probability"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Probability of a non-null effect"</span>,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle=</span><span class="fu">paste0</span>(<span class="st">"Effects of an ABF of "</span>,<span class="fu">round</span>(ABF,<span class="dv">3</span>))</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/wakefield-abf-visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
 <section id="multinomial-models" class="level3">
 <h3 class="anchored" data-anchor-id="multinomial-models">Multinomial Models</h3>
 <p>What if there are more than one outcome, rather than a binary outcome that can be modelled with binomial/bernoulli distributions. In this case there is a multinomial model <span class="math inline">\(Multinomial(N,\pi)\)</span> where <span class="math inline">\(N\)</span> is the number of trials and <span class="math inline">\(\pi=(\pi_1,\pi_2,...\pi_k)\)</span> is the vector of probabilities for each of the <span class="math inline">\(k\)</span> categories. The conjugate prior for this is a Dirichlet distribution <span class="math inline">\(Dirichlet(\alpha_1,\alpha_2,...\alpha_k)\)</span> where <span class="math inline">\(\alpha_i\)</span> is the prior pseudo-count for category <span class="math inline">\(i\)</span>. The posterior distribution is then <span class="math inline">\(Dirichlet(\alpha_1+y_1,\alpha_2+y_2,...\alpha_k+y_k)\)</span> where <span class="math inline">\(y_i\)</span> is the observed count for category <span class="math inline">\(i\)</span>. The mean of <span class="math inline">\(\pi_i\)</span> is then <span class="math inline">\(\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}\)</span> and the variance is <span class="math inline">\(\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}\)</span> where <span class="math inline">\(\bar{\alpha_i}=\frac{\alpha_i}{\alpha_o}\)</span> and <span class="math inline">\(\alpha_o=\sum_j \alpha_j\)</span>. The Jeffreys prior for a multinomial model is the <span class="math inline">\(Dirichlet(\frac{1}{2},\frac{1}{2},...,\frac{1}{2})\)</span>.</p>
@@ -974,49 +1030,49 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Lets say we have three categories with observed counts 4, 2, 0. We set a prior of <span class="math inline">\(Dirichlet(\frac{1}{2},\frac{1}{2},\frac{1}{2})\)</span>. Using this, our updated posterior is <span class="math inline">\(Dirichlet(\frac{1}{2}+4,\frac{1}{2}+2,\frac{1}{2}+0)=Dirichlet(4.5, 2.5, 0.5)\)</span>. Based on this, the posterior mean is 0.6, 0.3333333, 0.0666667 with a variance of 0.0282353, 0.0261438, 0.0073203. This is visualized here:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">50000</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>mn.data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Gamma_A =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">1</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_B =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">2</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_C =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">3</span>], <span class="at">rate =</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_A =</span> Gamma_A <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_B =</span> Gamma_B <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_C =</span> Gamma_C <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C)</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'distribution'</span>,<span class="st">"variable"</span>),</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep =</span> <span class="st">"_"</span>,</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Gamma"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Gamma draws </span><span class="sc">\n</span><span class="st">(unnormalized)"</span>,</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> gamma.plot</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Dirichlet"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Dirichlet marginals"</span>,</span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> dirichlet.plot</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(gamma.plot,dirichlet.plot,<span class="at">nrow=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">50000</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>mn.data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Gamma_A =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">1</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_B =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">2</span>], <span class="at">rate =</span> <span class="dv">1</span>),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Gamma_C =</span> <span class="fu">rgamma</span>(N, <span class="at">shape =</span> <span class="fl">0.5</span><span class="sc">+</span>counts[<span class="dv">3</span>], <span class="at">rate =</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_A =</span> Gamma_A <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_B =</span> Gamma_B <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Dirichlet_C =</span> Gamma_C <span class="sc">/</span> (Gamma_A <span class="sc">+</span> Gamma_B <span class="sc">+</span> Gamma_C)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">'distribution'</span>,<span class="st">"variable"</span>),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep =</span> <span class="st">"_"</span>,</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Gamma"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Gamma draws </span><span class="sc">\n</span><span class="st">(unnormalized)"</span>,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> gamma.plot</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>mn.data <span class="sc">|&gt;</span></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(distribution<span class="sc">==</span><span class="st">"Dirichlet"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">col =</span> variable,<span class="at">x=</span>value)) <span class="sc">+</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)<span class="sc">+</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Dirichlet marginals"</span>,</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">'density'</span>) <span class="ot">-&gt;</span> dirichlet.plot</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_grid</span>(gamma.plot,dirichlet.plot,<span class="at">nrow=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1249,6 +1305,9 @@ Jeffreys, Harold. 1961. <em>Theory of Probability</em>. 3rd ed. Oxford: Oxford U
 <div id="ref-poisson1837probabilite" class="csl-entry" role="listitem">
 Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mati<span>è</span>re Criminelle Et En Mati<span>è</span>re Civile, Pr<span>é</span>c<span>é</span>d<span>é</span>es Des r<span>è</span>gles g<span>é</span>n<span>é</span>rales Du Calcul Des Probabilit<span>é</span>s</em>. Paris, France: Bachelier.
 </div>
+<div id="ref-wakefield2009bayes" class="csl-entry" role="listitem">
+Wakefield, Jon. 2009. <span>“Bayes Factors for Genome-Wide Association Studies: Comparison with <span>P</span>-Values.”</span> <em>Genetic Epidemiology</em> 33 (1): 79–86. <a href="https://doi.org/10.1002/gepi.20359">https://doi.org/10.1002/gepi.20359</a>.
+</div>
 </div>
 </section>
 <section id="session-information" class="level2">
@@ -1256,7 +1315,7 @@ Poisson, Siméon Denis. 1837. <em>Probabilit<span>é</span> Des Jugements En Mat
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
