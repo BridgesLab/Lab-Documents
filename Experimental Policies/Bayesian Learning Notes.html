@@ -143,6 +143,11 @@ window.Quarto = {
   <li><a href="#wakefields-approximate-bayes-factors" id="toc-wakefields-approximate-bayes-factors" class="nav-link" data-scroll-target="#wakefields-approximate-bayes-factors">Wakefield’s Approximate Bayes Factors</a></li>
   <li><a href="#multinomial-models" id="toc-multinomial-models" class="nav-link" data-scroll-target="#multinomial-models">Multinomial Models</a></li>
   </ul></li>
+  <li><a href="#monte-carlo-sampling-to-estimate-parameters" id="toc-monte-carlo-sampling-to-estimate-parameters" class="nav-link" data-scroll-target="#monte-carlo-sampling-to-estimate-parameters">Monte Carlo Sampling to Estimate Parameters</a>
+  <ul class="collapse">
+  <li><a href="#linear-regression" id="toc-linear-regression" class="nav-link" data-scroll-target="#linear-regression">Linear Regression</a></li>
+  <li><a href="#evaluating-sampling-chains-using." id="toc-evaluating-sampling-chains-using." class="nav-link" data-scroll-target="#evaluating-sampling-chains-using.">Evaluating Sampling Chains using`.</a></li>
+  </ul></li>
   <li><a href="#summary-tables" id="toc-summary-tables" class="nav-link" data-scroll-target="#summary-tables">Summary Tables</a>
   <ul class="collapse">
   <li><a href="#predictive-probability-distributions" id="toc-predictive-probability-distributions" class="nav-link" data-scroll-target="#predictive-probability-distributions">Predictive Probability Distributions</a></li>
@@ -1085,6 +1090,285 @@ window.Quarto = {
 </section>
 </section>
 </section>
+<section id="monte-carlo-sampling-to-estimate-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="monte-carlo-sampling-to-estimate-parameters">Monte Carlo Sampling to Estimate Parameters</h2>
+<section id="linear-regression" class="level3">
+<h3 class="anchored" data-anchor-id="linear-regression">Linear Regression</h3>
+<p>Lets say we are performing a linear regression, described by <span class="math inline">\(y = \alpha + \beta \cdot x_1 + \epsilon\)</span> where <span class="math inline">\(\epsilon \sim N(0,\frac{1}{\tau})\)</span>. The natural conjugate priors for each parameter are <span class="math inline">\(\alpha \sim N(\mu_{\alpha},\frac{1}{\tau^2_{\alpha}})\)</span>, <span class="math inline">\(\beta \sim N(\mu_{\beta},\frac{1}{\tau^2_{\beta}})\)</span> and <span class="math inline">\(\tau^2 \sim Gamma(\alpha_{\tau},\beta_{\tau})\)</span>. The marginal posterior distributions are algebraically messy, and Gibbs sampling provides a convenient way to sample from them. However we can use Monte Carlo sampling to estimate the posterior distribution of each parameter. This is done by iteratively sampling from the conditional posterior distributions of each parameter given the current values of the other parameters. This is known as Gibbs sampling. The conditional posterior distributions are:</p>
+<p><span class="math display">\[\alpha | \beta, \sigma^2, y, x \sim N(\mu_{\alpha}^{},\tau_{\alpha}^{2}) \\
+\beta | \alpha, \tau^2, y, x \sim N(\mu_{\beta},\tau^2_{\beta}) \\
+\tau^2_{\epsilon} | \alpha, \beta, x, y \sim Gamma(
+\alpha_{\epsilon} + \frac{n}{2}, \beta_{\epsilon} +\frac{1}{2}\sum^n_{i=1}{(y-\alpha-\beta\cdot x_i)^2})\]</span></p>
+<p>These conditionals can be solved by monte carlo chains, which should converge to the true joint posterior under most conditions. Gibbs sampling proceeds by iteratively sampling from these full conditional posterior distributions. Each update conditions on the most recent values of the remaining parameters, defining a Markov chain whose stationary distribution is the joint posterior distribution of (<span class="math inline">\(\alpha, \beta, \tau\)</span>). After an initial burn-in period, samples from the chain can be used to approximate marginal posterior distributions, credible intervals, and posterior predictive quantities.</p>
+<p>This only works if there are known conjugacies between priors and posteriors, or if there are many parameters from which to sample from. In this case we can use the Metropolis-Hastings sampling algorithm to sample from the posterior distribution. This works by proposing new values for each parameter based on a proposal distribution, and then accepting or rejecting the proposed values based on the ratio of the posterior probabilities of the proposed and current values. This allows us to sample from the posterior distribution even when there are no conjugate priors.</p>
+</section>
+<section id="evaluating-sampling-chains-using." class="level3">
+<h3 class="anchored" data-anchor-id="evaluating-sampling-chains-using.">Evaluating Sampling Chains using`.</h3>
+<p>Chain convergence is important to ensure stability of estimates. The <code>coda</code> package has a variety of tools to assist in evaluating convergence of MCMC chains. Here is an example of how to use <code>coda</code> to evaluate convergence of a simple MCMC chain.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(coda)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>n_iter <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>good_chain1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">2</span>, <span class="fl">0.5</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>good_chain2 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">2</span>, <span class="fl">0.5</span>)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>good_chain3 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">2</span>, <span class="fl">0.5</span>)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>good_mcmc <span class="ot">&lt;-</span> <span class="fu">mcmc.list</span>(</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(good_chain1),</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(good_chain2),</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(good_chain3)</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>bad_chain1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">cumsum</span>(<span class="fu">rnorm</span>(n_iter, <span class="fl">0.02</span>, <span class="fl">0.5</span>)),</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">1</span>, <span class="fl">0.2</span>)</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>bad_chain2 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">5</span>, <span class="fl">0.3</span>),</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">3</span>, <span class="fl">0.2</span>)</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>bad_chain3 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">rnorm</span>(n_iter, <span class="sc">-</span><span class="dv">5</span>, <span class="fl">0.3</span>),</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta  =</span> <span class="fu">rnorm</span>(n_iter, <span class="dv">0</span>, <span class="fl">0.2</span>)</span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>bad_mcmc <span class="ot">&lt;-</span> <span class="fu">mcmc.list</span>(</span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(bad_chain1),</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(bad_chain2),</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc</span>(bad_chain3)</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>tidy_mcmc <span class="ot">&lt;-</span> <span class="cf">function</span>(mcmc_list, label) {</span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(<span class="fu">as.matrix</span>(mcmc_list)) <span class="sc">|&gt;</span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">iter =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>           <span class="at">chain =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(mcmc_list), <span class="at">each =</span> n_iter),</span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>           <span class="at">dataset =</span> label) <span class="sc">|&gt;</span></span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(alpha, beta),</span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>                 <span class="at">names_to =</span> <span class="st">"parameter"</span>,</span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>                 <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a>df_good <span class="ot">&lt;-</span> <span class="fu">tidy_mcmc</span>(good_mcmc, <span class="st">"Converged"</span>)</span>
+<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a>df_bad  <span class="ot">&lt;-</span> <span class="fu">tidy_mcmc</span>(bad_mcmc,  <span class="st">"Not converged"</span>)</span>
+<span id="cb25-61"><a href="#cb25-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-62"><a href="#cb25-62" aria-hidden="true" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(df_good, df_bad)</span>
+<span id="cb25-63"><a href="#cb25-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-64"><a href="#cb25-64" aria-hidden="true" tabindex="-1"></a>trace_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_all,</span>
+<span id="cb25-65"><a href="#cb25-65" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">aes</span>(<span class="at">x =</span> iter, <span class="at">y =</span> value, <span class="at">color =</span> <span class="fu">factor</span>(chain))) <span class="sc">+</span></span>
+<span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(dataset <span class="sc">~</span> parameter, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">"Chain"</span>,</span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Trace plots: converged vs non-converged"</span>) <span class="sc">+</span></span>
+<span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
+<span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a>trace_plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/mcmc-coda-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>density_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df_all,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">fill =</span> <span class="fu">factor</span>(chain))) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(dataset <span class="sc">~</span> parameter, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Chain"</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Posterior densities by chain"</span>) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>density_plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/mcmc-coda-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calcualate effective sample sizes</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>ess_good <span class="ot">&lt;-</span> <span class="fu">effectiveSize</span>(good_mcmc)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>ess_bad  <span class="ot">&lt;-</span> <span class="fu">effectiveSize</span>(bad_mcmc)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>ess_good <span class="sc">|&gt;</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Effective sample size for converged chains"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Effective sample size for converged chains</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">alpha</td>
+<td style="text-align: right;">6415.821</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta</td>
+<td style="text-align: right;">5948.834</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ess_bad <span class="sc">|&gt;</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Effective sample size for poorly converged chains"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Effective sample size for poorly converged chains</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">alpha</td>
+<td style="text-align: right;">3449.665</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta</td>
+<td style="text-align: right;">6265.442</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calcualte Gelman-Rubin statistics</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>gelman_good <span class="ot">&lt;-</span> <span class="fu">gelman.diag</span>(good_mcmc)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>gelman_bad  <span class="ot">&lt;-</span> <span class="fu">gelman.diag</span>(bad_mcmc)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>tidy_gelman <span class="ot">&lt;-</span> <span class="cf">function</span>(gelman_obj) {</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(gelman_obj<span class="sc">$</span>psrf) <span class="sc">|&gt;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">parameter =</span> <span class="fu">rownames</span>(gelman_obj<span class="sc">$</span>psrf)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">rhat =</span> <span class="st">`</span><span class="at">Point est.</span><span class="st">`</span>,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">rhat_upper =</span> <span class="st">`</span><span class="at">Upper C.I.</span><span class="st">`</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(parameter, rhat, rhat_upper)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>gelman_good <span class="sc">|&gt;</span> <span class="fu">tidy_gelman</span>() <span class="sc">|&gt;</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Gelman-Rubin statistics for converged chains"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Gelman-Rubin statistics for converged chains</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">parameter</th>
+<th style="text-align: right;">rhat</th>
+<th style="text-align: right;">rhat_upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">alpha</td>
+<td style="text-align: left;">alpha</td>
+<td style="text-align: right;">1.0013087</td>
+<td style="text-align: right;">1.005827</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta</td>
+<td style="text-align: left;">beta</td>
+<td style="text-align: right;">0.9997171</td>
+<td style="text-align: right;">1.000248</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>gelman_bad <span class="sc">|&gt;</span> <span class="fu">tidy_gelman</span>() <span class="sc">|&gt;</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Gelman-Rubin statistics for poorly converged chains"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Gelman-Rubin statistics for poorly converged chains</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">parameter</th>
+<th style="text-align: right;">rhat</th>
+<th style="text-align: right;">rhat_upper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">alpha</td>
+<td style="text-align: left;">alpha</td>
+<td style="text-align: right;">2.666946</td>
+<td style="text-align: right;">14.68917</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta</td>
+<td style="text-align: left;">beta</td>
+<td style="text-align: right;">11.430209</td>
+<td style="text-align: right;">21.85569</td>
+</tr>
+</tbody>
+</table>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gelman.plot</span>(good_mcmc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/mcmc-coda-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gelman.plot</span>(bad_mcmc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Bayesian-Learning-Notes_files/figure-html/mcmc-coda-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>heidel_good <span class="ot">&lt;-</span> <span class="fu">heidel.diag</span>(good_mcmc)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>heidel_bad  <span class="ot">&lt;-</span> <span class="fu">heidel.diag</span>(bad_mcmc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
 <section id="summary-tables" class="level2">
 <h2 class="anchored" data-anchor-id="summary-tables">Summary Tables</h2>
 <section id="predictive-probability-distributions" class="level3">
@@ -1315,7 +1599,7 @@ Wakefield, Jon. 2009. <span>“Bayes Factors for Genome-Wide Association Studies
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -1336,23 +1620,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
- [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
- [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.1        
-[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.1       
-[13] ggplot2_4.0.1       tidyverse_2.0.0    
+ [1] coda_0.19-4.1       extraDistr_1.10.0.1 cowplot_1.2.0      
+ [4] invgamma_1.2        knitr_1.51          lubridate_1.9.4    
+ [7] forcats_1.0.1       stringr_1.6.0       dplyr_1.1.4        
+[10] purrr_1.2.1         readr_2.1.6         tidyr_1.3.2        
+[13] tibble_3.3.1        ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.1        
  [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
- [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
-[13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
-[17] rlang_1.1.7        stringi_1.8.7      xfun_0.55          S7_0.2.1          
-[21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
-[25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
-[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    
-[33] glue_1.8.0         farver_2.1.2       rmarkdown_2.30     tools_4.5.2       
-[37] pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
+ [9] fastmap_1.2.0      lattice_0.22-7     R6_2.6.1           labeling_0.4.3    
+[13] generics_0.1.4     htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1     
+[17] RColorBrewer_1.1-3 rlang_1.1.7        stringi_1.8.7      xfun_0.55         
+[21] S7_0.2.1           otel_0.2.0         timechange_0.3.0   cli_3.6.5         
+[25] withr_3.0.2        magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
+[29] rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5       
+[33] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       rmarkdown_2.30    
+[37] tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
 </div>
 </div>
 </section>

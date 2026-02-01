@@ -870,6 +870,234 @@ plot_grid(gamma.plot,dirichlet.plot,nrow=1)
 :::
 
 
+## Monte Carlo Sampling to Estimate Parameters
+
+### Linear Regression
+
+Lets say we are performing a linear regression, described by $y = \alpha + \beta \cdot x_1 + \epsilon$ where $\epsilon \sim N(0,\frac{1}{\tau})$.  The natural conjugate priors for each parameter are $\alpha \sim N(\mu_{\alpha},\frac{1}{\tau^2_{\alpha}})$, $\beta \sim N(\mu_{\beta},\frac{1}{\tau^2_{\beta}})$ and $\tau^2 \sim Gamma(\alpha_{\tau},\beta_{\tau})$.  The marginal posterior distributions are algebraically messy, and Gibbs sampling provides a convenient way to sample from them.  However we can use Monte Carlo sampling to estimate the posterior distribution of each parameter.  This is done by iteratively sampling from the conditional posterior distributions of each parameter given the current values of the other parameters.  This is known as Gibbs sampling.  The conditional posterior distributions are: 
+
+$$\alpha | \beta, \sigma^2, y, x \sim N(\mu_{\alpha}^{},\tau_{\alpha}^{2}) \\
+\beta | \alpha, \tau^2, y, x \sim N(\mu_{\beta},\tau^2_{\beta}) \\
+\tau^2_{\epsilon} | \alpha, \beta, x, y \sim Gamma(
+\alpha_{\epsilon} + \frac{n}{2}, \beta_{\epsilon} +\frac{1}{2}\sum^n_{i=1}{(y-\alpha-\beta\cdot x_i)^2})$$
+
+These conditionals can be solved by monte carlo chains, which  should converge to the true joint posterior under most conditions.  Gibbs sampling proceeds by iteratively sampling from these full conditional posterior distributions. Each update conditions on the most recent values of the remaining parameters, defining a Markov chain whose stationary distribution is the joint posterior distribution of ($\alpha, \beta, \tau$). After an initial burn-in period, samples from the chain can be used to approximate marginal posterior distributions, credible intervals, and posterior predictive quantities.
+
+This only works if there are known conjugacies between priors and posteriors, or if there are many parameters from which to sample from.  In this case we can use the Metropolis-Hastings sampling algorithm to sample from the posterior distribution.  This works by proposing new values for each parameter based on a proposal distribution, and then accepting or rejecting the proposed values based on the ratio of the posterior probabilities of the proposed and current values.  This allows us to sample from the posterior distribution even when there are no conjugate priors.
+
+### Evaluating Sampling Chains using`.
+
+Chain convergence is important to ensure stability of estimates. The `coda` package has a variety of tools to assist in evaluating convergence of MCMC chains.  Here is an example of how to use `coda` to evaluate convergence of a simple MCMC chain.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+library(coda)
+
+set.seed(123)
+
+n_iter <- 2000
+
+good_chain1 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_chain2 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_chain3 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_mcmc <- mcmc.list(
+  mcmc(good_chain1),
+  mcmc(good_chain2),
+  mcmc(good_chain3)
+)
+
+bad_chain1 <- cbind(
+  alpha = cumsum(rnorm(n_iter, 0.02, 0.5)),
+  beta  = rnorm(n_iter, 1, 0.2)
+)
+
+bad_chain2 <- cbind(
+  alpha = rnorm(n_iter, 5, 0.3),
+  beta  = rnorm(n_iter, 3, 0.2)
+)
+
+bad_chain3 <- cbind(
+  alpha = rnorm(n_iter, -5, 0.3),
+  beta  = rnorm(n_iter, 0, 0.2)
+)
+
+bad_mcmc <- mcmc.list(
+  mcmc(bad_chain1),
+  mcmc(bad_chain2),
+  mcmc(bad_chain3)
+)
+
+tidy_mcmc <- function(mcmc_list, label) {
+  as.data.frame(as.matrix(mcmc_list)) |>
+    mutate(iter = row_number(),
+           chain = rep(1:length(mcmc_list), each = n_iter),
+           dataset = label) |>
+    pivot_longer(cols = c(alpha, beta),
+                 names_to = "parameter",
+                 values_to = "value")
+}
+
+df_good <- tidy_mcmc(good_mcmc, "Converged")
+df_bad  <- tidy_mcmc(bad_mcmc,  "Not converged")
+
+df_all <- bind_rows(df_good, df_bad)
+
+trace_plot <- ggplot(df_all,
+                     aes(x = iter, y = value, color = factor(chain))) +
+  geom_line(alpha = 0.6) +
+  facet_grid(dataset ~ parameter, scales = "free_y") +
+  labs(color = "Chain",
+       title = "Trace plots: converged vs non-converged") +
+  theme_bw(base_size = 12)
+
+trace_plot
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-1.png){width=672}
+:::
+
+```{.r .cell-code}
+density_plot <- ggplot(df_all,
+                       aes(x = value, fill = factor(chain))) +
+  geom_density(alpha = 0.4) +
+  facet_grid(dataset ~ parameter, scales = "free") +
+  labs(fill = "Chain",
+       title = "Posterior densities by chain") +
+  theme_bw(base_size = 12)
+
+density_plot
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-2.png){width=672}
+:::
+
+```{.r .cell-code}
+#calcualate effective sample sizes
+ess_good <- effectiveSize(good_mcmc)
+ess_bad  <- effectiveSize(bad_mcmc)
+
+ess_good |> kable(caption="Effective sample size for converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Effective sample size for converged chains
+
+|      |        x|
+|:-----|--------:|
+|alpha | 6415.821|
+|beta  | 5948.834|
+
+
+:::
+
+```{.r .cell-code}
+ess_bad |> kable(caption="Effective sample size for poorly converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Effective sample size for poorly converged chains
+
+|      |        x|
+|:-----|--------:|
+|alpha | 3449.665|
+|beta  | 6265.442|
+
+
+:::
+
+```{.r .cell-code}
+#calcualte Gelman-Rubin statistics
+gelman_good <- gelman.diag(good_mcmc)
+gelman_bad  <- gelman.diag(bad_mcmc)
+
+tidy_gelman <- function(gelman_obj) {
+
+  as.data.frame(gelman_obj$psrf) |>
+    mutate(
+      parameter = rownames(gelman_obj$psrf)
+    ) |>
+    rename(
+      rhat = `Point est.`,
+      rhat_upper = `Upper C.I.`
+    ) |>
+    select(parameter, rhat, rhat_upper)
+}
+gelman_good |> tidy_gelman() |> kable(caption="Gelman-Rubin statistics for converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Gelman-Rubin statistics for converged chains
+
+|      |parameter |      rhat| rhat_upper|
+|:-----|:---------|---------:|----------:|
+|alpha |alpha     | 1.0013087|   1.005827|
+|beta  |beta      | 0.9997171|   1.000248|
+
+
+:::
+
+```{.r .cell-code}
+gelman_bad |> tidy_gelman() |> kable(caption="Gelman-Rubin statistics for poorly converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Gelman-Rubin statistics for poorly converged chains
+
+|      |parameter |      rhat| rhat_upper|
+|:-----|:---------|---------:|----------:|
+|alpha |alpha     |  2.666946|   14.68917|
+|beta  |beta      | 11.430209|   21.85569|
+
+
+:::
+
+```{.r .cell-code}
+gelman.plot(good_mcmc)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-3.png){width=672}
+:::
+
+```{.r .cell-code}
+gelman.plot(bad_mcmc)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-4.png){width=672}
+:::
+
+```{.r .cell-code}
+heidel_good <- heidel.diag(good_mcmc)
+heidel_bad  <- heidel.diag(bad_mcmc)
+```
+:::
+
+
 ## Summary Tables
 
 ### Predictive Probability Distributions
@@ -963,23 +1191,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] extraDistr_1.10.0.1 cowplot_1.2.0       invgamma_1.2       
- [4] knitr_1.51          lubridate_1.9.4     forcats_1.0.1      
- [7] stringr_1.6.0       dplyr_1.1.4         purrr_1.2.1        
-[10] readr_2.1.6         tidyr_1.3.2         tibble_3.3.1       
-[13] ggplot2_4.0.1       tidyverse_2.0.0    
+ [1] coda_0.19-4.1       extraDistr_1.10.0.1 cowplot_1.2.0      
+ [4] invgamma_1.2        knitr_1.51          lubridate_1.9.4    
+ [7] forcats_1.0.1       stringr_1.6.0       dplyr_1.1.4        
+[10] purrr_1.2.1         readr_2.1.6         tidyr_1.3.2        
+[13] tibble_3.3.1        ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.1        
  [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
- [9] fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     generics_0.1.4    
-[13] htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1      RColorBrewer_1.1-3
-[17] rlang_1.1.7        stringi_1.8.7      xfun_0.55          S7_0.2.1          
-[21] otel_0.2.0         timechange_0.3.0   cli_3.6.5          withr_3.0.2       
-[25] magrittr_2.0.4     digest_0.6.39      grid_4.5.2         rstudioapi_0.17.1 
-[29] hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5        evaluate_1.0.5    
-[33] glue_1.8.0         farver_2.1.2       rmarkdown_2.30     tools_4.5.2       
-[37] pkgconfig_2.0.3    htmltools_0.5.9   
+ [9] fastmap_1.2.0      lattice_0.22-7     R6_2.6.1           labeling_0.4.3    
+[13] generics_0.1.4     htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1     
+[17] RColorBrewer_1.1-3 rlang_1.1.7        stringi_1.8.7      xfun_0.55         
+[21] S7_0.2.1           otel_0.2.0         timechange_0.3.0   cli_3.6.5         
+[25] withr_3.0.2        magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
+[29] rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5       
+[33] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       rmarkdown_2.30    
+[37] tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   
 ```
 
 
