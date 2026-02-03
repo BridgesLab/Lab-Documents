@@ -40,7 +40,7 @@ mtcars.data <-
                            am==1~"manual")),
          engine=factor(case_when(vs==0~"V-Shaped",
                        vs==1~"Straight")),
-         cylindars=factor(cyl))
+         cylindars = factor(cyl))
   
 kable(mtcars.data,caption="The mtcars dataset")
 ```
@@ -118,10 +118,10 @@ Table: Summary of model fit for mpg versus transmission
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 17.143421| 1.1519719| 14.8388381| 19.350500|
-|fixed    |cond      |NA       |transmissionmanual             |  7.225931| 1.8212300|  3.6337217| 10.812434|
-|ran_pars |cond      |Residual |sd__Observation                |  5.027552| 0.6589096|  3.9727225|  6.540039|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  6.036337| 7.1209665|  0.2056836| 21.753285|
+|fixed    |cond      |NA       |(Intercept)                    | 17.097677| 1.1364917| 14.9012782| 19.316796|
+|fixed    |cond      |NA       |transmissionmanual             |  7.264199| 1.8109926|  3.6689723| 10.864794|
+|ran_pars |cond      |Residual |sd__Observation                |  5.028371| 0.6561548|  3.9331937|  6.495243|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.913367| 6.6387586|  0.1846534| 22.336345|
 
 
 :::
@@ -143,7 +143,7 @@ hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tr
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) > 0     7.23      1.82     4.25    10.18        Inf
+1 (transmissionmanual) > 0     7.26      1.81     4.35     10.2        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -158,7 +158,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.
 :::
 
 
-As you can see, this analysis estimates that the manual transmission has a 7.2259306 higher mpg ($\pm$ 1.82123) with a very high Bayes Factor (\infty{}) and posterior probability (1).
+As you can see, this analysis estimates that the manual transmission has a 7.2641994 higher mpg ($\pm$ 1.8109926) with a very high Bayes Factor (\infty{}) and posterior probability (1).
 
 The posterior distribution for the effect of a manual transmission is here:
 
@@ -209,54 +209,114 @@ Table: Default priors for a pairwise analysis of mpg vs transmission in the mtca
 :::
 
 
-This includes flat priors for the beta coefficients, student's *t* distributions for intercept (centered around the mean mpg) and residual error (centered around zero).  
+This includes flat priors for the beta coefficients, student's *t* distributions for intercept (centered around the mean mpg) and residual error (centered around zero).
 
-### What if I Want an ANOVA
+### How about an ANOVA
 
-Perhaps I only am interested in whether there is a difference between groups, but not pairwise differences (*i.e* an ANOVA).  This can be done as well (again using default priors).
+Lets say we want to test across groups (rather than testing effects between groups)
+.  For that we can use the number of cylindars as a factor
+
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-anova.fit <- brm(mpg~0+cylindars,data=mtcars.data, sample_prior = TRUE) #zero sets there to be no intercept, shows the mean for each group
-anova.fit.null <- brm(mpg~0,data=mtcars.data, sample_prior = TRUE) #null model
-
-#estimate the bayes factor
-bayes_factor(anova.fit,anova.fit.null) -> anova.bf
-post_prob(anova.fit,anova.fit.null) -> anova.pp
+anova.fit <- brm(mpg~0+cylindars,data=mtcars.data, #zero makes sure each cylindar gets its own intercept
+                    sample_prior = TRUE)
+anova.fit.null <- brm(mpg~0,data=mtcars.data, #null model not including cylindars
+                    sample_prior = TRUE)
 ```
 :::
 
 
-Now lets look at the results of those analyses comparasons.  The bayes factor for the ANOVA is 3.480474\times 10^{28} which is very extreme evidence for a difference between groups.  The posterior probabilities are 1 (very hight) for the fitted model and 2.8951489\times 10^{-29} (very low) for the null model.
-
+The analysis here is a little bit different than before.  We can still plot the posterior distributions for each model but the relevant test is now to compare the model with the cylindars to a null model, without that term.
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-prior_summary(anova.fit) %>% kable(caption="Summary of priors for comparason between cylindar numbres on mpg")
+tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylindars")
 ```
 
 ::: {.cell-output-display}
 
 
-Table: Summary of priors for comparason between cylindar numbres on mpg
+Table: Summary of model fit for mpg versus cylindars
 
-|prior                |class |coef       |group |resp |dpar |nlpar |lb |ub |source  |
-|:--------------------|:-----|:----------|:-----|:----|:----|:-----|:--|:--|:-------|
-|                     |b     |           |      |     |     |      |   |   |default |
-|                     |b     |cylindars4 |      |     |     |      |   |   |default |
-|                     |b     |cylindars6 |      |     |     |      |   |   |default |
-|                     |b     |cylindars8 |      |     |     |      |   |   |default |
-|student_t(3, 0, 5.4) |sigma |           |      |     |     |      |0  |   |default |
+|effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
+|:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
+|fixed    |cond      |NA       |cylindars4                     | 26.671540|  1.009890| 24.6931994| 28.684420|
+|fixed    |cond      |NA       |cylindars6                     | 19.710334|  1.292718| 17.1888040| 22.281530|
+|fixed    |cond      |NA       |cylindars8                     | 15.107150|  0.902260| 13.3049123| 16.826756|
+|ran_pars |cond      |Residual |sd__Observation                |  3.338449|  0.454706|  2.5896345|  4.374084|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  6.021950|  7.654006|  0.1700044| 23.006449|
 
 
 :::
 
 ```{.r .cell-code}
-#create a teable of the pairwise hypotheses
+plot(anova.fit)
+```
+
+::: {.cell-output-display}
+![](bayesian-examples_files/figure-html/brms-anova-analysis-1.png){width=672}
+:::
+
+```{.r .cell-code}
+# extracts the bayes factor comparing the models
+bayes_factor(anova.fit,anova.fit.null) -> anova.bf 
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Iteration: 1
+Iteration: 2
+Iteration: 3
+Iteration: 4
+Iteration: 5
+Iteration: 1
+Iteration: 2
+Iteration: 3
+Iteration: 4
+Iteration: 5
+```
+
+
+:::
+
+```{.r .cell-code}
+library(tidyr)
+as_draws_df(anova.fit) %>%
+  select(starts_with('b')) %>%
+  pivot_longer(cols=everything(),
+               names_to = "term",
+               values_to="mpg") %>%
+  ggplot(aes(x=mpg,fill=term)) +
+  geom_density() +
+  geom_vline(xintercept=0,color="red",lty=2) +
+  labs(y="",
+       x="Miles Per Gallon",
+       title="Posterior probabilities") +
+  scale_fill_discrete(name="") +
+  theme_classic(base_size=16) +
+  theme(legend.position="top")
+```
+
+::: {.cell-output-display}
+![](bayesian-examples_files/figure-html/brms-anova-analysis-2.png){width=672}
+:::
+:::
+
+
+In this case the Bayes Factor for the hypothesis that this term is relevant is 3.4878578\times 10^{28}.
+
+We can still do post-hoc tests using the hypothesis command:
+
+
+::: {.cell}
+
+```{.r .cell-code}
 rbind(hypothesis(anova.fit, "cylindars4>cylindars6")$hypothesis,
       hypothesis(anova.fit, "cylindars4>cylindars8")$hypothesis,
       hypothesis(anova.fit, "cylindars6>cylindars8")$hypothesis) %>%
@@ -270,63 +330,14 @@ Table: Pairwise hypothesis tests for cylindars on mpg
 
 |Hypothesis                    |  Estimate| Est.Error| CI.Lower|  CI.Upper| Evid.Ratio| Post.Prob|Star |
 |:-----------------------------|---------:|---------:|--------:|---------:|----------:|---------:|:----|
-|(cylindars4)-(cylindars6) > 0 |  6.951115|  1.610548| 4.271252|  9.580710|        Inf|     1.000|*    |
-|(cylindars4)-(cylindars8) > 0 | 11.570649|  1.311123| 9.418828| 13.740806|        Inf|     1.000|*    |
-|(cylindars6)-(cylindars8) > 0 |  4.619534|  1.592882| 1.928073|  7.195892|        999|     0.999|*    |
+|(cylindars4)-(cylindars6) > 0 |  6.961206|  1.613525| 4.318895|  9.640136|        Inf|   1.00000|*    |
+|(cylindars4)-(cylindars8) > 0 | 11.564389|  1.358335| 9.344448| 13.776835|        Inf|   1.00000|*    |
+|(cylindars6)-(cylindars8) > 0 |  4.603184|  1.565119| 2.070603|  7.158059|   265.6667|   0.99625|*    |
 
 
 :::
-
-```{.r .cell-code}
-tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylindars")
-```
-
-::: {.cell-output-display}
-
-
-Table: Summary of model fit for mpg versus cylindars
-
-|effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
-|:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |cylindars4                     | 26.674991| 0.9847944| 24.7509078| 28.614889|
-|fixed    |cond      |NA       |cylindars6                     | 19.723876| 1.2957542| 17.1683532| 22.195507|
-|fixed    |cond      |NA       |cylindars8                     | 15.104342| 0.8993668| 13.3434595| 16.874540|
-|ran_pars |cond      |Residual |sd__Observation                |  3.353738| 0.4562683|  2.5995379|  4.391616|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.815645| 6.6495139|  0.1943924| 21.192693|
-
-
 :::
 
-```{.r .cell-code}
-plot(anova.fit)
-```
-
-::: {.cell-output-display}
-![](bayesian-examples_files/figure-html/anova-results-1.png){width=672}
-:::
-
-```{.r .cell-code}
-library(tidyr) #for pivot wider
-as_draws_df(anova.fit) %>%
-  select(starts_with('b')) %>%
-  pivot_longer(cols=everything(),
-             names_to = "term",
-             values_to="mpg") %>%
-  ggplot(aes(x=mpg,fill=term)) +
-  geom_density() +
-  geom_vline(xintercept=0,color="red",lty=2) +
-  labs(y="",
-     x="Miles Per Gallon",
-     title="Posterior probabilities") +
-  scale_fill_discrete(name="") +
-  theme_classic(base_size=16) +
-  theme(legend.position="top")
-```
-
-::: {.cell-output-display}
-![](bayesian-examples_files/figure-html/anova-results-2.png){width=672}
-:::
-:::
 
 
 ## What is a Linear Regression Equivalent?
@@ -378,10 +389,10 @@ Table: Summary of model fit for mpg versus weight
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 37.277524| 1.9488644| 33.5630567| 41.047348|
-|fixed    |cond      |NA       |wt                             | -5.345703| 0.5808476| -6.4704002| -4.206927|
-|ran_pars |cond      |Residual |sd__Observation                |  3.141695| 0.4131310|  2.4504439|  4.060535|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.862912| 6.7138970|  0.2056104| 22.226963|
+|fixed    |cond      |NA       |(Intercept)                    | 37.257714| 1.9360071| 33.4151941| 40.982049|
+|fixed    |cond      |NA       |wt                             | -5.341900| 0.5792852| -6.4596890| -4.176700|
+|ran_pars |cond      |Residual |sd__Observation                |  3.160016| 0.4253177|  2.4736451|  4.126301|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.960987| 6.6349369|  0.1906678| 22.410161|
 
 
 :::
@@ -403,7 +414,7 @@ hypothesis(linear.fit, "wt<0") # testing for whether weight has a negative effec
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0    -5.35      0.58    -6.29    -4.39        Inf         1    *
+1   (wt) < 0    -5.34      0.58     -6.3    -4.41        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -449,9 +460,9 @@ kable(bayes_R2(linear.fit),caption="Estimates for R2 between weight and mpg")
 
 Table: Estimates for R2 between weight and mpg
 
-|   |  Estimate| Est.Error|      Q2.5|     Q97.5|
-|:--|---------:|---------:|---------:|---------:|
-|R2 | 0.7419158| 0.0459144| 0.6238349| 0.7972728|
+|   |  Estimate| Est.Error|      Q2.5|    Q97.5|
+|:--|---------:|---------:|---------:|--------:|
+|R2 | 0.7417077| 0.0472553| 0.6189107| 0.797102|
 
 
 :::
@@ -572,8 +583,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term               |   estimate| std.error|   conf.low| conf.high|
 |:------|:---------|:-----|:------------------|----------:|---------:|----------:|---------:|
-|fixed  |cond      |NA    |(Intercept)        |  0.5566786| 0.4742936| -0.3572361| 1.4948730|
-|fixed  |cond      |NA    |transmissionmanual | -0.7376952| 0.7618668| -2.2347186| 0.7104292|
+|fixed  |cond      |NA    |(Intercept)        |  0.5564512| 0.4845538| -0.3728695| 1.5250906|
+|fixed  |cond      |NA    |transmissionmanual | -0.7365043| 0.7455498| -2.2076540| 0.7021128|
 
 
 :::
@@ -595,9 +606,9 @@ hypothesis(counts.model, "transmissionmanual<0") # testing for whether weight ha
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) < 0    -0.74      0.76       -2     0.52       5.12
+1 (transmissionmanual) < 0    -0.74      0.75    -1.99     0.45       5.05
   Post.Prob Star
-1      0.84     
+1      0.83     
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -625,7 +636,7 @@ as_draws_df(counts.model) %>%
 :::
 
 
-Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=-0.7376952 $\pm$ 0.7618668) with a Bayes Factor of 5.116208 and a Posterior Probability of 0.8365.
+Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=-0.7365043 $\pm$ 0.7455498) with a Bayes Factor of 5.0514372 and a Posterior Probability of 0.83475.
 
 ## What is a Binomial Regression Equivalent?
 
@@ -673,8 +684,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term        |  estimate| std.error|  conf.low| conf.high|
 |:------|:---------|:-----|:-----------|---------:|---------:|---------:|---------:|
-|fixed  |cond      |NA    |(Intercept) | 14.427575|  5.020183|  6.492069| 25.823775|
-|fixed  |cond      |NA    |wt          | -4.766818|  1.588900| -8.336203| -2.202195|
+|fixed  |cond      |NA    |(Intercept) | 14.822531|  5.646451|  6.143241| 27.985245|
+|fixed  |cond      |NA    |wt          | -4.899447|  1.776671| -8.932556| -2.160662|
 
 
 :::
@@ -696,7 +707,7 @@ hypothesis(binomial.fit, "wt<0") # testing for whether weight has a negative eff
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0    -4.77      1.59    -7.62    -2.49        Inf         1    *
+1   (wt) < 0     -4.9      1.78     -8.1    -2.51        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;

@@ -41,11 +41,24 @@ color_scheme <- c("#00274c", "#ffcb05")
 :::
 
 
-## Purpose
-
 These are notes as I work through and understand the notes from BIOSTAT 682
 
-### Single Parameter Models
+Bayes theoreom says
+
+$$Pr(\theta|y) = \frac{Pr(y|\theta)\cdot Pr(\theta)}{Pr(y)}$$
+
+Where:
+
+- $Pr(\theta|y)$ is the posterior probability, given the data $y$
+- $Pr(y|\theta)$ is the likelihood function (the probability of getting data $y$ presuming the current hypothesis $\theta$ is correct)
+- $Pr(\theta)$ is the prior probability
+- $Pr(y)$ is probability of observing the data
+
+## Conjugate Priors
+
+Conjugate priors for a distribution are chosen so that the prior and the posterior have the same form.  According to Bayes' theorem $Pr(\theta | y) \propto Pr(y|\theta) \cdot \Pr(\theta)$ where both $Pr(\theta)$ (the prior) and $\Pr(\theta|y)$ (the posterior) are distributions over the parameter $\theta$.  This allows us to do Bayesian updating of models as new data arrives without the computationally expensive computation of the product of the likelihood and the prior.
+
+## Single Parameter Models
 
 The motivating example here is that there was an incidence of cancer wherein 8 cancers appeared out of a total of 145 people.  The question is whether this incidence is greater than the expected incidence of 4.458% from [@CancerStatisticsNCI2015]
 
@@ -199,7 +212,7 @@ Table: Summary statistics for prior and posterior distributions
 
 By this model the posterior probability that the incidence is greater than 4.44% is 79.8%.
 
-##### Example of Beta as a Conjugate Prior
+###### Example of Beta as a Conjugate Prior
 
 Imagine there is a mouse that has a rare phenotype, we observe $n=20$ mice, and find $y=4$ have this phenotype. The probability of this occuring can be denoted as $Y | p \sim Bin(20,p)$.  Before noticing this, we believe the phenotype is uncommon but i have low certainty on this hypothesis, given as $p \sim Beta(2,20)$. This was selected because in $Beta(\alpha,\beta)$ this means that
 
@@ -268,7 +281,7 @@ data.frame(probability=seq(0,1,by=0.01)) |>
 
 Given this result of a posterior probability of $Beta(6,36)$ this corresponds to a mean probability of $\frac{6}{6+36}=\frac{6}{42}=$ 0.1428571.  The variance is $Var(p)=\frac{\alpha \times \beta}{(\alpha + beta)^2\times(\alpha + \beta + 1)}= \frac{6\times 36}{(6+36)^2\times(6+36+1)}=$ 0.0028477.  The posterior mode is $MAP=\frac{\alpha-1}{\alpha + \beta - 2}=$ 0.125.
 
-##### Nutrition Example
+###### Nutrition Example
 
 You are studying a rare adverse event from a new dietary supplement.  From prior literature, events are uncommon, but not impossible.  You now run a small pilot study. You observe 7 adverse events out of 50 participants.
 
@@ -292,7 +305,7 @@ By this logic, the posterior probability should be $Beta(\alpha+y_o,beta+n-y_o)$
 ::: {.cell}
 
 ```{.r .cell-code}
-data.frame(probability=seq(0,1,by=0.01)) |>
+data.frame(probability=seq(0,0.2,by=0.001)) |>
   mutate(prior = dbeta(probability,11,991),
          posterior = dbeta(probability,18,1037)) |>
   pivot_longer(c(prior,posterior),names_to="type",values_to = "density") |>
@@ -338,7 +351,7 @@ For a Normal likelihood with known mean $\mu$, the conjugate prior for the varia
 
 If we use precision $\frac{1}{\sigma^2}$ then the conjugate prior for variance is the Gamma distribution with the same meaning for $\alpha$ and $\beta$ except that $\beta$ is now a rate rather than a scale.
 
-##### Example for Estimating Prior and Posterior Variance
+###### Example for Estimating Prior and Posterior Variance
 
 You are studying a biomarker that is known (from calibration experiments) to have mean $\mu=100$.  You are uncertain about the variance $\sigma^2$.  You have this prior information:
 
@@ -403,6 +416,746 @@ data.frame(variance=seq(0,100,by=1)) |>
 
 The updated $\sigma^2$ values are then $E(\sigma^2)=\frac{\beta}{\alpha-1}$,  $Var(\sigma^2)=\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$, and $\text{Mode}=\frac{\beta}{\alpha+1}$ so 20.8928571 [12.4523081, 34.8405654] with a modal value of 18.28125. This is compared to the prior estimates which were 27.7777778 [14.6328871, 52.1334173] and a modal value of 22.7272727.  As you can see from the figure the posterior shifted left with the updated data that had smaller variance than expected.  The updated standard deviation is 4.5708705[3.5287828, 5.9025897] compared to 5.  The probability that the value is below 5 is 0.7984651.  Note for this case we have to use Gamma rather than Inverse-Gamma due to point arithmetic issues with large arguments in `pinvgamma`.
 
+##### Poisson Distributions
+
+Poisson distributions work well for independent counts data (*e.g.* 0, 1, 2, 3 ...) and are described by $\text{Poisson}(\gamma)$, which has a probability mass function of $Pr(Y=y_o|\lambda)=\frac{\lambda^{y_o} \cdot e^{-\lambda}}{y_o!}$ where $\lambda$ describes the expected rate of a certain number events and $y_o$ is observed the number of events [@poisson1837probabilite].  $\lambda$ is both the mean and variance of this distribution, with the modal value given by the largest integer less than or equal to $\lambda$ or $\text{floor}(\lambda)$.
+
+The conjugate prior for a Poisson distribution is a **Gamma** distribution ($Gamma(\alpha,\beta)$) where the mean of $\gamma$ is $\frac{\alpha}{\beta}$, the variance is $\frac{\alpha}{\beta^2}$ and the modal value is $\frac{\alpha-1}{\beta}$.  The updated posterior distribution is $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ and the posterior predictive distribution is a negative binomial of the same form.  This is because for predictive purposes rather than exactly knowing $\gamma$ we have a range of possible $\gamma$ given by the updated distributions.  This mixture is now a negative binomial distribution
+
+###### Example Counts-Based Updating
+
+Lets say there is a number of adverse events (in a 30 day period) from a dietary supplement ($Y$) defined by $Pr(Y|\gamma)\sim\text{Poisson}(\gamma)$ where $\gamma$ is the average number of events over a fixed 30 day period.  Historically there are 2 events per month, based on about 10 months of experiences.  Based on this we should set the prior probability to be $Pr(Y)\sim\text{Gamma}(20,10)$ because the mean should be $\frac{\alpha}{\beta}=2=\frac{\alpha}{10}$
+
+
+::: {.cell}
+
+```{.r .cell-code}
+historical.events <- 2
+experiences <- 10
+alpha <- historical.events*experiences
+beta <- experiences
+
+new.months <- 3
+total.new.events <- 10
+```
+:::
+
+
+Now over the next 3 months we observe 10 total new events, a max likelihood estimate of 3.3333333.  This is now updated as $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)=\text{Gamma}(20+10,10+3)=\text{Gamma}(30,13)$.  This indicates that the mean number of events shifts from 2 [1.221652, 2.9670854] to 2.3076923 [1.5569903, 3.2037567], the modal number of events from 1.9 to 2.2307692.  This indicates the average number of events per thirty days. This means that the posterior probability of the true event rate or $\gamma>3$ is low (0.0591173). The variance moved from 0.2 to 0.1775148.  Going forward, using a negative binomial distribution, the probability of observing over 3 events per 30 days is 0.2072399.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+data.frame(observations = seq(0,10,by=0.1)) |>
+  mutate(prior=dgamma(observations,alpha,beta),
+         posterior =dgamma(observations,
+                           alpha+total.new.events,
+                           beta+new.months)) |>
+  pivot_longer(c(prior,posterior),names_to="type",values_to="probability") |>
+  ggplot(aes(y=probability,x=observations,col=type)) +
+  geom_line() +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.8,0.3))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/poisson-visualization-1.png){width=672}
+:::
+
+```{.r .cell-code}
+data.frame(counts = seq(0,10,by=1)) |>
+  mutate(prior= dnbinom(counts,
+                            size = alpha,
+                            mu = alpha/beta),
+         posterior= dnbinom(counts,
+                            size = alpha+total.new.events,
+                            mu = (alpha+total.new.events) / (beta+new.months))) |>
+  pivot_longer(c(prior,posterior),
+               names_to="type",
+               values_to="probability") |>
+  ggplot(aes(y=probability,x=counts,fill=type)) +
+  geom_bar(stat='identity',position='dodge') +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Predictive Probability")
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/poisson-visualization-2.png){width=672}
+:::
+:::
+
+
+## Multiple Parameter Models
+
+Most real world problems require us to estimate more than one parameter, unlike the examples above.  That being said we are generally only interested in one or two of them.
+
+### Jeffries Priors
+
+One special class of priors are Jeffreys priors.  These are defined by the likelihood function (normal, poisson, binomial, *et cetera*) than by our pre-existing intution or data.  This makes them more objective, but perhaps less Bayesian.  The Jeffrey's prior is denoted as $Pr(\theta) \propto \sqrt{I(\theta)}$ where $I(\theta)$ is the Fisher information of $\theta$.  This measures how sensitive the distribution is to changes in the parameter.  This is why it is based on the average of differential of the square of the log likelihood $(\frac{d}{d\theta}\cdot \log Pr(y|\theta))^2$.  Jeffreys priors are therefore uninformative with respect to the information geometry of the likelihood, rather than being flat over the parameter values themselves [@jeffreys1961theory].
+
+#### Likelihoods and Jeffreys Priors for Common Models
+
+| Likelihood | Parameter(s) | Likelihood $p(y \mid \theta)$ | Fisher Information $I(\theta)$ | Jeffreys Prior $\pi_J(\theta)$ | Notes |
+|-----------|--------------|---------------------------------|---------------------------------|---------------------------------|-------|
+| **Bernoulli** | $p \in (0,1)$ | $p^y (1-p)^{1-y}$ | $\frac{1}{p(1-p)}$ | $\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}$ | Proper; Beta$(\frac{1}{2}, \frac{1}{2})$ |
+| **Binomial** | $p \in (0,1)$ | $\binom{n}{y} p^y (1-p)^{n-y}$ | $\frac{n}{p(1-p)}$ | $\pi(p) \propto \frac{1}{\sqrt{p(1-p)}}$ | Same as Bernoulli (constant drops out) |
+| **Poisson** | $\lambda > 0$ | $\frac{\lambda^y e^{-\lambda}}{y!}$ | $\frac{1}{\lambda}$ | $\pi(\lambda) \propto \lambda^{-1/2}$ | Improper; flat in $\sqrt{\lambda}$ |
+| **Normal (mean only)** | $\mu \in \mathbb{R}$ | $\mathcal{N}(\mu, \sigma^2)$ | $\frac{1}{\sigma^2}$ | $\pi(\mu) \propto 1$ | Location parameter |
+| **Normal (variance only)** | $\sigma > 0$ | $\mathcal{N}(\mu, \sigma^2)$ | $\frac{2}{\sigma^2}$ | $\pi(\sigma) \propto \frac{1}{\sigma}$ | Scale-invariant |
+| **Normal (mean & variance)** | $(\mu, \sigma)$ | $\mathcal{N}(\mu, \sigma^2)$ | — | $\pi(\mu, \sigma) \propto \frac{1}{\sigma}$ | Joint Jeffreys prior |
+| **Multinomial** | $\mathbf{p} = (p_1, \dots, p_k)$ | $\frac{n!}{\prod_i y_i!} \prod_i p_i^{y_i}$ | $\mathrm{diag}(1/p_i)$ | $\pi(\mathbf{p}) \propto \prod_i p_i^{-1/2}$ | Dirichlet$(\frac{1}{2}, \dots, \frac{1}{2})$ |
+
+
+::: {.cell}
+
+```{.r .cell-code}
+p <- seq(0.001, 0.999, length.out = 500)
+
+tibble(
+  p = p,
+  jeffreys = dbeta(p, 0.5, 0.5),
+  uniform = dbeta(p, 1, 1),
+  informative = dbeta(p, 14, 6)
+) |>
+  pivot_longer(-p, names_to = "prior", values_to = "density") |>
+  ggplot(aes(x = p, y = density, color = prior)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.3,0.8)) +
+  labs(
+    title = "Priors for Binomial Probability p",
+    x = expression(p),
+    y = "Density"
+  )-> binomial.plot
+
+
+lambda_grid <- seq(0.01, 30, length.out = 500)
+
+tibble(
+  lambda = seq(0.01, 30, length.out = 500),
+  jeffreys = lambda^(-1/2),          # unnormalized
+  informative = dgamma(lambda, shape = 10, rate = 2)
+) |>
+  pivot_longer(-lambda, names_to = "type", values_to = "density") |>
+  ggplot(aes(x = lambda, y = density, color = type)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.3,0.5)) +
+  labs(
+    title = "Jeffreys vs Informative Prior (Poisson)",
+    x = expression(lambda),
+    y = "Prior density \n(unnormalized for Jeffreys)"
+  ) -> poisson.plot
+
+mu <- seq(-5, 25, length.out = 500)
+
+tibble(
+  mu = mu,
+  jeffreys = rep(1, length(mu)),                 # flat
+  informative = dnorm(mu, mean = 10, sd = 2)
+) |>
+  pivot_longer(-mu, names_to = "prior", values_to = "density") |>
+  ggplot(aes(x = mu, y = density, color = prior)) +
+  geom_line(linewidth = 1) +
+  theme_classic(base_size = 6) +
+  theme(legend.position=c(0.8,0.5)) +
+  labs(
+    title = "Priors for Normal Mean (σ known)",
+    x = expression(mu),
+    y = "Density"
+  ) -> norm.plot
+
+library(cowplot)
+plot_grid(plotlist=c(binomial.plot,poisson.plot,norm.plot),
+          nrow=1)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffries-prior-visualizations-1.png){width=672}
+:::
+:::
+
+
+#### Example Using Jeffrey's Priors 
+
+Considering ultraprocessed foods, asking whether a food recommends the FDA recommendation for sodium in a single serving.  This is based on a survey of foods in a cafeteria.  The question (binomial) is whether a product exceeds or does not exceed the limit.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+products.sampled <- 12
+exceeded <- 9
+
+# based on 90% estimate
+informed.alpha <- 90+1 #observed + 1
+informed.beta <- 10+1 #not-observed +1
+```
+:::
+
+
+We sampled 12 products, finding that 9 of them exceeded the limits.  This is denoted by $Binomial(n=12,p)$.  For the binomial distribution, the Jeffreys prior for a binomial distribution is $Beta(\frac{1}{2},\frac{1}{2})$, which makes sense as we have no preferred parameterization.  The posterior probability in this case is $Beta(\frac{1}{2}+9,\frac{1}{2}+12-9) = Beta(9.5,3.5)$.  The MLE is 0.75.  We estimate the posterior mean (the percent of products that exceed limits) is 0.7307692 $\pm$ [0.4708089, 0.9240577] with a modal value of 0.7727273. This is in comparason to a much more informed prior $Binomial(91,11)$ which gives a posterior mean of 0.877193 $\pm$ [0.8113073, 0.9305813].  These three distributions are shown in the figure showing that with a jeffreys prior vs a strong informed prior there is a substantial difference, with the jeffreys prior being broad and closer to the MLE and the strong prior only modifying the posterior estimate from that prior slightly.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+data.frame(p=seq(0.001, 0.999, length.out = 200)) |>
+  mutate(jeffreys_prior=dbeta(p,0.5,0.5),
+         jeffreys_posterior=dbeta(p,0.5+exceeded,0.5-exceeded+products.sampled),
+         informed_prior=dbeta(p,informed.alpha,informed.beta),
+         informed_posterior=dbeta(p,informed.alpha+exceeded,informed.beta-exceeded+products.sampled)) |> 
+  pivot_longer(-p,names_sep="_",
+               names_to=c("prior","type"),
+               values_to='density') |>
+  ggplot(aes(y=density,x=p,col=type,lty=prior)) +
+  geom_line() +
+    geom_vline(xintercept=exceeded/products.sampled, lty=2, col="grey") +
+  annotate(
+    geom  = "text",
+    x     = exceeded/products.sampled-0.01,           # ← your chosen x-position
+    y     = 12,            # ← your chosen y-position
+    label = "Observed",
+    hjust = 1,            # 0 = left justified (most important part)
+    vjust = 0.5,          # optional: 0.5 = vertically centered
+    size  = 5, color = "grey"
+  ) +
+  theme_classic(base_size=16) +
+  theme(legend.position=c(0.2,0.7))
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-upf-example-1.png){width=672}
+:::
+:::
+
+
+
+### Nuisance Parameters
+
+Perhaps there are several parameters that are required in a model, but we only care about one, so think of a model with parameters $\theta=(\theta_1,\theta_2)$ of which we only care about $\theta_1$, that makes $\theta_2$ a nuisance parameter.  For example we may only care about the mean but not the variance. In modeling the posterior $Pr(\theta|y) \propto Pr(y|\theta)\cdot(Pr(\theta)$.  To get $\Pr(\theta_1|y)$, the marginal posterior, we integrate out $\theta_2$.  This can give you the marginal distribution of $\theta_1$.  Another approach is to use the Jeffreys priors and only keep terms that include $\theta_1$.  For example for a normal distribution, using a Jeffreys prior the posterior probability is $Pr(\mu,\sigma^2|y) \propto (\sigma^2)^{\frac{n}{2}-\frac{1}{2}}\cdot \exp\{-\frac{\sigma^2}{2}[SS+n(\mu-\bar{y})^2]\}$ where $n$ is the number of new observations $SS$ is the new sum of squares and $\bar{y}$ is the new mean.
+
+### Using Jeffreys Prior to Define a Marginal Posterior
+
+For a normal distribution the Jeffreys prior is $Pr(\mu,\sigma) \propto \frac{1}{\sigma}$ or $\tau$.  We can derive the posterior probability using that and the likelihood function for the normal distribution and multiplying by a Jeffreys prior.  Integrating out $\tau$ gives the marginal posterior for $\mu$ gives me the $t$ distribution with $n-1$ degrees of freedom or $\mu|y \sim t_{n-1}(\bar{y}, \frac{SS}{n\cdot(n-1)})$ with a marginal predictive posterior probability of $y_{new}|y \sim t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$
+
+#### Example Using Jeffrey's Derived Marginal Probabilities
+
+
+::: {.cell}
+
+```{.r .cell-code}
+observations <- c(4.2,5.1,6.3,5.4,4.8)
+observations.ss <- sum((observations-mean(observations))^2)
+library(extraDistr)
+```
+:::
+
+
+We observe the following values 4.2, 5.1, 6.3, 5.4, 4.8.  Based on this $n=5$, $\bar{y}=5.16$ and $SS=2.412$.  Based on this the probability that $Pr(5.0<\mu<5.5∣y)$ is based on the difference between the two t-distributions for 5 and 5.5 $t_{n-1}(\bar{y},\frac{SS}{n\cdot(n-1)})$ or 0.4740412 as visualized below:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+n <- length(observations)
+mu_hat <- mean(observations)
+sigma_mu <- sqrt(observations.ss / (n * (n - 1)))
+
+df_plot <- data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    density = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    )
+  )
+
+ggplot(df_plot, aes(x = values, y = density)) +
+  geom_line(linewidth = 1) +
+  geom_area(
+    data = subset(df_plot, values >= 5 & values <= 5.5),
+    aes(x = values, y = density),
+    fill = "grey70",
+    alpha = 0.6
+  ) +
+  geom_vline(xintercept = c(5, 5.5), linetype = 2, color = "grey40") +
+  theme_classic(base_size = 16) +
+  labs(
+    x = expression(mu),
+    y = "Posterior density",
+    title = expression(paste("Posterior for ", mu, " under Jeffreys prior"))
+  )
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-visualization-1.png){width=672}
+:::
+:::
+
+
+The predictive probability of a new value being between 4.5 and 6 is given by the differnce between the distributions $t_{n-1}(\bar{y},\frac{SS(n+1)}{n(n-1)})$ or 0.5697764.  This is a wider range because the scale parameter is larger due to the uncertainty in predicting a new value 0.3472751 vs 0.8506468.  This is shown here:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+sigma_mu <- sqrt(observations.ss / (length(observations) * (length(observations) - 1)))
+sigma_mu.pred <- sqrt(observations.ss * (length(observations) + 1) / (length(observations) * (length(observations) - 1)))
+
+data.frame(
+  values = seq(0, 10, by = 0.01)
+) |>
+  mutate(
+    posterior = dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu
+    ),
+    predictive= dlst(
+      values,
+      df    = n - 1,
+      mu    = mu_hat,
+      sigma = sigma_mu.pred
+    ),
+  ) |>
+  pivot_longer(c(posterior, predictive),
+               names_to="type",
+               values_to="density") |>
+  ggplot(aes(x = values, y = density, color=type)) +
+  geom_line()+
+  theme_classic(base_size = 16) +
+  theme(legend.position=c(0.8,0.8)) 
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/jeffreys-marginal-predictive-visualization-1.png){width=672}
+:::
+:::
+
+
+### Wakefield's Approximate Bayes Factors
+
+Lets say from a study we have an estimate of an effect size $\hat{\beta}$ and its standard error $SE(\hat{\beta})$.  We want to test the null hypothesis that $\beta=0$ versus the alternative that $\beta \neq 0$.  We can use Wakefield's approximate Bayes factors to do this [@wakefield2009bayes].  This requires us to set a prior distribution for $\beta \sim N(0,W)$ where $W$ is the prior variance of the effect size.  We are presuming (often with good reason) that $\beta$ follows a normal distribution.  This is still a *single-parameter model* in that we are trying to solve for $\beta$, but where we algebraicly model out nuisance parameters.  So the likelihood of $\hat{\beta}$ given $\beta$ is given by $Pr(\hat{\beta}|\beta) \sim N(\beta,SE_{\beta}^2)$.  For the null hypothesis ($H_0$) of $\beta = 0$ the likelihood is  $Pr(\hat{\beta}|H_0) \sim N(0,SE^2)$ and for the alternate hypothesis ($H_1$) the marginal likelihood is calculated as
+
+$$Pr(\hat{\beta}|H_1) = \int{Pr(\hat{\beta}|\beta)\cdot p(\beta) \cdot d \beta} \sim \int{N(\hat{\beta}|\beta,SE^2)\cdot N(\beta|0,W)}\sim N(0,SE^2+W)$$
+
+This means that under the null hypothesis $H_o$ the marginal likelihood is $Pr(\hat{\beta}|H_0) \sim N(0,SE_{\hat{\beta}}^2)$ and this is compared to $Pr(\hat{\beta}|H_1)\sim N(0,SE^2+W)$.  The Bayes factor is then given by $BF_{1,0}=\frac{Pr(\hat{\beta}|H_1)}{Pr(\hat{\beta}|H_0)}=\frac{ N(0,SE^2+W)}{N(0,SE_{\hat{\beta}}^2)}$.  After a lot of alegebra this "simplifies" to this approximate bayes factor where W is the estimated prior variance, $\hat{\beta}$ is the estimated effect size and $SE^2$ is the estimated variance:
+
+$$ABF=\sqrt{\frac{SE^2}{SE^2+W}}\cdot \exp{(\frac{\hat{\beta}^2}{2}\cdot [\frac{1}{SE^2}-\frac{1}{SE^2+W}])}$$
+
+This can be used to calculate a posterior probability of $Pr(\hat{\beta}|H1) = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + Pr(H_0)} = \frac{BF_{1,0}\cdot Pr(H_1)}{BF_{1,0}\cdot Pr(H_1) + 1-Pr(H_1)}$.  You can set the prior probabilities to anything, but if you set them to be equal ($H_1=H_0=0.5$ then this simplifies to $Pr(H_1|\hat{\beta})=\frac{BF_{1,0}}{BF_{1,0}+1}$.
+
+#### Example Using Wakefield's ABF
+
+
+::: {.cell}
+
+```{.r .cell-code}
+beta = 0.12
+se_beta = 0.14
+W = 0.16
+prior_H1 = 0.05
+prior_H1_alt = 0.95
+
+ABF = sqrt(se_beta^2/(se_beta^2+W))*
+  exp((beta^2/2)*((1/se_beta^2)-(1/(se_beta^2+W))))
+```
+:::
+
+
+You are analyzing data from a large cohort study investigating the association between processed meat consumption (exposure) and systolic blood pressure (outcome). You are looking at the standardized effect size (standardized beta), which tells you how many standard deviations blood pressure changes for every standard deviation increase in meat consumption.  You have calculated $\hat{\beta}=0.12 \pm 0.14$.  The prior variance is estimated at $W=0.16$ meaning $SD=0.4$ or the true effect is between -0.784 and +0.784 (95% CI).  Your are generally skeptical of an effect so your prior probability is $Pr(H_1)=0.05$. The only decision you would have to make is how big to make $W$, one way to think about it is what is the maximum plausible effect size you would estimate and convert from that (*e.g.* $W=(\frac{\text{Maximum Effect}}{1.96})^2$).
+
+This calculates out as an approximate Bayes Factor of 0.4582486.  Based on my prior belief (0.05), the posterior probability is 0.0235504.  This indicates that there is a low probability that there is a true effect of processed meat consumption on systolic blood pressure based on this data and my prior belief.  On the other hand, if my prior belief was very strong ($Pr(H_1)=0.95$) this would mean a posterior probability of 0.8969786.  This indicates that with a strong prior belief in an effect, the data supports that belief.  For ease of use this can be done using the `calculate_abf` and `calculate_posterior` functions loaded from [../scripts/abf_calculation.R](scripts/abf_calculation.R).
+
+
+::: {.cell}
+
+```{.r .cell-code}
+source('../scripts/abf_calculation.R')
+priors <- seq(0,1,by=0.01)
+ABF <- calculate_abf(beta, se_beta, W)
+
+abf.data <- data.frame(
+  prior_H1 = priors) |>
+  mutate(posterior_H1 = calculate_posterior(ABF, priors))
+
+ggplot(abf.data, aes(x=prior_H1,y=posterior_H1)) +
+  geom_line() +
+  geom_hline(yintercept=0.95, lty=2, col="grey") +
+  theme_classic(base_size=16) +
+  labs(x="Prior probability",
+       y="Posterior probability",
+       title="Probability of a non-null effect",
+       subtitle=paste0("Effects of an ABF of ",round(ABF,3))
+  )
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/wakefield-abf-visualization-1.png){width=672}
+:::
+:::
+
+
+### Multinomial Models
+
+What if there are more than one outcome, rather than a binary outcome that can be modelled with binomial/bernoulli distributions.  In this case there is a multinomial model $Multinomial(N,\pi)$ where $N$ is the number of trials and $\pi=(\pi_1,\pi_2,...\pi_k)$ is the vector of probabilities for each of the $k$ categories.  The conjugate prior for this is a Dirichlet distribution $Dirichlet(\alpha_1,\alpha_2,...\alpha_k)$ where $\alpha_i$ is the prior pseudo-count for category $i$.  The posterior distribution is then $Dirichlet(\alpha_1+y_1,\alpha_2+y_2,...\alpha_k+y_k)$ where $y_i$ is the observed count for category $i$.  The mean of $\pi_i$ is then $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ and the variance is $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ where $\bar{\alpha_i}=\frac{\alpha_i}{\alpha_o}$ and $\alpha_o=\sum_j \alpha_j$.  The Jeffreys prior for a multinomial model is the $Dirichlet(\frac{1}{2},\frac{1}{2},...,\frac{1}{2})$.
+
+For each category, $i$, we can model a Gamma distribution $Gamma(\alpha_i+y_i,1)$ and then normalize across these to get the Dirichlet over probabilities  This is useful for sampling from the posterior distribution.  This can be interpreted such that the prior mean $E_i=\frac{\alpha_i}{\sum \alpha_i}$.  The posterior mean therefore is $E(\theta_i|y)=\frac{\alpha_i+Y_i}{\sum_{j}(\alpha_j+y_j)}$.  
+
+#### Example using a multinomial distribution
+
+
+::: {.cell}
+
+```{.r .cell-code}
+counts <- c(4,2,0)
+```
+:::
+
+
+Lets say we have three categories with observed counts 4, 2, 0.  We set a prior of $Dirichlet(\frac{1}{2},\frac{1}{2},\frac{1}{2})$. Using this, our updated posterior is $Dirichlet(\frac{1}{2}+4,\frac{1}{2}+2,\frac{1}{2}+0)=Dirichlet(4.5, 2.5, 0.5)$.  Based on this, the posterior mean is 0.6, 0.3333333, 0.0666667 with a variance of 0.0282353, 0.0261438, 0.0073203.  This is visualized here:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+set.seed(1)
+N <- 50000
+
+mn.data <- data.frame(Gamma_A = rgamma(N, shape = 0.5+counts[1], rate = 1),
+                      Gamma_B = rgamma(N, shape = 0.5+counts[2], rate = 1),
+                      Gamma_C = rgamma(N, shape = 0.5+counts[3], rate = 1)) |>
+  mutate(
+    Dirichlet_A = Gamma_A / (Gamma_A + Gamma_B + Gamma_C),
+    Dirichlet_B = Gamma_B / (Gamma_A + Gamma_B + Gamma_C),
+    Dirichlet_C = Gamma_C / (Gamma_A + Gamma_B + Gamma_C)
+  ) |>
+  pivot_longer(everything(),
+               names_to = c('distribution',"variable"),
+               names_sep = "_",
+               values_to = "value")
+  
+mn.data |>
+  filter(distribution=="Gamma") |>
+  ggplot(aes(col = variable,x=value)) +
+  geom_density() +
+  theme_classic(base_size=16)+
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Gamma draws \n(unnormalized)",
+       y='density') -> gamma.plot
+
+mn.data |>
+  filter(distribution=="Dirichlet") |>
+  ggplot(aes(col = variable,x=value)) +
+  geom_density() +
+  theme_classic(base_size=16)+
+  theme(legend.position=c(0.8,0.8)) +
+  labs(title="Dirichlet marginals",
+       y='density') -> dirichlet.plot
+
+library(cowplot)
+plot_grid(gamma.plot,dirichlet.plot,nrow=1)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/multinomial-distribution-1.png){width=672}
+:::
+:::
+
+
+## Monte Carlo Sampling to Estimate Parameters
+
+### Linear Regression
+
+Lets say we are performing a linear regression, described by $y = \alpha + \beta \cdot x_1 + \epsilon$ where $\epsilon \sim N(0,\frac{1}{\tau})$.  The natural conjugate priors for each parameter are $\alpha \sim N(\mu_{\alpha},\frac{1}{\tau^2_{\alpha}})$, $\beta \sim N(\mu_{\beta},\frac{1}{\tau^2_{\beta}})$ and $\tau^2 \sim Gamma(\alpha_{\tau},\beta_{\tau})$.  The marginal posterior distributions are algebraically messy, and Gibbs sampling provides a convenient way to sample from them.  However we can use Monte Carlo sampling to estimate the posterior distribution of each parameter.  This is done by iteratively sampling from the conditional posterior distributions of each parameter given the current values of the other parameters.  This is known as Gibbs sampling.  The conditional posterior distributions are: 
+
+$$\alpha | \beta, \sigma^2, y, x \sim N(\mu_{\alpha}^{},\tau_{\alpha}^{2}) \\
+\beta | \alpha, \tau^2, y, x \sim N(\mu_{\beta},\tau^2_{\beta}) \\
+\tau^2_{\epsilon} | \alpha, \beta, x, y \sim Gamma(
+\alpha_{\epsilon} + \frac{n}{2}, \beta_{\epsilon} +\frac{1}{2}\sum^n_{i=1}{(y-\alpha-\beta\cdot x_i)^2})$$
+
+These conditionals can be solved by monte carlo chains, which  should converge to the true joint posterior under most conditions.  Gibbs sampling proceeds by iteratively sampling from these full conditional posterior distributions. Each update conditions on the most recent values of the remaining parameters, defining a Markov chain whose stationary distribution is the joint posterior distribution of ($\alpha, \beta, \tau$). After an initial burn-in period, samples from the chain can be used to approximate marginal posterior distributions, credible intervals, and posterior predictive quantities.
+
+This only works if there are known conjugacies between priors and posteriors, or if there are many parameters from which to sample from.  In this case we can use the Metropolis-Hastings sampling algorithm to sample from the posterior distribution.  This works by proposing new values for each parameter based on a proposal distribution, and then accepting or rejecting the proposed values based on the ratio of the posterior probabilities of the proposed and current values.  This allows us to sample from the posterior distribution even when there are no conjugate priors.
+
+### Evaluating Sampling Chains using`.
+
+Chain convergence is important to ensure stability of estimates. The `coda` package has a variety of tools to assist in evaluating convergence of MCMC chains.  Here is an example of how to use `coda` to evaluate convergence of a simple MCMC chain.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+library(coda)
+
+set.seed(123)
+
+n_iter <- 2000
+
+good_chain1 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_chain2 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_chain3 <- cbind(
+  alpha = rnorm(n_iter, 0, 1),
+  beta  = rnorm(n_iter, 2, 0.5)
+)
+
+good_mcmc <- mcmc.list(
+  mcmc(good_chain1),
+  mcmc(good_chain2),
+  mcmc(good_chain3)
+)
+
+bad_chain1 <- cbind(
+  alpha = cumsum(rnorm(n_iter, 0.02, 0.5)),
+  beta  = rnorm(n_iter, 1, 0.2)
+)
+
+bad_chain2 <- cbind(
+  alpha = rnorm(n_iter, 5, 0.3),
+  beta  = rnorm(n_iter, 3, 0.2)
+)
+
+bad_chain3 <- cbind(
+  alpha = rnorm(n_iter, -5, 0.3),
+  beta  = rnorm(n_iter, 0, 0.2)
+)
+
+bad_mcmc <- mcmc.list(
+  mcmc(bad_chain1),
+  mcmc(bad_chain2),
+  mcmc(bad_chain3)
+)
+
+tidy_mcmc <- function(mcmc_list, label) {
+  as.data.frame(as.matrix(mcmc_list)) |>
+    mutate(iter = row_number(),
+           chain = rep(1:length(mcmc_list), each = n_iter),
+           dataset = label) |>
+    pivot_longer(cols = c(alpha, beta),
+                 names_to = "parameter",
+                 values_to = "value")
+}
+
+df_good <- tidy_mcmc(good_mcmc, "Converged")
+df_bad  <- tidy_mcmc(bad_mcmc,  "Not converged")
+
+df_all <- bind_rows(df_good, df_bad)
+
+trace_plot <- ggplot(df_all,
+                     aes(x = iter, y = value, color = factor(chain))) +
+  geom_line(alpha = 0.6) +
+  facet_grid(dataset ~ parameter, scales = "free_y") +
+  labs(color = "Chain",
+       title = "Trace plots: converged vs non-converged") +
+  theme_bw(base_size = 12)
+
+trace_plot
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-1.png){width=672}
+:::
+
+```{.r .cell-code}
+density_plot <- ggplot(df_all,
+                       aes(x = value, fill = factor(chain))) +
+  geom_density(alpha = 0.4) +
+  facet_grid(dataset ~ parameter, scales = "free") +
+  labs(fill = "Chain",
+       title = "Posterior densities by chain") +
+  theme_bw(base_size = 12)
+
+density_plot
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-2.png){width=672}
+:::
+
+```{.r .cell-code}
+#calcualate effective sample sizes
+ess_good <- effectiveSize(good_mcmc)
+ess_bad  <- effectiveSize(bad_mcmc)
+
+ess_good |> kable(caption="Effective sample size for converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Effective sample size for converged chains
+
+|      |        x|
+|:-----|--------:|
+|alpha | 6415.821|
+|beta  | 5948.834|
+
+
+:::
+
+```{.r .cell-code}
+ess_bad |> kable(caption="Effective sample size for poorly converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Effective sample size for poorly converged chains
+
+|      |        x|
+|:-----|--------:|
+|alpha | 3449.665|
+|beta  | 6265.442|
+
+
+:::
+
+```{.r .cell-code}
+#calcualte Gelman-Rubin statistics
+gelman_good <- gelman.diag(good_mcmc)
+gelman_bad  <- gelman.diag(bad_mcmc)
+
+tidy_gelman <- function(gelman_obj) {
+
+  as.data.frame(gelman_obj$psrf) |>
+    mutate(
+      parameter = rownames(gelman_obj$psrf)
+    ) |>
+    rename(
+      rhat = `Point est.`,
+      rhat_upper = `Upper C.I.`
+    ) |>
+    select(parameter, rhat, rhat_upper)
+}
+gelman_good |> tidy_gelman() |> kable(caption="Gelman-Rubin statistics for converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Gelman-Rubin statistics for converged chains
+
+|      |parameter |      rhat| rhat_upper|
+|:-----|:---------|---------:|----------:|
+|alpha |alpha     | 1.0013087|   1.005827|
+|beta  |beta      | 0.9997171|   1.000248|
+
+
+:::
+
+```{.r .cell-code}
+gelman_bad |> tidy_gelman() |> kable(caption="Gelman-Rubin statistics for poorly converged chains")
+```
+
+::: {.cell-output-display}
+
+
+Table: Gelman-Rubin statistics for poorly converged chains
+
+|      |parameter |      rhat| rhat_upper|
+|:-----|:---------|---------:|----------:|
+|alpha |alpha     |  2.666946|   14.68917|
+|beta  |beta      | 11.430209|   21.85569|
+
+
+:::
+
+```{.r .cell-code}
+gelman.plot(good_mcmc)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-3.png){width=672}
+:::
+
+```{.r .cell-code}
+gelman.plot(bad_mcmc)
+```
+
+::: {.cell-output-display}
+![](Bayesian-Learning-Notes_files/figure-html/mcmc-coda-4.png){width=672}
+:::
+
+```{.r .cell-code}
+heidel_good <- heidel.diag(good_mcmc)
+heidel_bad  <- heidel.diag(bad_mcmc)
+```
+:::
+
+
+## Summary Tables
+
+### Predictive Probability Distributions
+
+These are always larger due to the uncertainty in new predictions than the posterior probabilities.  They are summarized here:
+
+| Distribution | Conjugate Prior | Predictive Posterior |
+| -- | -- | -- |
+| Binomial | Beta | Beta-Binomial |
+| Bernoulli | Beta | Beta-Bernoulli |
+| Normal (known $\sigma$) | Normal |Normal |
+| Normal (unknown $\sigma$) | Normal-Inverse Gamma |$t$ |
+| Poisson | Gamma | Negative Binomial | 
+| Multinomial | Dirichlet | Dirichlet-Multinomial |
+ 
+### Summary of Conjugate Priors
+
+| Distribution | Prior | Updated Posterior | Mean | Mode | Variance |
+| --- | --- | --- | --- | --- | ----| 
+| $Binomial(n,\theta)$ | $Beta(\alpha, \beta)$ | $Beta(\alpha + y_o, \beta+n-y_o)$ | $\frac{\alpha}{\alpha + \beta}$  | $\frac{\alpha-1}{\alpha + \beta - 2}$ |$\frac{\alpha \cdot \beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}$ |
+| $N(\mu,\sigma^2)$ known mean | $InvGamma(\alpha,\beta)$ | $InvGamma(\alpha + \frac{n}{2},\beta + \frac{SS}{2})$ | $\frac{\beta}{\alpha-1}$  | $\frac{\beta}{\alpha+1}$ |$\frac{\beta^2}{(\alpha-1)^2(\alpha-2)}$  |
+|$N(\mu,\sigma^2)$ known variance | $N(\mu_o,\tau^2_o)$| $N\left(
+\frac{\frac{\mu_0}{\tau_0^2} + \frac{n \cdot \bar{y}}{\sigma^2}}
+{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}},
+\;
+\frac{1}{\frac{1}{\tau_0^2} + \frac{n}{\sigma^2}}
+\right)$ | $\mu$ | $\mu$ | $\sigma^2$|
+| $N(\mu,\sigma^2)$ | $N-InvGamma(\mu_0, \kappa_0,\alpha_0,\beta_0)$ | $\mu|y ~\sim t(\frac{\kappa_0 \cdot \mu_0 + n \cdot \bar{y}}{\kappa_0+n},\sqrt{\frac{\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2}{\alpha_0+\frac{n}{2} \cdot \kappa_0+n}})$$\sigma^2∣y∼InvGamma(\alpha_0+\frac{n}{2},\beta_0+\frac{SS}{2}+\frac{\kappa_0 \cdot n}{2\kappa_0+n}\cdot{(\bar{y}-\mu_0})^2)$ | $\mu$ \ $\frac{\beta}{\alpha-1}$| $\mu$ \ $\frac{\beta}{\alpha+1}$ | $\frac{\beta}{(\alpha-1)\cdot\kappa}$ $\frac{\beta^2}{(\alpha-1)^2\cdot(\alpha-2)}$|
+| $\text{Poisson}(\gamma)$ | $\text{Gamma}(\alpha,\beta)$ | $\text{Gamma}(\alpha+n\cdot \bar{y}, \beta+n)$ | $\frac{\alpha}{\beta}$ | $\frac{\alpha-1}{\beta}$ | $\frac{\alpha}{\beta^2}$ | 
+| $\text{Multinomial}(N,\pi)$ | $\text{Dirichlet}(\alpha+y_1...\alpha_k+y_k)$| $\frac{\alpha_i+y_i}{\sum_j(\alpha_j+y_j)}$ | $\frac{\alpha_i}{\alpha_o}$| $\frac{\alpha_i-1}{\alpha_o-K}$| $\frac{\bar{\alpha_i}(1-\bar{\alpha_i})}{\alpha_o+1}$ |
+
+In these tables:
+
+- $\alpha$ and $\beta$ vary depending on the model:
+    - For inverse gamma distributions $\alpha=\text{successes}+1$ and $\beta=\text{failures}+1$. 
+    - For normal distributions if using existing data, one heuristic could be $\alpha=\frac{\kappa}{2}$ (prior degrees of freedom) and $\beta=\frac{\sigma^2\cdot\kappa}{2}$ (prior total sum of squares)
+    - For poisson distributions, $\beta$ is the number of prior observations and $\alpha$ is the sum of events from those prior observations.
+    - For dirichlet, $\alpha_i$ is the prior pseudo-count for category $i$ and $\alpha_o$ is $\alpha_0 = \sum\limits_{i=1}^{K}$, the sum of all the alphas from 1 to k, the prior sample size.
+- $n$ is the number of new trials.
+- $y_o$ is the number of successes.
+- $SS$ is the sum of squares of the new data.
+- $\mu$ is the (known in some cases) mean, or the prior pseudo observation.
+- $\sigma^2$ is the (known in some cases) variance.
+- $\bar{y}$ is the mean of the new data.
+- $\kappa$ is the strength of the prior belief in $\mu$, or the effective sample size
+
+### Posterior and Predictive Probabilities with Jeffreys Priors
+
+| Distribution                | Likelihood                                              | Jeffreys prior                                          | Posterior (parameters)                                        | Predictive (new data)                                                     |
+| --------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Bernoulli / Binomial        | $y \sim \mathrm{Binomial}(n,p)$                         | $p(p)\propto [p(1-p)]^{-1/2}$                           | $p\mid y \sim \mathrm{Beta}(y+1/2,;n-y+1/2)$                  | $y_{\text{new}}\mid y \sim \mathrm{Beta\text{-}Binomial}$                 |
+| Poisson                     | $y_i \sim \mathrm{Poisson}(\lambda)$                    | $p(\lambda)\propto \lambda^{-1/2}$                      | $\lambda\mid y \sim \mathrm{Gamma}(\sum y_i+1/2,;n)$          | $y_{\text{new}}\mid y \sim \mathrm{Neg.\ Binomial}$                       |
+| Multinomial                 | $\mathbf y \sim \mathrm{Multinomial}(n,\boldsymbol\pi)$ | $\boldsymbol\pi \sim \mathrm{Dirichlet}(1/2,\dots,1/2)$ | $\boldsymbol\pi\mid y \sim \mathrm{Dirichlet}(y_1+1/2,\dots)$ | $\mathbf y_{\text{new}}\mid y \sim \mathrm{Dirichlet\text{-}Multinomial}$ |
+| Normal (μ unknown, σ known) | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\mu)\propto 1$                                       | $\mu\mid y \sim \mathcal N(\bar y,\sigma^2/n)$                | $y_{\text{new}}\mid y \sim \mathcal N(\bar y,\sigma^2(1+1/n))$            |
+| Normal (μ known, σ unknown) | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\sigma^2)\propto 1/\sigma^2$                         | $\sigma^2\mid y \sim \mathrm{Inv\text{-}Gamma}(n/2,;SS/2)$    | $y_{\text{new}}\mid y \sim t_n(\mu,\sqrt{SS/n})$                          |
+| Normal (μ, σ unknown)       | $y_i\sim\mathcal N(\mu,\sigma^2)$                       | $p(\mu,\sigma^2)\propto 1/\sigma^2$                     | $\mu\mid y \sim t_{n-1}(\bar y,;s/\sqrt n)$                   | $y_{\text{new}}\mid y \sim t_{n-1}(\bar y,;s\sqrt{1+1/n})$                |
+
+
 ## References
 
 ::: {#refs}
@@ -438,20 +1191,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] invgamma_1.2    knitr_1.50      lubridate_1.9.4 forcats_1.0.1  
- [5] stringr_1.6.0   dplyr_1.1.4     purrr_1.2.0     readr_2.1.6    
- [9] tidyr_1.3.1     tibble_3.3.0    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] coda_0.19-4.1       extraDistr_1.10.0.1 cowplot_1.2.0      
+ [4] invgamma_1.2        knitr_1.51          lubridate_1.9.4    
+ [7] forcats_1.0.1       stringr_1.6.0       dplyr_1.1.4        
+[10] purrr_1.2.1         readr_2.1.6         tidyr_1.3.2        
+[13] tibble_3.3.1        ggplot2_4.0.1       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  
- [5] dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12        fastmap_1.2.0     
- [9] R6_2.6.1           labeling_0.4.3     generics_0.1.4     htmlwidgets_1.6.4 
-[13] pillar_1.11.1      RColorBrewer_1.1-3 tzdb_0.5.0         rlang_1.1.6       
-[17] stringi_1.8.7      xfun_0.54          S7_0.2.1           timechange_0.3.0  
-[21] cli_3.6.5          withr_3.0.2        magrittr_2.0.4     digest_0.6.39     
-[25] grid_4.5.2         rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.4   
-[29] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2      
-[33] rmarkdown_2.30     tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     Rcpp_1.1.1        
+ [5] tidyselect_1.2.1   dichromat_2.0-0.1  scales_1.4.0       yaml_2.3.12       
+ [9] fastmap_1.2.0      lattice_0.22-7     R6_2.6.1           labeling_0.4.3    
+[13] generics_0.1.4     htmlwidgets_1.6.4  tzdb_0.5.0         pillar_1.11.1     
+[17] RColorBrewer_1.1-3 rlang_1.1.7        stringi_1.8.7      xfun_0.55         
+[21] S7_0.2.1           otel_0.2.0         timechange_0.3.0   cli_3.6.5         
+[25] withr_3.0.2        magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
+[29] rstudioapi_0.17.1  hms_1.1.4          lifecycle_1.0.5    vctrs_0.6.5       
+[33] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       rmarkdown_2.30    
+[37] tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   
 ```
 
 
