@@ -62,13 +62,9 @@ Several papers demonstrate a role for mTORC1 in promoting BAT thermogenesis @Liu
 
 In this framing, mTORC1 causes a nutrient dissipation flux. In normal cells, a drop in nutrients would inhibit mTORC1, which then acts as a circuit breaker to this flux. However, in constitutive models (*e.g.*, TSC1/2, GATOR1, or Sestrin deletions, Rheb/Rag activation mutants, PRAS40 deletion), the circuit breaker is removed and nutrient dissipation continues.  As such, even as internal nutrient concentrations ($[N]$) fall, the cell continues to drive protein and lipid synthesis and nutrient catabolism. This intracellular scarcity is a state of starvation in the midst of plenty; the cell has the machinery to grow, but the raw materials are being dissipated faster than they can be replenished.
 
-### Decreased efficiency of nutrient metabolism
-
-### Insulin resistance
-
-Insulin resistance at a cellular level.
-
 ### The enhanced export of nutrients in models of mTORC1 activation
+
+mTORC1 governs several transport processes in physiology.  In contrast to the lens that mTORC1 activity simply promotes anabolism, there are at least three clear examples where mTORC1 promotes both synthesis and export of macronutrients (liver VLDL production, milk macronutrient secretion, and enterocyte lipid uptake), often with the balance being towards prmoting nutrient dissipation.
 
 #### mTORC1 activation models cause reduced, not enhanced liver fat
 
@@ -84,13 +80,17 @@ During lactation, the mammary gland demands high nutrient flux to synthesize and
 
 Beyond mammary epithelial cells, adipocyte mTORC1 also plays a crucial role in mobilizing lipids for milk production. Activation of mTORC1 in adipocytes increases milk lipid content in lactating mice, while reducing the size of mammary adipocytes, demonstrating how mTORC1 signaling enhances nutrient delivery to the mammary gland [^elhabbalActivationAdipocyteMTORC12021]. Similar to the phenotype in the liver, chronic activation of mTORC1 causes less lipid remaining in the mammary gland and increased secretion, in this case into milk.
 
-## Managing the boundaries of an open system
+#### Intestinal Lipid Absorption and Chylomicron Export
 
-Metabolism is, of course, not a closed system.  How should the organism respond if mTORC1 activity promotes both the dissipation and storage of nutrients?  We posit that the same processes (potential scarcity from local nutrient dissipation) signal to paradoxically increase nutrient intake and absorption.
+The intestinal enterocyte faces a unique challenge among lipid-handling cells: it must absorb, repackage, and export dietary fat without accumulating toxic levels of free fatty acids or unesterified lipids intracellularly. The enterocyte handles this by re-assembling absorbed lipids into chylomicron particles that are secreted basolaterally into the intestinal lymph. If left unpackaged, absorbed lipids can be transiently stored in cytoplasmic lipid droplets, creating a dynamic partitioning between export and storage that determines the rate of dietary lipid delivery to peripheral tissues. mTORC1 signaling appears to govern this partitioning in favor of export to the tissues, consistent with the dissipative flux model observed in liver and mammary gland.
+
+Direct evidence for mTORC1 control of chylomicron production comes from enterocyte-like Caco-2 cell models. Knockdown of encoding Raptor significantly decreased expression of lipogenic enzymes (*FASN*, *DGAT1*, *DGAT2*), lipoprotein assembly genes (*APOB*, *MTTP*), fatty acid uptake machinery (*FATP2*, *DBI*), and prechylomicron transport vesicle components (*VAMP7*, *SAR1B*), resulting in repressed secretion of apoB-containing triacylglycerol-rich lipoprotein particles [^kaurChylomicronProductionRepressed2022]. Conversely, cells with constitutively active mTORC1 showed enhanced chylomicron-like particle secretion[^kaurChylomicronProductionRepressed2022]. These findings demonstrate that mTORC1 promotes the entire chylomicron assembly pipeline from fatty acid activation and TAG re-esterification, through apoB48 lipidation by MTP, to the COPII-like vesicular transport of prechylomicrons from the ER to the Golgi.
+
+As in the liver, the phosphatidylcholine axis is a critical mechanistic link.  mTORC1 drives PC synthesis for particle coating, but the stoichiometry of the phospholipid surface coat must be balanced. Excess PC relative to other membrane lipids impairs, rather than enhances, particle formation, suggesting that mTORC1's role is to maintain sufficient flux through the Kennedy pathway to support chylomicron assembly without overwhelming the system.
+
+The net effect of mTORC1 activation in the enterocyte is thus strikingly parallel to the hepatic and mamamary epithelial phenotype: rather than just synthesizing lipid, mTORC1 activation accelerates the transit of fat *through* the enterocyte and into the lymph. mTORC1 activation in the enterocyte shifts the balance away from cytoplasmic lipid droplet storage and toward chylomicron secretion, all to move dietary lipid rapidly through and out of the absorptive cell.
 
 ### Effects on Appetite and Energy Intake
-
-### Role of mTORC1 on Nutrient Absorption
 
 ## If this About Nutrient Excess, and if so which nutrients?
 
@@ -101,7 +101,6 @@ Metabolism is, of course, not a closed system.  How should the organism respond 
 ### How does this square with mTORC1's effects on immune function
 
 ### Aging and Chronic Disease
-
 
 # References
 
@@ -126,3 +125,10 @@ Metabolism is, of course, not a closed system.  How should the organism respond 
 [^molecularCellPaper2025]: [Author et al. "Title of the Molecular Cell paper on mTORC1 and lipid metabolism." Molecular Cell, 2025. doi:placeholder (update with full citation from https://www.cell.com/molecular-cell/abstract/S1097-2765(25)00706-3).]
 [^wuEnergyDeprivationinducedAMPK2022]: Wu, Z., Q. Li, S. Yang, T. Zheng, J. Shao, W. Guan, F. Chen, and S. Zhang. 2022. “Energy Deprivation-Induced AMPK Activation Inhibits Milk Synthesis by Targeting PrlR and PGC-1α.” Cell Communication and Signaling 20(1):25. doi:[10.1186/s12964-022-00830-6](https://pubmed.ncbi.nlm.nih.gov/35248054/).
 [^elhabbalActivationAdipocyteMTORC12021]: El Habbal, Noura, Allison C. Meyer, Hannah Hafner, JeAnna R. Redd, Zach Carlson, Molly C. Mulcahy, Brigid Gregg, and Dave Bridges. 2021. “Activation of Adipocyte mTORC1 Increases Milk Lipids in a Mouse Model of Lactation.” bioRxiv doi:[10.1101/2021.07.01.450596](https://www.biorxiv.org/content/10.1101/2021.07.01.450596v1).
+[^kaurChylomicronProductionRepressed2022]: Kaur H, Moreau R. Chylomicron production is repressed by RPTOR knockdown, R-α-lipoic acid and 4-phenylbutyric acid in human enterocyte-like Caco-2 cells. *J Nutr Biochem*. 2022;108:109087. doi:[10.1016/j.jnutbio.2022.109087](https://doi.org/10.1016/j.jnutbio.2022.109087)
+
+[^zhangLipin23Phosphatidic2019]: Zhang P, Csaki LS, Ronquillo E, Baufeld LJ, Lin JY, Gutierrez A, Dwyer JR, Brindley DN, Fong LG, Tontonoz P, Young SG, Reue K. Lipin 2/3 phosphatidic acid phosphatases maintain phospholipid homeostasis to regulate chylomicron synthesis. *J Clin Invest*. 2019;129(1):281–295. doi:[10.1172/JCI122595](https://doi.org/10.1172/JCI122595). PMCID: [PMC6307960](https://pmc.ncbi.nlm.nih.gov/articles/PMC6307960/)
+
+[^quinnMTORC1StimulatesPhosphatidylcholine2017]: Quinn WJ III, et al. mTORC1 stimulates phosphatidylcholine synthesis to promote triglyceride secretion. *J Clin Invest*. 2017;127(11):4126–4136. doi:[10.1172/JCI96578](https://doi.org/10.1172/JCI96578)
+
+[^arifEPRSmTORC1S6K2017]: Arif A, Terenzi F, Potdar AA, Jia J, Sacks J, Chen A, Mishra P, Nussinov R, Fox PL. EPRS is a critical mTORC1–S6K1 effector that influences adiposity in mice. *Nature*. 2017;542(7641):357–361. doi:[10.1038/nature21380](https://doi.org/10.1038/nature21380)
