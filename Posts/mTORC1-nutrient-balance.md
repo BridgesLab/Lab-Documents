@@ -80,7 +80,9 @@ The mechanism f or mTORC1 control of VLDL efflux involves mTORC1-driven phosphat
 
 #### Lactation and Nutrient Delivery
 
-Similarly, in the mammary gland, this drive supports the high-flux delivery of nutrients during lactation.
+During lactation, the mammary gland demands high nutrient flux to synthesize and secrete milk components. Prolactin, the master regulator of lactation, activates mTORC1 in mammary epithelial cells to promote milk protein synthesis and epithelial cell proliferation [^wuEnergyDeprivationinducedAMPK2022]. This mTORC1 activation may translating detected nutrient excess into milk production, further supporting the dissipative model where mTORC1 drives anabolic processes in response to nutrient availability.
+
+Beyond mammary epithelial cells, adipocyte mTORC1 also plays a crucial role in mobilizing lipids for milk production. Activation of mTORC1 in adipocytes increases milk lipid content in lactating mice, while reducing the size of mammary adipocytes, demonstrating how mTORC1 signaling enhances nutrient delivery to the mammary gland [^elhabbalActivationAdipocyteMTORC12021]. Similar to the phenotype in the liver, chronic activation of mTORC1 causes less lipid remaining in the mammary gland and increased secretion, in this case into milk.
 
 ## Managing the boundaries of an open system
 
@@ -122,3 +124,5 @@ Metabolism is, of course, not a closed system.  How should the organism respond 
 [^luFeedingInducesCholesterol2020]: Lu, Xiao-Yi, Xiong-Jie Shi, Ao Hu, Ju-Qiong Wang, Yi Ding, Wei Jiang, Ming Sun, Xiaolu Zhao, Jie Luo, Wei Qi, and Bao-Liang Song. 2020. “Feeding Induces Cholesterol Biosynthesis via the mTORC1–USP20–HMGCR Axis.” Nature 588(7838):479–84. doi:[10.1038/s41586-020-2928-y](http://dx.doi.org/10.1038/s41586-020-2928-y).
 [^quinnMTORC1StimulatesPhosphatidylcholine2017]: Quinn, William J., III, Min Wan, Swapnil V. Shewale, Rebecca Gelfer, Daniel J. Rader, Morris J. Birnbaum, and Paul M. Titchenell. 2017. “mTORC1 Stimulates Phosphatidylcholine Synthesis to Promote Triglyceride Secretion.” Journal of Clinical Investigation 127(11):4207–4215. doi:[10.1172/JCI96036](https://www.jci.org/articles/view/96036).
 [^molecularCellPaper2025]: [Author et al. "Title of the Molecular Cell paper on mTORC1 and lipid metabolism." Molecular Cell, 2025. doi:placeholder (update with full citation from https://www.cell.com/molecular-cell/abstract/S1097-2765(25)00706-3).]
+[^wuEnergyDeprivationinducedAMPK2022]: Wu, Z., Q. Li, S. Yang, T. Zheng, J. Shao, W. Guan, F. Chen, and S. Zhang. 2022. “Energy Deprivation-Induced AMPK Activation Inhibits Milk Synthesis by Targeting PrlR and PGC-1α.” Cell Communication and Signaling 20(1):25. doi:[10.1186/s12964-022-00830-6](https://pubmed.ncbi.nlm.nih.gov/35248054/).
+[^elhabbalActivationAdipocyteMTORC12021]: El Habbal, Noura, Allison C. Meyer, Hannah Hafner, JeAnna R. Redd, Zach Carlson, Molly C. Mulcahy, Brigid Gregg, and Dave Bridges. 2021. “Activation of Adipocyte mTORC1 Increases Milk Lipids in a Mouse Model of Lactation.” bioRxiv doi:[10.1101/2021.07.01.450596](https://www.biorxiv.org/content/10.1101/2021.07.01.450596v1).
