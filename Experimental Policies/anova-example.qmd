@@ -1,8 +1,11 @@
 ---
 title: "Explanation of How to Do An ANOVA"
 author: "Dave Bridges"
-date: today
-format: html
+date: "2026-04-29"
+format: 
+  html:
+    toc: true
+    toc-location: right
 theme: journal
 execute:
   keep-md: true
@@ -16,14 +19,18 @@ bibliography: references.bib
 library(tidyverse)
 library(emmeans)
 library(car)
+library(broom)
+library(knitr)
 ```
 
 ```{r data-creation}
 set.seed(42)
 balloon.data <- data.frame(
-  color = c(rep("green", 6), rep("red", 12), rep("blue", 6)),
-  shape = rep(c("square", "circle"), 12),
-  size  = rpois(24, lambda = 5) * abs(rnorm(24))
+  color = rep(c("blue", "green", "red"), each = 8),
+  shape = rep(c("circle", "square"), 12),
+  size  = c(rnorm(8, mean = 6, sd = 2),
+            rnorm(8, mean = 5, sd = 2),
+            rnorm(8, mean = 7, sd = 2))
 ) |>
   mutate(
     color = factor(color, levels = c("blue", "green", "red")),
@@ -31,21 +38,40 @@ balloon.data <- data.frame(
   )
 ```
 
-Setting factor levels explicitly (here `blue` and `circle` are the reference categories) ensures that contrasts have the direction you expect when interpreting results.
+Setting factor levels explicitly (here `blue` and `circle` are the reference categories) ensures that contrasts have the direction you expect when interpreting results. The design is balanced — 8 observations per color — which simplifies the sums-of-squares decomposition (see the Two-Way ANOVA section).
 
 # Check Distribution of Your Data
 
-First check the distribution of your groups using a Shapiro-Wilk test for normality, then check the assumption of equal variance with Levene's test.
+Before fitting models, screen for gross departures from normality using Shapiro-Wilk tests and check the assumption of equal variance with Levene's test.
 
-```{r shapiro-test}
-with(balloon.data, tapply(size, shape,
-                          FUN = function(x) shapiro.test(x)$p.value))
-with(balloon.data, tapply(size, list(color, shape),
-                          FUN = function(x) shapiro.test(x)$p.value))
+**Important caveat on power:** with small group sizes (n = 6–8), these pre-screening tests have very low statistical power — a non-significant result does not guarantee normality or equal variance. The more reliable check is a Shapiro-Wilk test on the model *residuals* after fitting, which pools information across all groups and is what ANOVA actually assumes. See the Assumptions section for that test. The cell-by-cell checks here are only a rough initial screen.
+
+```{r shapiro-by-shape}
+balloon.data |>
+  group_by(shape) |>
+  summarise(
+    W       = shapiro.test(size)$statistic,
+    p.value = shapiro.test(size)$p.value,
+    .groups = "drop"
+  ) |>
+  kable(digits = 3, caption = "Shapiro-Wilk test by shape")
+```
+
+```{r shapiro-by-cell}
+balloon.data |>
+  group_by(color, shape) |>
+  summarise(
+    W       = shapiro.test(size)$statistic,
+    p.value = shapiro.test(size)$p.value,
+    .groups = "drop"
+  ) |>
+  kable(digits = 3, caption = "Shapiro-Wilk test by color and shape")
 ```
 
 ```{r levene-test}
-leveneTest(size ~ color * shape, data = balloon.data)
+leveneTest(size ~ color * shape, data = balloon.data) |>
+  tidy() |>
+  kable(digits = 3, caption = "Levene's test for homogeneity of variance")
 ```
 
 If the data are non-normal or variances are unequal, consider transforming the dependent variable (e.g. `log(size)`) or using a non-parametric alternative (see the Assumptions section).
@@ -56,11 +82,18 @@ Use a one-way ANOVA when you have a single categorical predictor.
 
 ```{r one-way-anova}
 # Two-level factor — equivalent to a two-sample t-test with equal variances
-summary(aov(size ~ shape, data = balloon.data))
-t.test(size ~ shape, data = balloon.data, var.equal = TRUE)
+aov(size ~ shape, data = balloon.data) |> 
+  tidy() |>
+  kable(caption= "One-way ANOVA with two levels of shape")
+
+t.test(size ~ shape, data = balloon.data, var.equal = TRUE) |>
+  tidy() |>
+  kable(digits = 3, caption = "Two-sample t-test (equal variances)")
 
 # Three-level factor
-summary(aov(size ~ color, data = balloon.data))
+aov(size ~ color, data = balloon.data) |>
+  tidy() |>
+  kable(digits = 3, caption = "One-way ANOVA with three levels of color")
 ```
 
 ## Post-Hoc Comparisons for One-Way ANOVA
@@ -71,11 +104,15 @@ A significant omnibus F-test tells you that *some* groups differ, but not which 
 balloon.lm.color <- lm(size ~ color, data = balloon.data)
 
 # Estimated marginal means
-emmeans(balloon.lm.color, ~ color)
+emmeans(balloon.lm.color, ~ color) |>
+  as_tibble() |>
+  kable(digits = 2, caption = "Estimated marginal means by color")
 
 # All pairwise contrasts, Tukey-adjusted
 emmeans(balloon.lm.color, ~ color) |>
-  pairs(adjust = "tukey")
+  pairs(adjust = "tukey") |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Pairwise contrasts (Tukey-adjusted)")
 ```
 
 `emmeans` works with any model object (`lm`, `lmer`, `glm`, etc.) and integrates cleanly into tidyverse pipelines, making it more flexible than the older `TukeyHSD()` or `glht()` approaches.
@@ -84,14 +121,19 @@ emmeans(balloon.lm.color, ~ color) |>
 
 Use a two-way ANOVA when two categorical predictors may jointly affect your outcome.
 
-## Always Fit the Full Interaction Model
+## For a 2×2 Design, Always Fit the Full Interaction Model
 
 ```{r two-way-fit}
 balloon.lm <- lm(size ~ color * shape, data = balloon.data)
-anova(balloon.lm)
+
+car::Anova(balloon.lm, type = "III") |>
+  tidy() |>
+  kable(digits = 3, caption = "Type III ANOVA table")
 ```
 
-`anova()` gives an F-test for each term, including the `color:shape` interaction. The interaction p-value tests whether the effect of color depends on shape (and vice versa).
+`car::Anova()` with `type = "III"` gives each term's F-test conditioned on all other terms in the model. This is equivalent to `anova()` for balanced designs but gives the correct result for unbalanced designs (unequal group sizes), where the base-R `anova()` function uses sequential Type I sums of squares whose values depend on the order terms are written in the formula. Using Type III throughout is the safer habit.
+
+The interaction p-value tests whether the effect of color depends on shape (and vice versa).
 
 ### Why Not Drop the Interaction and Refit an Additive Model?
 
@@ -99,18 +141,22 @@ A common but problematic workflow is: *if the interaction p ≥ 0.05, drop the t
 
 1. **Pre-testing inflates Type I error.** Conditioning the reported main-effect inference on the outcome of the interaction test miscalibrates standard errors and p-values in the second model. Type I error rates can drift to 7–10% even when the nominal level is 5%.
 
-2. **Failure to reject ≠ no interaction.** Interaction tests are underpowered relative to main-effect tests — you typically need ~4× the sample size to detect an interaction of equivalent magnitude. Especially with small group sizes, you will almost always fail to reject the interaction null, but that does not mean the interaction is absent.
+2. **Failure to reject ≠ no interaction.** Interaction tests require substantially larger samples than main-effect tests to detect effects of equivalent magnitude — the deficit grows with the number of factor levels. With small group sizes you will almost always fail to reject the interaction null, but that does not mean the interaction is absent.
 
 3. **The additive model assumes additivity.** Fitting `size ~ color + shape` when the true data-generating process includes an interaction underestimates uncertainty and can bias main-effect estimates.
 
-The solution is to **always retain the interaction model and use `emmeans` to extract the quantities of interest** — marginal main effects and, when warranted, simple effects — all from the same fit with one residual variance estimate.
+The solution is to **retain the interaction model and use `emmeans` to extract the quantities of interest** — marginal main effects and, when warranted, simple effects — all from the same fit with one residual variance estimate.
+
+**When does this advice apply?** For a designed experiment with a small number of primary factors (e.g. a 2×2 diet × treatment design), the interaction is scientifically plausible and pre-specified, so it should stay in the model regardless of its p-value. The argument is weaker when your model contains many covariates: with $k$ predictors there are $k(k-1)/2$ pairwise interactions, and including them all burns degrees of freedom, causes collinearity, and risks overfitting. For nuisance covariates included only to improve precision (e.g. body weight in an ANCOVA), their interaction with the primary factor is usually not of scientific interest and need not be fitted. The key principle is that interactions should be included because they are scientifically motivated, not because a pre-test happened to reject — and excluded for the same reason, not because a pre-test failed to reject.
 
 ## Cell Means
 
 Cell means are the model-predicted group averages at every combination of the two factors.
 
 ```{r cell-means}
-emmeans(balloon.lm, ~ color * shape)
+emmeans(balloon.lm, ~ color * shape) |>
+  as_tibble() |>
+  kable(digits = 2, caption = "Cell means (estimated marginal means)")
 ```
 
 ## Marginal Main Effects
@@ -120,11 +166,15 @@ Marginal main effects answer: *what is the average effect of color, averaging ac
 ```{r marginal-effects}
 # Average effect of color (averaged over both shapes)
 emmeans(balloon.lm, ~ color) |>
-  pairs(adjust = "tukey")
+  pairs(adjust = "tukey") |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrasts for color (Tukey-adjusted)")
 
 # Average effect of shape (averaged over all colors)
 emmeans(balloon.lm, ~ shape) |>
-  pairs(adjust = "tukey")
+  pairs(adjust = "tukey") |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrast for shape (Tukey-adjusted)")
 ```
 
 These contrasts come from the same interaction model — `emmeans` computes them by averaging the cell means over the levels of the other factor. They represent the *average* simple effect, without assuming the effect is constant across levels of the other factor.
@@ -136,18 +186,22 @@ Simple effects answer: *what is the effect of color within each level of shape s
 ```{r simple-effects}
 # Effect of color within each shape
 emmeans(balloon.lm, ~ color | shape) |>
-  pairs(adjust = "tukey")
+  pairs(adjust = "tukey") |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Simple effects: color within each shape (Tukey-adjusted)")
 
 # Effect of shape within each color
 emmeans(balloon.lm, ~ shape | color) |>
-  pairs(adjust = "tukey")
+  pairs(adjust = "tukey") |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Simple effects: shape within each color (Tukey-adjusted)")
 ```
 
 ## What to Report
 
 | Quantity | Question answered | Code |
 |---|---|---|
-| Interaction F-test | Do effects combine non-additively? | `anova(balloon.lm)` |
+| Interaction F-test | Do effects combine non-additively? | `car::Anova(fit, type = "III")` |
 | Cell EMMs | Predicted mean at each group combination | `emmeans(fit, ~ color * shape)` |
 | Marginal main effects | Average effect of A across levels of B | `emmeans(fit, ~ A) |> pairs()` |
 | Simple effects | Effect of A within each level of B | `emmeans(fit, ~ A | B) |> pairs()` |
@@ -156,31 +210,46 @@ Always report the interaction test and marginal main effects. If the interaction
 
 ## Multiple Testing Across Many Outcomes
 
-If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives:
+If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
 
 ```{r multiple-testing}
-#| eval: false
-# Example: collect contrast p-values from many outcomes then adjust together
-results |>
-  mutate(p.adj = p.adjust(p.value, method = "BH"))
+# Collect marginal contrasts for both factors into one table, then adjust together
+color_contrasts <- emmeans(balloon.lm, ~ color) |>
+  pairs() |>
+  as_tibble() |>
+  mutate(factor = "color")
+
+shape_contrasts <- emmeans(balloon.lm, ~ shape) |>
+  pairs() |>
+  as_tibble() |>
+  mutate(factor = "shape")
+
+bind_rows(color_contrasts, shape_contrasts) |>
+  mutate(p.adj = p.adjust(p.value, method = "BH")) |>
+  select(factor, contrast, estimate, SE, df, t.ratio, p.value, p.adj) |>
+  kable(digits = 3, caption = "All marginal contrasts with BH-adjusted p-values")
 ```
 
 # Assumptions of ANOVA Analyses
 
-Although ANOVA is fairly robust to non-normality when group sizes are equal, the assumptions should be checked.
+Although ANOVA is fairly robust to non-normality when group sizes are equal, the assumptions should be verified. Checking normality on the model residuals (rather than cell-by-cell) is the primary approach — it directly tests what the model assumes and uses all residuals together for better power.
 
-```{r assumptions}
-# Residual normality
-shapiro.test(residuals(balloon.lm))
+```{r residual-normality}
+shapiro.test(residuals(balloon.lm)) |>
+  tidy() |>
+  kable(digits = 3, caption = "Shapiro-Wilk test on model residuals")
+```
 
-# Fitted vs. residuals plot to check homoscedasticity
+```{r residual-plot}
 plot(balloon.lm, which = 1)
 ```
 
 If data are non-normal, consider transforming the dependent variable (e.g. `log(size)`). For one-way designs a non-parametric Kruskal-Wallis test is also available, though it does not extend naturally to factorial designs.
 
 ```{r non-parametric}
-kruskal.test(size ~ color, data = balloon.data)
+kruskal.test(size ~ color, data = balloon.data) |>
+  tidy() |>
+  kable(digits = 3, caption = "Kruskal-Wallis test (one-way non-parametric alternative)")
 ```
 
 # References
