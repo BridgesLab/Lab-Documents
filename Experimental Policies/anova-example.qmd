@@ -1,0 +1,196 @@
+---
+title: "Explanation of How to Do An ANOVA"
+author: "Dave Bridges"
+date: today
+format: html
+theme: journal
+execute:
+  keep-md: true
+  message: false
+  warning: false
+editor: source
+bibliography: references.bib
+---
+
+```{r libraries}
+library(tidyverse)
+library(emmeans)
+library(car)
+```
+
+```{r data-creation}
+set.seed(42)
+balloon.data <- data.frame(
+  color = c(rep("green", 6), rep("red", 12), rep("blue", 6)),
+  shape = rep(c("square", "circle"), 12),
+  size  = rpois(24, lambda = 5) * abs(rnorm(24))
+) |>
+  mutate(
+    color = factor(color, levels = c("blue", "green", "red")),
+    shape = factor(shape, levels = c("circle", "square"))
+  )
+```
+
+Setting factor levels explicitly (here `blue` and `circle` are the reference categories) ensures that contrasts have the direction you expect when interpreting results.
+
+# Check Distribution of Your Data
+
+First check the distribution of your groups using a Shapiro-Wilk test for normality, then check the assumption of equal variance with Levene's test.
+
+```{r shapiro-test}
+with(balloon.data, tapply(size, shape,
+                          FUN = function(x) shapiro.test(x)$p.value))
+with(balloon.data, tapply(size, list(color, shape),
+                          FUN = function(x) shapiro.test(x)$p.value))
+```
+
+```{r levene-test}
+leveneTest(size ~ color * shape, data = balloon.data)
+```
+
+If the data are non-normal or variances are unequal, consider transforming the dependent variable (e.g. `log(size)`) or using a non-parametric alternative (see the Assumptions section).
+
+# One-Way ANOVA
+
+Use a one-way ANOVA when you have a single categorical predictor.
+
+```{r one-way-anova}
+# Two-level factor — equivalent to a two-sample t-test with equal variances
+summary(aov(size ~ shape, data = balloon.data))
+t.test(size ~ shape, data = balloon.data, var.equal = TRUE)
+
+# Three-level factor
+summary(aov(size ~ color, data = balloon.data))
+```
+
+## Post-Hoc Comparisons for One-Way ANOVA
+
+A significant omnibus F-test tells you that *some* groups differ, but not which ones. Use `emmeans` [@lenth2016; @emmeans] to compute estimated marginal means and pairwise contrasts with automatic multiplicity adjustment.
+
+```{r one-way-emmeans}
+balloon.lm.color <- lm(size ~ color, data = balloon.data)
+
+# Estimated marginal means
+emmeans(balloon.lm.color, ~ color)
+
+# All pairwise contrasts, Tukey-adjusted
+emmeans(balloon.lm.color, ~ color) |>
+  pairs(adjust = "tukey")
+```
+
+`emmeans` works with any model object (`lm`, `lmer`, `glm`, etc.) and integrates cleanly into tidyverse pipelines, making it more flexible than the older `TukeyHSD()` or `glht()` approaches.
+
+# Two-Way ANOVA
+
+Use a two-way ANOVA when two categorical predictors may jointly affect your outcome.
+
+## Always Fit the Full Interaction Model
+
+```{r two-way-fit}
+balloon.lm <- lm(size ~ color * shape, data = balloon.data)
+anova(balloon.lm)
+```
+
+`anova()` gives an F-test for each term, including the `color:shape` interaction. The interaction p-value tests whether the effect of color depends on shape (and vice versa).
+
+### Why Not Drop the Interaction and Refit an Additive Model?
+
+A common but problematic workflow is: *if the interaction p ≥ 0.05, drop the term and refit `size ~ color + shape`*. This should be avoided for three reasons [@mundry2009; @gelman2005]:
+
+1. **Pre-testing inflates Type I error.** Conditioning the reported main-effect inference on the outcome of the interaction test miscalibrates standard errors and p-values in the second model. Type I error rates can drift to 7–10% even when the nominal level is 5%.
+
+2. **Failure to reject ≠ no interaction.** Interaction tests are underpowered relative to main-effect tests — you typically need ~4× the sample size to detect an interaction of equivalent magnitude. Especially with small group sizes, you will almost always fail to reject the interaction null, but that does not mean the interaction is absent.
+
+3. **The additive model assumes additivity.** Fitting `size ~ color + shape` when the true data-generating process includes an interaction underestimates uncertainty and can bias main-effect estimates.
+
+The solution is to **always retain the interaction model and use `emmeans` to extract the quantities of interest** — marginal main effects and, when warranted, simple effects — all from the same fit with one residual variance estimate.
+
+## Cell Means
+
+Cell means are the model-predicted group averages at every combination of the two factors.
+
+```{r cell-means}
+emmeans(balloon.lm, ~ color * shape)
+```
+
+## Marginal Main Effects
+
+Marginal main effects answer: *what is the average effect of color, averaging across all shapes?* These should always be reported alongside the interaction test.
+
+```{r marginal-effects}
+# Average effect of color (averaged over both shapes)
+emmeans(balloon.lm, ~ color) |>
+  pairs(adjust = "tukey")
+
+# Average effect of shape (averaged over all colors)
+emmeans(balloon.lm, ~ shape) |>
+  pairs(adjust = "tukey")
+```
+
+These contrasts come from the same interaction model — `emmeans` computes them by averaging the cell means over the levels of the other factor. They represent the *average* simple effect, without assuming the effect is constant across levels of the other factor.
+
+## Simple Effects
+
+Simple effects answer: *what is the effect of color within each level of shape separately?* Report these when the interaction term is large or scientifically meaningful.
+
+```{r simple-effects}
+# Effect of color within each shape
+emmeans(balloon.lm, ~ color | shape) |>
+  pairs(adjust = "tukey")
+
+# Effect of shape within each color
+emmeans(balloon.lm, ~ shape | color) |>
+  pairs(adjust = "tukey")
+```
+
+## What to Report
+
+| Quantity | Question answered | Code |
+|---|---|---|
+| Interaction F-test | Do effects combine non-additively? | `anova(balloon.lm)` |
+| Cell EMMs | Predicted mean at each group combination | `emmeans(fit, ~ color * shape)` |
+| Marginal main effects | Average effect of A across levels of B | `emmeans(fit, ~ A) |> pairs()` |
+| Simple effects | Effect of A within each level of B | `emmeans(fit, ~ A | B) |> pairs()` |
+
+Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.
+
+## Multiple Testing Across Many Outcomes
+
+If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives:
+
+```{r multiple-testing}
+#| eval: false
+# Example: collect contrast p-values from many outcomes then adjust together
+results |>
+  mutate(p.adj = p.adjust(p.value, method = "BH"))
+```
+
+# Assumptions of ANOVA Analyses
+
+Although ANOVA is fairly robust to non-normality when group sizes are equal, the assumptions should be checked.
+
+```{r assumptions}
+# Residual normality
+shapiro.test(residuals(balloon.lm))
+
+# Fitted vs. residuals plot to check homoscedasticity
+plot(balloon.lm, which = 1)
+```
+
+If data are non-normal, consider transforming the dependent variable (e.g. `log(size)`). For one-way designs a non-parametric Kruskal-Wallis test is also available, though it does not extend naturally to factorial designs.
+
+```{r non-parametric}
+kruskal.test(size ~ color, data = balloon.data)
+```
+
+# References
+
+::: {#refs}
+:::
+
+# Session Information
+
+```{r session-info}
+#| echo: false
+sessionInfo()
+```
