@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Dave Bridges">
-<meta name="dcterms.date" content="2025-02-10">
+<meta name="dcterms.date" content="2025-04-29">
 
 <title>Correlations and Linear Models</title>
 <style>
@@ -23,8 +23,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -56,19 +57,40 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="correlations-linear-models_files/libs/clipboard/clipboard.min.js"></script>
-<script src="correlations-linear-models_files/libs/quarto-html/quarto.js"></script>
+<script src="correlations-linear-models_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="correlations-linear-models_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="correlations-linear-models_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="correlations-linear-models_files/libs/quarto-html/popper.min.js"></script>
 <script src="correlations-linear-models_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="correlations-linear-models_files/libs/quarto-html/anchor.min.js"></script>
 <link href="correlations-linear-models_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="correlations-linear-models_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="correlations-linear-models_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="correlations-linear-models_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="correlations-linear-models_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="correlations-linear-models_files/libs/bootstrap/bootstrap-2ca845081218289dd5ebe290c54fff29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="correlations-linear-models_files/libs/bootstrap/bootstrap-75002b1d8148a6ce22b7ae2bfa1c577b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -84,7 +106,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -102,7 +124,7 @@ window.Quarto = {
 
 </head>
 
-<body>
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
@@ -111,15 +133,25 @@ window.Quarto = {
    
   <ul>
   <li><a href="#visualizing-a-relationship" id="toc-visualizing-a-relationship" class="nav-link active" data-scroll-target="#visualizing-a-relationship">Visualizing a Relationship</a></li>
-  <li><a href="#describing-the-linear-relationship" id="toc-describing-the-linear-relationship" class="nav-link" data-scroll-target="#describing-the-linear-relationship">Describing the Linear Relationship</a>
+  <li><a href="#quantifying-the-relationship-correlation" id="toc-quantifying-the-relationship-correlation" class="nav-link" data-scroll-target="#quantifying-the-relationship-correlation">Quantifying the Relationship: Correlation</a>
   <ul class="collapse">
+  <li><a href="#pearson-correlation" id="toc-pearson-correlation" class="nav-link" data-scroll-target="#pearson-correlation">Pearson Correlation</a></li>
+  <li><a href="#spearman-correlation" id="toc-spearman-correlation" class="nav-link" data-scroll-target="#spearman-correlation">Spearman Correlation</a></li>
+  </ul></li>
+  <li><a href="#describing-the-linear-relationship-with-regression" id="toc-describing-the-linear-relationship-with-regression" class="nav-link" data-scroll-target="#describing-the-linear-relationship-with-regression">Describing the Linear Relationship with Regression</a>
+  <ul class="collapse">
+  <li><a href="#confidence-intervals-vs.-prediction-intervals" id="toc-confidence-intervals-vs.-prediction-intervals" class="nav-link" data-scroll-target="#confidence-intervals-vs.-prediction-intervals">Confidence Intervals vs.&nbsp;Prediction Intervals</a></li>
   <li><a href="#testing-the-assumptions-of-the-model" id="toc-testing-the-assumptions-of-the-model" class="nav-link" data-scroll-target="#testing-the-assumptions-of-the-model">Testing the Assumptions of the Model</a></li>
   </ul></li>
+  <li><a href="#non_linear" id="toc-non_linear" class="nav-link" data-scroll-target="#non_linear">Evaluating and Modifying Models for Non-Linear Relationships</a>
+  <ul class="collapse">
+  <li><a href="#comparing-models-with-aic-and-bic" id="toc-comparing-models-with-aic-and-bic" class="nav-link" data-scroll-target="#comparing-models-with-aic-and-bic">Comparing Models with AIC and BIC</a></li>
+  </ul></li>
   <li><a href="#bayesian-approach" id="toc-bayesian-approach" class="nav-link" data-scroll-target="#bayesian-approach">Bayesian Approach</a></li>
-  <li><a href="#non_linear" id="toc-non_linear" class="nav-link" data-scroll-target="#non_linear">Evaluating and Modifying Models for Non-Linear Relationships</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="correlations-linear-models.md"><i class="bi bi-file-code"></i>Github (GFM)</a></li></ul></div></nav>
+</nav>
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -142,7 +174,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 10, 2025</p>
+      <p class="date">April 29, 2025</p>
     </div>
   </div>
   
@@ -154,26 +186,25 @@ window.Quarto = {
 </header>
 
 
-<p>Lets say you want to explore the relationship between two continuous variables. Here we will cover how to explore, graph, and quantify these relationships.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sets maize and blue color scheme</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>color_scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#00274c"</span>, <span class="st">"#ffcb05"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moderndive)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(moderndive)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>We will use the <code>houseprices</code> dataset in the moderndive package. It has data about a variety of factors about housing. Here we will explore how the square feet of living space (<code>sqft_living</code>) relates to the <code>price</code>.</p>
+<p>We will use the <code>house_prices</code> dataset from the <code>moderndive</code> package, which contains sale prices and characteristics of houses in King County, Washington. Here we explore how the square feet of living space (<code>sqft_living</code>) relates to sale <code>price</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>color_scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#00274c"</span>, <span class="st">"#ffcb05"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <section id="visualizing-a-relationship" class="level2">
 <h2 class="anchored" data-anchor-id="visualizing-a-relationship">Visualizing a Relationship</h2>
-<p>The best first thing to do is to make a plot looking at the two variables. Here we will use ggplot, defining the x and y axis aesthetics, and adding both a linear and smoothed line (geom)</p>
+<p>The first step is always to plot the two variables against each other. Here we overlay both a smoothed (loess) curve and a linear fit to see whether a straight line is a reasonable description of the relationship.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(house_prices,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">y=</span>price,<span class="at">x=</span>sqft_living)) <span class="sc">+</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.1</span>) <span class="sc">+</span> <span class="co">#transparency of the points</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"loess"</span>,<span class="at">color=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span> <span class="co">#smoothed line</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>,<span class="at">color=</span>color_scheme[<span class="dv">1</span>]) <span class="sc">+</span> <span class="co">#linear relationship</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>) <span class="co">#classic theme, and increasing the font size</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(house_prices, <span class="fu">aes</span>(<span class="at">y =</span> price, <span class="at">x =</span> sqft_living)) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">color =</span> color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>,    <span class="at">color =</span> color_scheme[<span class="dv">1</span>]) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -182,24 +213,120 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>This appears to be an approximately linear relationship (blue line), though the smooth best fit curve (maize line) suggests it might be nonlinear and slightly upward sloping. For now lets focus on describing the linear relationship, we will come back to a non-linear relationship in <a href="#non_linear">Non-Linear Relationships</a>.</p>
+<p>The relationship appears approximately linear (blue line), though the loess curve (maize) suggests a slight upward bend at larger values, indicating some non-linearity. We will address this in the <a href="#non_linear">Non-Linear Relationships</a> section.</p>
 </section>
-<section id="describing-the-linear-relationship" class="level2">
-<h2 class="anchored" data-anchor-id="describing-the-linear-relationship">Describing the Linear Relationship</h2>
-<p>In general there are two components to a relationship</p>
-<ol type="1">
-<li>The slope estimate and its error, in this example how much does price increase per square foot of living space</li>
-<li>The linearity (<span class="math inline">\(R^2\)</span>), or how much of the price is explained by square feet of living space.</li>
-</ol>
-<p>In both cases this can be solved with a linear model, and the results visualized with the <code>tidy</code> and <code>glance</code> functions from the <code>broom</code> package</p>
+<section id="quantifying-the-relationship-correlation" class="level2">
+<h2 class="anchored" data-anchor-id="quantifying-the-relationship-correlation">Quantifying the Relationship: Correlation</h2>
+<p>Before fitting a regression model it is useful to quantify the strength of the association with a correlation coefficient. There are two main choices.</p>
+<section id="pearson-correlation" class="level3">
+<h3 class="anchored" data-anchor-id="pearson-correlation">Pearson Correlation</h3>
+<p>Pearson’s <em>r</em> measures the strength of the <strong>linear</strong> association. Inference (the t-test for H₀: ρ = 0) relies on bivariate normality — both variables should be approximately normally distributed. With large samples the Central Limit Theorem makes the test robust to moderate departures, but Pearson <em>r</em> is sensitive to outliers and is attenuated by non-linearity.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>lm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">lm</span>(price<span class="sc">~</span>sqft_living,<span class="at">data=</span>house_prices)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom) <span class="co">#for glance/tidy</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr) <span class="co">#for kable</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Estimates for the price/square foot relationship"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(house_prices<span class="sc">$</span>price, house_prices<span class="sc">$</span>sqft_living, <span class="at">method =</span> <span class="st">"pearson"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Pearson correlation between price and living area"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Estimates for the price/square foot relationship</caption>
+<caption>Pearson correlation between price and living area</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 35%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">parameter</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: left;">method</th>
+<th style="text-align: left;">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.702</td>
+<td style="text-align: right;">144.92</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">21611</td>
+<td style="text-align: right;">0.695</td>
+<td style="text-align: right;">0.709</td>
+<td style="text-align: left;">Pearson’s product-moment correlation</td>
+<td style="text-align: left;">two.sided</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="spearman-correlation" class="level3">
+<h3 class="anchored" data-anchor-id="spearman-correlation">Spearman Correlation</h3>
+<p>Spearman’s ρ is a rank-based measure of <strong>monotonic</strong> association. It does not assume normality and is robust to outliers and non-linearity. It is the better default when the data are skewed or when the relationship may be monotonic but not strictly linear — both of which apply here.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(house_prices<span class="sc">$</span>price, house_prices<span class="sc">$</span>sqft_living, <span class="at">method =</span> <span class="st">"spearman"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Spearman correlation between price and living area"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Spearman correlation between price and living area</caption>
+<colgroup>
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 10%">
+<col style="width: 43%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: left;">method</th>
+<th style="text-align: left;">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.644</td>
+<td style="text-align: right;">598702208243</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Spearman’s rank correlation rho</td>
+<td style="text-align: left;">two.sided</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Spearman ρ will generally differ from Pearson <em>r</em> when the data are skewed or the relationship is non-linear. A noticeably higher Spearman ρ suggests the relationship is monotonic but not strictly linear — which matches what the loess curve shows.</p>
+</section>
+</section>
+<section id="describing-the-linear-relationship-with-regression" class="level2">
+<h2 class="anchored" data-anchor-id="describing-the-linear-relationship-with-regression">Describing the Linear Relationship with Regression</h2>
+<p>A linear model provides both the <strong>slope</strong> (how much price changes per additional square foot) and <strong>R²</strong> (the proportion of variance in price explained by living area). We extract these with <code>tidy()</code> (coefficients) and <code>glance()</code> (overall fit), adding confidence intervals throughout.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">lm</span>(price <span class="sc">~</span> sqft_living, <span class="at">data =</span> house_prices)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm<span class="fl">.1</span>, <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Coefficient estimates with 95% confidence intervals"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Coefficient estimates with 95% confidence intervals</caption>
+<colgroup>
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">term</th>
@@ -207,30 +334,37 @@ window.Quarto = {
 <th style="text-align: right;">std.error</th>
 <th style="text-align: right;">statistic</th>
 <th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">-43580.7431</td>
-<td style="text-align: right;">4402.689690</td>
-<td style="text-align: right;">-9.898663</td>
+<td style="text-align: right;">-43580.74</td>
+<td style="text-align: right;">4402.69</td>
+<td style="text-align: right;">-9.90</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">-52210.34</td>
+<td style="text-align: right;">-34951.15</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">sqft_living</td>
-<td style="text-align: right;">280.6236</td>
-<td style="text-align: right;">1.936399</td>
-<td style="text-align: right;">144.920356</td>
+<td style="text-align: right;">280.62</td>
+<td style="text-align: right;">1.94</td>
+<td style="text-align: right;">144.92</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">276.83</td>
+<td style="text-align: right;">284.42</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(lm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Model fit for the price/square food relationship"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(lm<span class="fl">.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Overall model fit"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Model fit for the price/square food relationship</caption>
+<caption>Overall model fit</caption>
 <colgroup>
 <col style="width: 8%">
 <col style="width: 12%">
@@ -263,8 +397,8 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.4928532</td>
-<td style="text-align: right;">0.4928298</td>
+<td style="text-align: right;">0.493</td>
+<td style="text-align: right;">0.493</td>
 <td style="text-align: right;">261452.9</td>
 <td style="text-align: right;">21001.91</td>
 <td style="text-align: right;">0</td>
@@ -280,20 +414,83 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>As you can see from these tables, we estimate that the price increases by $280.6235679 <span class="math inline">\(\pm\)</span> 1.9363986 per square foot of living space. This is a highly significant relationship (p=0). The <span class="math inline">\(R^2\)</span> for this model is estimated at 0.4928532.</p>
+<p>We estimate that price increases by $281 (95% CI: $277 – $284) per square foot of living space. The model explains 49.3% of the variance in price (R² = 0.493). For simple regression with one predictor, R² equals the squared Pearson correlation. When comparing models with different numbers of predictors, use adjusted R² from <code>glance()</code> instead, which penalises additional parameters.</p>
+<section id="confidence-intervals-vs.-prediction-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="confidence-intervals-vs.-prediction-intervals">Confidence Intervals vs.&nbsp;Prediction Intervals</h3>
+<p>It is important to distinguish two types of interval around the fitted line:</p>
+<ul>
+<li>A <strong>confidence interval</strong> describes uncertainty in the <em>mean</em> response at a given x — how well we know where the regression line is.</li>
+<li>A <strong>prediction interval</strong> describes uncertainty for a <em>new individual observation</em> at a given x — it is always wider because it must also account for the residual variance around the line.</li>
+</ul>
+<p>For applied questions (e.g.&nbsp;“what will this specific house sell for?”), prediction intervals are what matter.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>new_sizes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sqft_living =</span> <span class="fu">c</span>(<span class="dv">1000</span>, <span class="dv">2000</span>, <span class="dv">3000</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_cols</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  new_sizes,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(lm<span class="fl">.1</span>, <span class="at">newdata =</span> new_sizes, <span class="at">interval =</span> <span class="st">"confidence"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">ci_lwr =</span> lwr, <span class="at">ci_upr =</span> upr),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(lm<span class="fl">.1</span>, <span class="at">newdata =</span> new_sizes, <span class="at">interval =</span> <span class="st">"prediction"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">pi_lwr =</span> lwr, <span class="at">pi_upr =</span> upr)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">0</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Fitted values with 95% confidence intervals (CI) and prediction intervals (PI)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Fitted values with 95% confidence intervals (CI) and prediction intervals (PI)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">sqft_living</th>
+<th style="text-align: right;">fit</th>
+<th style="text-align: right;">ci_lwr</th>
+<th style="text-align: right;">ci_upr</th>
+<th style="text-align: right;">pi_lwr</th>
+<th style="text-align: right;">pi_upr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">237043</td>
+<td style="text-align: right;">231662</td>
+<td style="text-align: right;">242423</td>
+<td style="text-align: right;">-275452</td>
+<td style="text-align: right;">749538</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2000</td>
+<td style="text-align: right;">517666</td>
+<td style="text-align: right;">514167</td>
+<td style="text-align: right;">521165</td>
+<td style="text-align: right;">5188</td>
+<td style="text-align: right;">1030145</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3000</td>
+<td style="text-align: right;">798290</td>
+<td style="text-align: right;">793356</td>
+<td style="text-align: right;">803224</td>
+<td style="text-align: right;">285799</td>
+<td style="text-align: right;">1310781</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The prediction intervals are substantially wider than the confidence intervals, illustrating that even a well-fitting model has considerable uncertainty for individual predictions.</p>
+</section>
 <section id="testing-the-assumptions-of-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="testing-the-assumptions-of-the-model">Testing the Assumptions of the Model</h3>
-<p>For a linear model there are four assumptions</p>
+<p>For a linear model there are four assumptions:</p>
 <ul>
-<li><strong>Linearity</strong>: The relationship between the predictor (x) and the outcome (y) is assumed to be linear. This means that for one unit change in the predictor, there is a constant change in the response.</li>
-<li><strong>Independence</strong>: The residuals (error terms) are assumed to be independent of each other. This means we cannot predict the size of a residual from another residual or from the value of a predictor variable.</li>
-<li><strong>Homoscedasticity</strong>: The residuals are assumed to have constant variance across all levels of the predictor variable. This is also known as homogeneity of variance.</li>
-<li><strong>Normality</strong>: The residuals are assumed to be normally distributed. While perfect normality is not required, it suggests that the model is doing a good job of predicting the response.</li>
+<li><strong>Linearity</strong>: The relationship between predictor and outcome is linear — one unit change in x produces a constant change in y.</li>
+<li><strong>Independence</strong>: Residuals are independent of each other and of the predictor.</li>
+<li><strong>Homoscedasticity</strong>: Residuals have constant variance across all fitted values.</li>
+<li><strong>Normality</strong>: Residuals are approximately normally distributed.</li>
 </ul>
-<p>These can be generated in base r or using the <code>lindia</code> package. I’ll show code for both, but we will focus on the four main diagnostic plots in base R.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lm<span class="fl">.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lm<span class="fl">.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -301,32 +498,55 @@ window.Quarto = {
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#alternatively can use diagnostics in the lindia package</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#library(lindia)</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#gg_diagnose(lm.1)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="interpreting-these-model-plots" class="level4">
-<h4 class="anchored" data-anchor-id="interpreting-these-model-plots">Interpreting these Model Plots</h4>
+<section id="interpreting-these-diagnostic-plots" class="level4">
+<h4 class="anchored" data-anchor-id="interpreting-these-diagnostic-plots">Interpreting These Diagnostic Plots</h4>
 <ul>
-<li><strong>Residuals vs.&nbsp;Fitted Plot</strong> This plot helps detect non-linearity, unequal error variances, and outliers. <em>Linearity</em>: The residuals should “bounce randomly” around the horizontal line at y=0. If you see a pattern, it suggests non-linearity. <em>Equal Variance</em>: The vertical spread of residuals should be similar across the plot. A “horizontal band” indicates equal error variances. <em>Outliers</em>: Look for any points that stand out from the overall pattern.</li>
-<li><strong>Normal Q-Q Plot</strong> This plot checks if residuals are normally distributed. <em>Normal Distribution</em>: Points should fall approximately along the diagonal line. Significant deviations suggest non-normality. <em>Tails</em>: Pay attention to deviations at the ends of the line, which indicate issues with the tails of the distribution.</li>
-<li><strong>Scale-Location Plot</strong> This plot checks the assumption of equal variance (homoscedasticity). <em>Equal Variance</em>: Look for a horizontal line with randomly spread points. Any patterns or funneling suggest heteroscedasticity.</li>
-<li><strong>Residuals vs.&nbsp;Leverage Plot</strong> This plot helps identify influential observations. <em>Influential Points</em>: Look for any points falling outside Cook’s distance (usually marked by dashed lines). These are considered influential observations. <em>Leverage</em>: Points far to the right have high leverage, meaning they have a strong influence on the model coefficients.</li>
+<li><strong>Residuals vs.&nbsp;Fitted</strong>: Residuals should scatter randomly around zero with no pattern. A cone shape (widening spread) indicates heteroscedasticity; a curve indicates non-linearity.</li>
+<li><strong>Normal Q-Q</strong>: Residuals should fall on the diagonal reference line. Deviations at the upper tail (points curve above the line) indicate a heavy right tail or right skewness. An S-shape indicates the tails are lighter than normal (platykurtic); a reverse S-shape indicates heavier tails (leptokurtic).</li>
+<li><strong>Scale-Location</strong>: The square root of standardised residuals should be approximately flat. An upward slope indicates heteroscedasticity.</li>
+<li><strong>Residuals vs.&nbsp;Leverage</strong>: Points outside Cook’s distance dashed lines are influential — their removal would substantially change the fitted coefficients.</li>
 </ul>
-<p>My interpretation is that there are several issues with our model fit. First from the residuals vs fitted plot, I see a cone-shape of points rather than a slug shape. This means that as the price increases the error is worse. Similarly the scale-location plot has an upward slope indicating the same thing. This suggests unequal variance across the estimates or <em>heteroscedasticity</em>. In terms of normality, the Q-Q plot shows points lifting off the line, so this suggests these data are not <em>normally distributed</em>. This can be confirmed by a Shapiro-Wilk test of either covariate or the model fit residuals:</p>
+</section>
+<section id="assessing-residual-normality" class="level4">
+<h4 class="anchored" data-anchor-id="assessing-residual-normality">Assessing Residual Normality</h4>
+<p>A Q-Q plot of model residuals is the primary visual diagnostic for normality. Points should fall approximately on the diagonal; systematic departures indicate the residuals are not normally distributed.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#note shapiro tests require 5000 or less values, so i randomly sampled</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(house_prices<span class="sc">$</span>price,<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"prices"</span>), </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(house_prices<span class="sc">$</span>sqft_living,<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"sqft_living"</span>), </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sample</span>(<span class="fu">residuals</span>(lm<span class="fl">.1</span>),<span class="dv">5000</span>,<span class="at">replace=</span>F) <span class="sc">%&gt;%</span> shapiro.test <span class="sc">%&gt;%</span> <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">input=</span><span class="st">"redisuals"</span>)) <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(input) <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Shapiro-Wilk Tests for Variables and Residuals"</span>,<span class="at">digits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dv">99</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">residuals =</span> <span class="fu">residuals</span>(lm<span class="fl">.1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">sample =</span> residuals)) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>(<span class="at">color =</span> color_scheme[<span class="dv">1</span>]) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Normal Q-Q plot of model residuals"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x     =</span> <span class="st">"Theoretical normal quantiles"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y     =</span> <span class="st">"Observed residual quantiles"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlations-linear-models_files/figure-html/qq-residuals-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A Shapiro-Wilk test can supplement the visual check, but note that with large datasets it has very high power — it will reject normality for trivial departures that have no practical effect on inference. Treat the Q-Q plot as the primary diagnostic and the p-value as a supplementary signal.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shapiro-Wilk requires n ≤ 5000; sample from the full dataset</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample</span>(house_prices<span class="sc">$</span>price,       <span class="dv">5000</span>) <span class="sc">|&gt;</span> <span class="fu">shapiro.test</span>() <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="st">"price"</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample</span>(house_prices<span class="sc">$</span>sqft_living, <span class="dv">5000</span>) <span class="sc">|&gt;</span> <span class="fu">shapiro.test</span>() <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="st">"sqft_living"</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample</span>(<span class="fu">residuals</span>(lm<span class="fl">.1</span>),          <span class="dv">5000</span>) <span class="sc">|&gt;</span> <span class="fu">shapiro.test</span>() <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="st">"residuals"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(variable) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Shapiro-Wilk tests (n = 5000 sample; see text on large-n interpretation)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Shapiro-Wilk Tests for Variables and Residuals</caption>
+<caption>Shapiro-Wilk tests (n = 5000 sample; see text on large-n interpretation)</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;">input</th>
+<th style="text-align: left;">variable</th>
 <th style="text-align: right;">statistic</th>
 <th style="text-align: right;">p.value</th>
 <th style="text-align: left;">method</th>
@@ -334,58 +554,369 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">prices</td>
-<td style="text-align: right;">0.668</td>
-<td style="text-align: right;">1.591593e-71</td>
+<td style="text-align: left;">price</td>
+<td style="text-align: right;">0.699</td>
+<td style="text-align: right;">0</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">sqft_living</td>
-<td style="text-align: right;">0.923</td>
-<td style="text-align: right;">7.073408e-45</td>
+<td style="text-align: right;">0.927</td>
+<td style="text-align: right;">0</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">redisuals</td>
-<td style="text-align: right;">0.837</td>
-<td style="text-align: right;">9.880667e-58</td>
+<td style="text-align: left;">residuals</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0</td>
 <td style="text-align: left;">Shapiro-Wilk normality test</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>Here both variables and the residuals are significantly non-normal, and the diagnostic plots confirm heteroscedasticity (cone-shaped residuals vs.&nbsp;fitted, upward-sloping scale-location plot) and a heavy upper tail (Q-Q points lift above the line at high quantiles). This combination — right-skewed outcome, heteroscedasticity, slight non-linearity — is typical of price data and suggests a log transformation of the response is worth trying (see below).</p>
 </section>
 <section id="what-to-do-if-assumptions-are-not-met" class="level4">
-<h4 class="anchored" data-anchor-id="what-to-do-if-assumptions-are-not-met">What to Do if Assumptions are Not Met</h4>
+<h4 class="anchored" data-anchor-id="what-to-do-if-assumptions-are-not-met">What to Do if Assumptions Are Not Met</h4>
 <ul>
-<li><strong>Linearity</strong>. Apply a non-linear transformation to the predictor or response variable (<em>e.g.</em>, log, square root, or polynomial terms). Add interaction terms or higher-order terms (<em>e.g.</em>, quadratic) to the model to account for non-linear relationships. Alternatively use a generalized additive model (GAM) or other non-linear modeling techniques. See <a href="#non_linear">non-linear relationships</a> for more details on these approaches.</li>
-<li><strong>Independence</strong> Check for omitted variables that might explain the correlation and include them in the model. For time-series data, use models like ARIMA or include lagged variables to account for autocorrelation. If independence is violated due to clustering or grouping, consider using mixed-effects models or hierarchical models.</li>
-<li><strong>Homoscedasticity (Constant Variance)</strong> Apply a log transformation or other variance-stabilizing transformations to the response variable. Use weighted least squares (WLS) regression, which assigns weights inversely proportional to the variance of residuals. Consider robust regression methods, such as those implemented in the robustbase package (lmrob).</li>
-<li><strong>Normality of Residuals</strong> Apply transformations (<em>e.g.</em>, log, square root) to the response variable if it is skewed. Use non-parametric regression methods that do not assume normality, such as quantile regression. If normality is violated due to outliers, investigate and either remove or down-weight their influence using robust regression techniques like least trimmed squares or MM-estimators.</li>
+<li><strong>Non-linearity</strong>: Apply a transformation (log, square root) to the predictor or response, add polynomial or spline terms, or use a generalised additive model (GAM). See <a href="#non_linear">Non-Linear Relationships</a>.</li>
+<li><strong>Heteroscedasticity</strong>: Log-transform the response (often fixes both heteroscedasticity and non-linearity for skewed outcomes); use weighted least squares; or use heteroscedasticity-consistent (sandwich) standard errors via <code>lmtest::coeftest()</code> with <code>sandwich::vcovHC()</code>.</li>
+<li><strong>Non-normality of residuals</strong>: Transformation is usually the first step. With large n, the CLT means non-normal residuals have little effect on coefficient inference, but they do affect prediction intervals. Robust regression (<code>MASS::rlm()</code>) or quantile regression are alternatives.</li>
+<li><strong>Non-independence</strong>: For clustered or repeated-measures data, use mixed-effects models (<code>lme4::lmer()</code>). For time series, use ARIMA or include lagged terms.</li>
 </ul>
 </section>
 </section>
 </section>
-<section id="bayesian-approach" class="level2">
-<h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
-<p>Lets say you want to take a Bayesian approach to this question, and dispense with null hypothesis significance testing (see <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html">here for an introduction</a>). In this approach you would set a prior probablity, indexing what you would expect from this relationship then use a MCMC sampling method to estimate the <span class="math inline">\(\beta\)</span> coefficient and <span class="math inline">\(R^2\)</span> along with confidence intervals. You can then derive a Bayes Factor and Posterior Probability of some hypothesis. We will use the <code>brms</code> package for this.</p>
-<p>For our prior probability, I have a general sense of this relationship. I could assign an uninformative flat prior (meaning the <span class="math inline">\(\beta\)</span> coefficient can be any value) but I did a quick AI query and came up with a plausible global estimate of $1663/sq ft with a standard deviation of $602. Im also setting the family to Student’s <em>t</em> distribution which is more robust to outliers due to its heavier tails (normal or gaussian distribution of residualsis the default).</p>
+<section id="non_linear" class="level2">
+<h2 class="anchored" data-anchor-id="non_linear">Evaluating and Modifying Models for Non-Linear Relationships</h2>
+<p>Given the diagnostic evidence of non-linearity and heteroscedasticity, we can try a log transformation of the response and compare it against the original model and a polynomial extension.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>housing.priors <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">1663</span>,<span class="dv">602</span>), <span class="at">class=</span>b, <span class="at">coef=</span>sqft_living)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>brm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">brm</span>(price<span class="sc">~</span>sqft_living,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data=</span>house_prices,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prior =</span> housing.priors,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">family =</span> <span class="fu">student</span>(),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>In summary, this is what we did:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Prior summary for effects of square feet of living space on price"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>lm.log <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(price) <span class="sc">~</span> sqft_living, <span class="at">data =</span> house_prices)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm.log, <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Log-price model coefficients"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Prior summary for effects of square feet of living space on price</caption>
+<caption>Log-price model coefficients</caption>
+<colgroup>
+<col style="width: 17%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">12.2185</td>
+<td style="text-align: right;">0.0064</td>
+<td style="text-align: right;">1916.8830</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12.2060</td>
+<td style="text-align: right;">12.2310</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sqft_living</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">142.2326</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">0.0004</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lm.log)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlations-linear-models_files/figure-html/log-model-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The slope on the log scale is a proportional effect. The exact percentage change in price per unit increase in <code>sqft_living</code> is <span class="math inline">\((\exp(\beta) - 1) \times 100\)</span>. The approximation <span class="math inline">\(\beta \times 100\)</span> is adequate only when <span class="math inline">\(|\beta| \lesssim 0.05\)</span>; for larger coefficients the approximation understates the true effect.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>beta_log <span class="ot">&lt;-</span> <span class="fu">coef</span>(lm.log)[<span class="st">"sqft_living"</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">slope_log_scale      =</span> beta_log,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pct_change_exact     =</span> (<span class="fu">exp</span>(beta_log) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pct_change_approx    =</span> beta_log <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Exact vs approximate percentage-change interpretation of log-scale slope"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Exact vs approximate percentage-change interpretation of log-scale slope</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">slope_log_scale</th>
+<th style="text-align: right;">pct_change_exact</th>
+<th style="text-align: right;">pct_change_approx</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">4e-04</td>
+<td style="text-align: right;">0.0399</td>
+<td style="text-align: right;">0.0399</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The diagnostic plots should now show more uniform spread and a straighter Q-Q line if the transformation was appropriate.</p>
+<p>We can also fit a polynomial model on the original scale (valid AIC comparison since the response is the same). We use <code>poly(sqft_living, 2)</code> rather than <code>sqft_living + I(sqft_living^2)</code> because <code>poly()</code> generates orthogonal polynomial terms, eliminating the collinearity between x and x² that inflates standard errors with raw polynomial coding.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>lm.poly <span class="ot">&lt;-</span> <span class="fu">lm</span>(price <span class="sc">~</span> <span class="fu">poly</span>(sqft_living, <span class="dv">2</span>), <span class="at">data =</span> house_prices)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm.poly, <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Orthogonal polynomial model coefficients"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Orthogonal polynomial model coefficients</caption>
+<colgroup>
+<col style="width: 26%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">540088.1</td>
+<td style="text-align: right;">1707.09</td>
+<td style="text-align: right;">316.38</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">536742.1</td>
+<td style="text-align: right;">543434.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(sqft_living, 2)1</td>
+<td style="text-align: right;">37889845.6</td>
+<td style="text-align: right;">250965.79</td>
+<td style="text-align: right;">150.98</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">37397934.1</td>
+<td style="text-align: right;">38381757.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poly(sqft_living, 2)2</td>
+<td style="text-align: right;">10779419.7</td>
+<td style="text-align: right;">250965.79</td>
+<td style="text-align: right;">42.95</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10287508.2</td>
+<td style="text-align: right;">11271331.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="comparing-models-with-aic-and-bic" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-models-with-aic-and-bic">Comparing Models with AIC and BIC</h3>
+<p>AIC and BIC penalise model complexity and can identify which model fits the data best relative to its degrees of freedom. <strong>Models must have the same response variable to be compared</strong> — so we compare the log-response models with each other, and the original-scale models with each other, but not across the two response scales.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original-scale models: linear vs. quadratic</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(lm<span class="fl">.1</span>, lm.poly) <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"model"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>, <span class="at">caption =</span> <span class="st">"AIC comparison: linear vs. quadratic (original scale)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>AIC comparison: linear vs.&nbsp;quadratic (original scale)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">AIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">lm.1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">600540.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lm.poly</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">598772.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(lm<span class="fl">.1</span>, lm.poly) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"model"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>, <span class="at">caption =</span> <span class="st">"BIC comparison: linear vs. quadratic (original scale)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>BIC comparison: linear vs.&nbsp;quadratic (original scale)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">BIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">lm.1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">600564.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lm.poly</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">598803.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Lower AIC/BIC indicates better fit adjusted for model complexity. A difference of &gt;2 is considered meaningful; &gt;10 is strong evidence in favour of the lower-scoring model.</p>
+<p>For <strong>nested models</strong> — where one model is a special case of another — a likelihood ratio test via <code>anova()</code> is more powerful than AIC and directly tests whether the extra terms improve fit significantly. AIC and BIC are more appropriate for comparing non-nested models.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(lm<span class="fl">.1</span>, lm.poly) <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Likelihood ratio test: linear vs. quadratic (nested comparison)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Likelihood ratio test: linear vs.&nbsp;quadratic (nested comparison)</caption>
+<colgroup>
+<col style="width: 32%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 3%">
+<col style="width: 14%">
+<col style="width: 11%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">df.residual</th>
+<th style="text-align: right;">rss</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">sumsq</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">price ~ sqft_living</td>
+<td style="text-align: right;">21611</td>
+<td style="text-align: right;">1.477276e+15</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">price ~ poly(sqft_living, 2)</td>
+<td style="text-align: right;">21610</td>
+<td style="text-align: right;">1.361080e+15</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.161959e+14</td>
+<td style="text-align: right;">1844.853</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Alternatively, spline terms offer a flexible non-linear fit without specifying the polynomial degree:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splines)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>lm.spline <span class="ot">&lt;-</span> <span class="fu">lm</span>(price <span class="sc">~</span> <span class="fu">ns</span>(sqft_living, <span class="at">df =</span> <span class="dv">4</span>), <span class="at">data =</span> house_prices)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(lm<span class="fl">.1</span>, lm.poly, lm.spline) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"model"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>, <span class="at">caption =</span> <span class="st">"AIC comparison across three model structures"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>AIC comparison across three model structures</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">AIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">lm.1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">600540.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lm.poly</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">598772.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lm.spline</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">598546.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The natural spline with 4 degrees of freedom allows up to 3 bends in the curve. Re-examine the residual plots after fitting to confirm improvement in linearity.</p>
+</section>
+</section>
+<section id="bayesian-approach" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
+<p>For an alternative to null hypothesis significance testing, a Bayesian approach estimates the posterior distribution of the slope and R² directly. See <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html">the Bayesian tutorial</a> for background.</p>
+<p>We set an illustrative informative prior based on published estimates (here ~$1,663/sq ft with SD $602) and use a Student-<em>t</em> likelihood, which is more robust to the outliers and heteroscedasticity diagnosed above.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>housing.priors <span class="ot">&lt;-</span> <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">1663</span>, <span class="dv">602</span>), <span class="at">class =</span> b, <span class="at">coef =</span> sqft_living)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>brm<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  price <span class="sc">~</span> sqft_living,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> house_prices,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior        =</span> housing.priors,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">family       =</span> <span class="fu">student</span>(),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prior_summary</span>(brm<span class="fl">.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Prior summary"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Prior summary</caption>
 <colgroup>
 <col style="width: 31%">
 <col style="width: 10%">
@@ -483,20 +1014,21 @@ window.Quarto = {
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Summary of model fit for price vs square feet of living space"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm<span class="fl">.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Posterior estimates for price vs. square feet of living space"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Summary of model fit for price vs square feet of living space</caption>
+<caption>Posterior estimates for price vs.&nbsp;square feet of living space</caption>
 <colgroup>
-<col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 8%">
-<col style="width: 28%">
-<col style="width: 11%">
-<col style="width: 12%">
-<col style="width: 11%">
-<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 31%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -516,55 +1048,55 @@ window.Quarto = {
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">78528.3965</td>
-<td style="text-align: right;">3.333290e+03</td>
-<td style="text-align: right;">72067.2054</td>
-<td style="text-align: right;">85107.0555</td>
+<td style="text-align: right;">78578.84</td>
+<td style="text-align: right;">3307.55</td>
+<td style="text-align: right;">72290.11</td>
+<td style="text-align: right;">85058.91</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">sqft_living</td>
-<td style="text-align: right;">201.1642</td>
-<td style="text-align: right;">1.661884e+00</td>
-<td style="text-align: right;">197.9176</td>
-<td style="text-align: right;">204.3408</td>
+<td style="text-align: right;">201.15</td>
+<td style="text-align: right;">1.66</td>
+<td style="text-align: right;">197.93</td>
+<td style="text-align: right;">204.34</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">fixed</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">NA</td>
 <td style="text-align: left;">sigma</td>
-<td style="text-align: right;">145391.3712</td>
-<td style="text-align: right;">1.199778e+03</td>
-<td style="text-align: right;">143037.7072</td>
-<td style="text-align: right;">147670.2147</td>
+<td style="text-align: right;">145421.19</td>
+<td style="text-align: right;">1176.01</td>
+<td style="text-align: right;">143150.13</td>
+<td style="text-align: right;">147736.10</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">sd__Observation</td>
-<td style="text-align: right;">1666.5511</td>
-<td style="text-align: right;">5.991218e+02</td>
-<td style="text-align: right;">504.0056</td>
-<td style="text-align: right;">2846.3785</td>
+<td style="text-align: right;">1672.75</td>
+<td style="text-align: right;">594.01</td>
+<td style="text-align: right;">510.88</td>
+<td style="text-align: right;">2818.90</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ran_pars</td>
 <td style="text-align: left;">cond</td>
 <td style="text-align: left;">Residual</td>
 <td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
-<td style="text-align: right;">242774.5665</td>
-<td style="text-align: right;">3.279991e+05</td>
-<td style="text-align: right;">7270.0050</td>
-<td style="text-align: right;">919500.8346</td>
+<td style="text-align: right;">245731.04</td>
+<td style="text-align: right;">291231.18</td>
+<td style="text-align: right;">6211.26</td>
+<td style="text-align: right;">933181.81</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(brm<span class="fl">.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(brm<span class="fl">.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -572,11 +1104,11 @@ window.Quarto = {
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living&gt;0"</span>) <span class="co"># hypothesis testing for a positive relationship</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living &gt; 0"</span>)   <span class="co"># is the slope positive?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
          Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob
-1 (sqft_living) &gt; 0   201.16      1.66   198.45    203.8        Inf         1
+1 (sqft_living) &gt; 0   201.15      1.66   198.42   203.87        Inf         1
   Star
 1    *
 ---
@@ -585,11 +1117,11 @@ window.Quarto = {
 for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living=1663"</span>) <span class="co"># hypothesis testing that my prior is correct</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm<span class="fl">.1</span>, <span class="st">"sqft_living = 1663"</span>) <span class="co"># does the slope match the prior mean?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (sqft_living)-(1663) = 0 -1461.84      1.66 -1465.08 -1458.66          0
+1 (sqft_living)-(1663) = 0 -1461.85      1.66 -1465.07 -1458.66          0
   Post.Prob Star
 1         0    *
 ---
@@ -598,28 +1130,32 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 for two-sided hypotheses, the value tested against lies outside the 95%-CI.
 Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(brm<span class="fl">.1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b_sqft_living)) <span class="sc">+</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_vline(xintercept=0,color=color_scheme[2],lty=2) +</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"Living Space (square feet)"</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(brm<span class="fl">.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> b_sqft_living)) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x     =</span> <span class="st">"Slope: price per square foot ($)"</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y     =</span> <span class="st">""</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Posterior distribution of slope"</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="correlations-linear-models_files/figure-html/linear-analysis-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="correlations-linear-models_files/figure-html/posterior-slope-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>This gives me an estimate of $201.16415 <span class="math inline">\(\pm\)</span> 1.6618838, compared to the linear model approach which estimated 280.6235679 <span class="math inline">\(\pm\)</span> 1.9363986 per square foot of living space, so very similar results. We also get a very similar value for <span class="math inline">\(R^2\)</span></p>
+<p>The Bayesian estimate ($201 ± 2) is similar to the OLS estimate ($281 ± 2), though the Student-<em>t</em> likelihood downweights influential high-value outliers slightly.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>),<span class="at">caption=</span><span class="st">"Estimates for R2 between price and square feet of living space"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Bayesian R²"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Estimates for R2 between price and square feet of living space</caption>
+<caption>Bayesian R²</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
@@ -632,23 +1168,20 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">R2</td>
-<td style="text-align: right;">0.3166025</td>
-<td style="text-align: right;">0.0042288</td>
-<td style="text-align: right;">0.3083265</td>
-<td style="text-align: right;">0.3246707</td>
+<td style="text-align: right;">0.317</td>
+<td style="text-align: right;">0.004</td>
+<td style="text-align: right;">0.308</td>
+<td style="text-align: right;">0.325</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>r2.probs <span class="ot">&lt;-</span> <span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>, <span class="at">summary=</span>F) <span class="co">#summary false is to get the posterior probabilities</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>r2.probs, <span class="fu">aes</span>(<span class="at">x=</span>R2)) <span class="sc">+</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span>color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_vline(xintercept=0,color=color_scheme[1],lty=2) +</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">""</span>,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x=</span><span class="st">"R2"</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">title=</span><span class="st">"Posterior probabilities"</span>) <span class="sc">+</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#lims(x=c(0,1)) +</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size=</span><span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bayes_R2</span>(brm<span class="fl">.1</span>, <span class="at">summary =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> R2)) <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> color_scheme[<span class="dv">2</span>]) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"R²"</span>, <span class="at">y =</span> <span class="st">""</span>, <span class="at">title =</span> <span class="st">"Posterior distribution of R²"</span>) <span class="sc">+</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">16</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -657,10 +1190,9 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </div>
 </div>
 </div>
-<p>This approach has several advantages, including allowing for more robust handling of outliers and heteroscedasticity (due to using the Student’s <em>t</em> distribution). This allows for more robust posterior predictions. This is probably why the estimates of the relationship are somewhat attenuated (because there are several influential high price/high square foot data points).</p>
-<p>The linearity concerns may still remain in this approach. We can evaluate this with a posterior probability check. It shows again that when plotting the observed (<span class="math inline">\(y\)</span>) and the predicted (<span class="math inline">\(y_{rep}\)</span>) values, they tend to lift off the line as <span class="math inline">\(y\)</span> increases, so the relationship is nonlinear and slightly exponential in nature.</p>
+<p>A posterior predictive check confirms whether the model captures the data-generating process. The lingering non-linearity means that even the Bayesian model with a robust likelihood will show some systematic mis-fit at high fitted values.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"scatter_avg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"scatter_avg"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -668,7 +1200,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"dens_overlay"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(brm<span class="fl">.1</span>, <span class="at">type =</span> <span class="st">"dens_overlay"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -678,24 +1210,19 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 </div>
 </div>
 </section>
-<section id="non_linear" class="level2">
-<h2 class="anchored" data-anchor-id="non_linear">Evaluating and Modifying Models for Non-Linear Relationships</h2>
-<p>If your model diagnostics suggest a non-linear relationship (for example the residuals vs fitted plot shows a curve rather than random scatter), you can consider several approaches to address this:</p>
-<ul>
-<li>Perform a transformation on one of the predictors or the response variable (<em>e.g.</em>, log, square root, polynomial terms). You should do this if you have some prior knowledge of the relationship. This has the advantage of easier interpretability if the model is simple. An example if this kind of approach is <code>model_poly &lt;- lm(y ~ x + I(x^2), data = df)</code> where you model a quadratic relationship between <code>x</code> and <code>y</code>.</li>
-<li>Use a spline fitting or GAM to model a nonlinear predictor. This can be useful if the relationship is smooth but more complex than you can capture with polynomial terms. This has the advantage of flexibility, but can be harder to interpret. An example if this kind of model is <code>model_spline &lt;- lm(y ~ ns(x, df = 4), data = df)</code> where <code>ns</code> is a natural spline with 4 degrees of freedom. This means you can have up to 3 bends in the curve.</li>
-</ul>
-<p>If you see evidence of non-linearity test these approaches and re-run the residuals vs fitted plots to see if linearity has improved. You can also compare models using AIC or BIC to see if the more complex model is justified.</p>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" role="list">
+
+</div>
 </section>
 <section id="session-information" class="level2">
 <h2 class="anchored" data-anchor-id="session-information">Session Information</h2>
-<p>This script used <a href="https://perplexity.ai">perplexity.ai</a> to help with its design and interpretation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.5.1 (2025-06-13)
+<pre><code>R version 4.5.3 (2026-03-11)
 Platform: aarch64-apple-darwin20
-Running under: macOS Sequoia 15.6.1
+Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
 BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
@@ -708,46 +1235,48 @@ time zone: America/Detroit
 tzcode source: internal
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] splines   stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
- [1] broom.mixed_0.2.9.6 brms_2.23.0         Rcpp_1.1.0         
- [4] knitr_1.50          broom_1.0.10        moderndive_0.7.0   
- [7] lubridate_1.9.4     forcats_1.0.0       stringr_1.5.2      
-[10] dplyr_1.1.4         purrr_1.1.0         readr_2.1.5        
-[13] tidyr_1.3.1         tibble_3.3.0        ggplot2_4.0.0      
+ [1] broom.mixed_0.2.9.6 brms_2.23.0         Rcpp_1.1.1         
+ [4] knitr_1.51          broom_1.0.11        moderndive_0.7.0   
+ [7] lubridate_1.9.4     forcats_1.0.1       stringr_1.6.0      
+[10] dplyr_1.1.4         purrr_1.2.1         readr_2.1.6        
+[13] tidyr_1.3.2         tibble_3.3.1        ggplot2_4.0.1      
 [16] tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.1      farver_2.1.2          loo_2.8.0            
- [4] S7_0.2.0              fastmap_1.2.0         TH.data_1.1-4        
- [7] tensorA_0.36.2.1      janitor_2.2.1         digest_0.6.37        
-[10] timechange_0.3.0      estimability_1.5.1    lifecycle_1.0.4      
-[13] StanHeaders_2.32.10   processx_3.8.6        survival_3.8-3       
-[16] magrittr_2.0.4        posterior_1.6.1       compiler_4.5.1       
-[19] rlang_1.1.6           tools_4.5.1           yaml_2.3.10          
-[22] labeling_0.4.3        bridgesampling_1.1-2  pkgbuild_1.4.8       
-[25] plyr_1.8.9            RColorBrewer_1.1-3    abind_1.4-8          
-[28] multcomp_1.4-28       withr_3.0.2           grid_4.5.1           
-[31] stats4_4.5.1          future_1.67.0         inline_0.3.21        
-[34] globals_0.18.0        emmeans_1.11.2-8      scales_1.4.0         
-[37] MASS_7.3-65           cli_3.6.5             mvtnorm_1.3-3        
-[40] rmarkdown_2.29        generics_0.1.4        RcppParallel_5.1.11-1
-[43] rstudioapi_0.17.1     reshape2_1.4.4        tzdb_0.5.0           
-[46] rstan_2.32.7          operator.tools_1.6.3  splines_4.5.1        
-[49] bayesplot_1.14.0      parallel_4.5.1        infer_1.0.9          
-[52] matrixStats_1.5.0     vctrs_0.6.5           Matrix_1.7-4         
-[55] sandwich_3.1-1        jsonlite_2.0.0        callr_3.7.6          
-[58] hms_1.1.3             listenv_0.9.1         parallelly_1.45.1    
-[61] glue_1.8.0            ps_1.9.1              codetools_0.2-20     
-[64] distributional_0.5.0  stringi_1.8.7         gtable_0.3.6         
-[67] QuickJSR_1.8.0        furrr_0.3.1           pillar_1.11.0        
-[70] htmltools_0.5.8.1     Brobdingnag_1.2-9     R6_2.6.1             
-[73] formula.tools_1.7.1   evaluate_1.0.5        lattice_0.22-7       
-[76] backports_1.5.0       snakecase_0.11.1      rstantools_2.5.0     
-[79] gridExtra_2.3         coda_0.19-4.1         nlme_3.1-168         
-[82] checkmate_2.3.3       mgcv_1.9-3            xfun_0.53            
-[85] zoo_1.8-14            pkgconfig_2.0.3      </code></pre>
+ [1] tidyselect_1.2.1      farver_2.1.2          loo_2.9.0            
+ [4] S7_0.2.1              fastmap_1.2.0         TH.data_1.1-5        
+ [7] tensorA_0.36.2.1      janitor_2.2.1         digest_0.6.39        
+[10] timechange_0.3.0      estimability_1.5.1    lifecycle_1.0.5      
+[13] StanHeaders_2.32.10   processx_3.8.6        survival_3.8-6       
+[16] magrittr_2.0.4        posterior_1.6.1       compiler_4.5.3       
+[19] rlang_1.1.7           tools_4.5.3           yaml_2.3.12          
+[22] labeling_0.4.3        bridgesampling_1.2-1  htmlwidgets_1.6.4    
+[25] pkgbuild_1.4.8        plyr_1.8.9            RColorBrewer_1.1-3   
+[28] abind_1.4-8           multcomp_1.4-29       withr_3.0.2          
+[31] stats4_4.5.3          grid_4.5.3            future_1.68.0        
+[34] colorspace_2.1-2      inline_0.3.21         xtable_1.8-4         
+[37] globals_0.18.0        emmeans_2.0.1         scales_1.4.0         
+[40] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.5            
+[43] mvtnorm_1.3-3         rmarkdown_2.30        generics_0.1.4       
+[46] otel_0.2.0            RcppParallel_5.1.11-1 rstudioapi_0.17.1    
+[49] reshape2_1.4.5        tzdb_0.5.0            rstan_2.32.7         
+[52] operator.tools_1.6.3  bayesplot_1.15.0      parallel_4.5.3       
+[55] infer_1.1.0           matrixStats_1.5.0     vctrs_0.6.5          
+[58] Matrix_1.7-4          sandwich_3.1-1        jsonlite_2.0.0       
+[61] callr_3.7.6           hms_1.1.4             listenv_0.10.0       
+[64] parallelly_1.46.1     glue_1.8.0            ps_1.9.1             
+[67] codetools_0.2-20      distributional_0.5.0  stringi_1.8.7        
+[70] gtable_0.3.6          QuickJSR_1.8.1        furrr_0.3.1          
+[73] pillar_1.11.1         htmltools_0.5.9       Brobdingnag_1.2-9    
+[76] R6_2.6.1              formula.tools_1.7.1   evaluate_1.0.5       
+[79] lattice_0.22-9        backports_1.5.0       snakecase_0.11.1     
+[82] rstantools_2.6.0      gridExtra_2.3         coda_0.19-4.1        
+[85] nlme_3.1-168          checkmate_2.3.3       mgcv_1.9-4           
+[88] xfun_0.55             zoo_1.8-15            pkgconfig_2.0.3      </code></pre>
 </div>
 </div>
 </section>
@@ -755,236 +1284,243 @@ loaded via a namespace (and not attached):
 </main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -992,185 +1528,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 
 
