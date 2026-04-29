@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Dave Bridges">
-<meta name="dcterms.date" content="2014-05-09">
+<meta name="dcterms.date" content="2026-04-29">
 
-<title>General Statistics</title>
+<title>General Statistical Methods</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,8 +23,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -35,7 +36,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -80,15 +81,17 @@ div.csl-indent {
 
 
 <script src="general-statistics_files/libs/clipboard/clipboard.min.js"></script>
-<script src="general-statistics_files/libs/quarto-html/quarto.js"></script>
+<script src="general-statistics_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="general-statistics_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="general-statistics_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="general-statistics_files/libs/quarto-html/popper.min.js"></script>
 <script src="general-statistics_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="general-statistics_files/libs/quarto-html/anchor.min.js"></script>
 <link href="general-statistics_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="general-statistics_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="general-statistics_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="general-statistics_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="general-statistics_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="general-statistics_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="general-statistics_files/libs/bootstrap/bootstrap-75002b1d8148a6ce22b7ae2bfa1c577b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -104,7 +107,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -122,7 +125,7 @@ window.Quarto = {
 
 </head>
 
-<body>
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
@@ -131,23 +134,26 @@ window.Quarto = {
    
   <ul>
   <li><a href="#general-statistical-methods" id="toc-general-statistical-methods" class="nav-link active" data-scroll-target="#general-statistical-methods">General Statistical Methods</a></li>
+  <li><a href="#experimental-design" id="toc-experimental-design" class="nav-link" data-scroll-target="#experimental-design">Experimental Design</a>
+  <ul class="collapse">
+  <li><a href="#pairwise-comparisons" id="toc-pairwise-comparisons" class="nav-link" data-scroll-target="#pairwise-comparisons">Pairwise Comparisons</a></li>
+  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
+  </ul></li>
   <li><a href="#pairwise-testing" id="toc-pairwise-testing" class="nav-link" data-scroll-target="#pairwise-testing">Pairwise Testing</a>
   <ul class="collapse">
-  <li><a href="#testing-the-assumptions" id="toc-testing-the-assumptions" class="nav-link" data-scroll-target="#testing-the-assumptions">Testing the Assumptions</a>
+  <li><a href="#always-use-welchs-t-test" id="toc-always-use-welchs-t-test" class="nav-link" data-scroll-target="#always-use-welchs-t-test">Always Use Welch’s <em>t</em>-Test</a></li>
+  <li><a href="#assessing-normality" id="toc-assessing-normality" class="nav-link" data-scroll-target="#assessing-normality">Assessing Normality</a></li>
+  </ul></li>
+  <li><a href="#when-normality-is-doubtful" id="toc-when-normality-is-doubtful" class="nav-link" data-scroll-target="#when-normality-is-doubtful">When Normality is Doubtful</a>
   <ul class="collapse">
-  <li><a href="#testing-normality" id="toc-testing-normality" class="nav-link" data-scroll-target="#testing-normality">Testing Normality</a></li>
-  <li><a href="#testing-for-equal-variance" id="toc-testing-for-equal-variance" class="nav-link" data-scroll-target="#testing-for-equal-variance">Testing for Equal Variance</a></li>
+  <li><a href="#option-1-log-transformation" id="toc-option-1-log-transformation" class="nav-link" data-scroll-target="#option-1-log-transformation">Option 1: Log Transformation</a></li>
+  <li><a href="#option-2-glm-with-an-appropriate-distribution-family" id="toc-option-2-glm-with-an-appropriate-distribution-family" class="nav-link" data-scroll-target="#option-2-glm-with-an-appropriate-distribution-family">Option 2: GLM with an Appropriate Distribution Family</a></li>
+  <li><a href="#option-3-wilcoxon-rank-sum-test" id="toc-option-3-wilcoxon-rank-sum-test" class="nav-link" data-scroll-target="#option-3-wilcoxon-rank-sum-test">Option 3: Wilcoxon Rank-Sum Test</a></li>
+  <li><a href="#choosing-between-options" id="toc-choosing-between-options" class="nav-link" data-scroll-target="#choosing-between-options">Choosing Between Options</a></li>
   </ul></li>
-  <li><a href="#performing-the-appropriate-pairwise-test" id="toc-performing-the-appropriate-pairwise-test" class="nav-link" data-scroll-target="#performing-the-appropriate-pairwise-test">Performing the Appropriate Pairwise Test</a>
-  <ul class="collapse">
-  <li><a href="#students-t-test" id="toc-students-t-test" class="nav-link" data-scroll-target="#students-t-test">Student’s <em>t</em> Test</a></li>
-  <li><a href="#welchs-t-test" id="toc-welchs-t-test" class="nav-link" data-scroll-target="#welchs-t-test">Welch’s <em>t</em> Test</a></li>
-  <li><a href="#wilcoxon-rank-sum-test" id="toc-wilcoxon-rank-sum-test" class="nav-link" data-scroll-target="#wilcoxon-rank-sum-test">Wilcoxon Rank Sum Test</a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#corrections-for-multiple-observations" id="toc-corrections-for-multiple-observations" class="nav-link" data-scroll-target="#corrections-for-multiple-observations">Corrections for Multiple Observations</a></li>
-  <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
+  <li><a href="#corrections-for-multiple-comparisons" id="toc-corrections-for-multiple-comparisons" class="nav-link" data-scroll-target="#corrections-for-multiple-comparisons">Corrections for Multiple Comparisons</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#session-information" id="toc-session-information" class="nav-link" data-scroll-target="#session-information">Session Information</a></li>
   </ul>
 </nav>
 </div>
@@ -155,7 +161,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">General Statistics</h1>
+<h1 class="title">General Statistical Methods</h1>
 </div>
 
 
@@ -172,7 +178,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 9, 2014</p>
+      <p class="date">April 29, 2026</p>
     </div>
   </div>
   
@@ -185,82 +191,139 @@ window.Quarto = {
 
 
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#figures makde will go to directory called figures, will make them as both png and pdf files </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">fig.path=</span><span class="st">'figures/'</span>,<span class="at">dev=</span><span class="fu">c</span>(<span class="st">'png'</span>,<span class="st">'pdf'</span>))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">2</span>, <span class="at">digits =</span> <span class="dv">3</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># set echo and message to TRUE if you want to display code blocks and code output respectively</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>knit_hooks<span class="sc">$</span><span class="fu">set</span>(<span class="at">inline =</span> <span class="cf">function</span>(x) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">:::</span><span class="fu">format_sci</span>(x, <span class="st">'md'</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>superpose.eb <span class="ot">&lt;-</span> <span class="cf">function</span> (x, y, ebl, <span class="at">ebu =</span> ebl, <span class="at">length =</span> <span class="fl">0.08</span>, ...)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrows</span>(x, y <span class="sc">+</span> ebu, x, y <span class="sc">-</span> ebl, <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">code =</span> <span class="dv">3</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">length =</span> length, ...)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">sd</span>(x, <span class="at">na.rm=</span>T)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">length</span>(x))</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#load these packages, nearly always needed</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sets maize and blue color scheme</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>color.scheme <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'#00274c'</span>, <span class="st">'#ffcb05'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pwr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="general-statistical-methods" class="level1">
 <h1>General Statistical Methods</h1>
-<p>There are several important concepts that we will adhere to in our group. These involve design considerations, execution considerations and analysis concerns. The standard for our field is null hypothesis significance testing, which means that we are generally comparing our data to a null hypothesis, generating an <strong>effect size</strong> and a <strong>p-value</strong>. As a general rule, we report both of these both within our Rmd/qmd scripts, and in our publications.</p>
-<p>We generally use an <span class="math inline">\(\alpha\)</span> of <span class="math inline">\(p&lt;0.05\)</span> to determine significance, which means that (if true) we are rejecting the null hypothesis. This is known as null hypothesis significance testing.</p>
-<p>An alternative approach is to use a Bayesian approach, described in more detail in <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html">this document</a></p>
+<p>There are several important concepts that we adhere to in our group. These involve design considerations, execution considerations and analysis concerns. The standard for our field is null hypothesis significance testing, which means that we are generally comparing our data to a null hypothesis, generating an <strong>effect size</strong> and a <strong>p-value</strong>. As a general rule, we report both of these both within our scripts and in our publications.</p>
+<p>We generally use an <span class="math inline">\(\alpha\)</span> of <span class="math inline">\(p&lt;0.05\)</span> to determine significance. This threshold is a convention, not a bright line — p-values should be interpreted on a continuum alongside effect sizes and confidence intervals, not as a binary pass/fail.</p>
+<p>An alternative to null hypothesis significance testing is the Bayesian approach, described in more detail in <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html">this document</a>. For comparing more than two groups, or for factorial designs with multiple predictors, see the <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/anova-example.html">ANOVA tutorial</a>.</p>
+</section>
+<section id="experimental-design" class="level1">
+<h1>Experimental Design</h1>
+<p>Where possible, perform a power analysis before an experiment to determine the appropriate sample size. To do this you need:</p>
+<ul>
+<li>The <strong>effect size</strong> you hope to detect, expressed as Cohen’s <em>d</em> = (expected difference) / (standard deviation). Keep a log of standard deviations from past measurements so you can estimate this.</li>
+<li>The desired <strong>false positive rate</strong> (<span class="math inline">\(\alpha\)</span>, normally 0.05 — the Type I error rate).</li>
+<li>The desired <strong>power</strong> (normally 0.8 — the probability of detecting the effect when it is real; equivalently, 1 minus the Type II error rate).</li>
+</ul>
+<p>We use the R package <strong>pwr</strong> <span class="citation" data-cites="pwr">(<a href="#ref-pwr" role="doc-biblioref">Champely 2017</a>)</span> for power calculations.</p>
+<section id="pairwise-comparisons" class="level2">
+<h2 class="anchored" data-anchor-id="pairwise-comparisons">Pairwise Comparisons</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>false.negative.rate <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>statistical.power   <span class="ot">&lt;-</span> <span class="fl">0.8</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sd                  <span class="ot">&lt;-</span> <span class="fl">3.5</span>   <span class="co"># estimated from prior measurements</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>difference          <span class="ot">&lt;-</span> <span class="dv">3</span>     <span class="co"># minimum difference you want to detect</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>cohens.d            <span class="ot">&lt;-</span> difference <span class="sc">/</span> sd  <span class="co"># standardised effect size</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>power.result <span class="ot">&lt;-</span> <span class="fu">pwr.t.test</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">d         =</span> cohens.d,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sig.level =</span> false.negative.rate,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">power     =</span> statistical.power</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Cohen's d</span><span class="st">`</span>       <span class="ot">=</span> <span class="fu">round</span>(cohens.d, <span class="dv">2</span>),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">n per group</span><span class="st">`</span>     <span class="ot">=</span> <span class="fu">ceiling</span>(power.result<span class="sc">$</span>n),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Alpha</span><span class="st">`</span>           <span class="ot">=</span> false.negative.rate,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Power</span><span class="st">`</span>           <span class="ot">=</span> statistical.power</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Power analysis for a two-sample t-test"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Power analysis for a two-sample t-test</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Cohen’s d</th>
+<th style="text-align: right;">n per group</th>
+<th style="text-align: right;">Alpha</th>
+<th style="text-align: right;">Power</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>To detect a difference of at least 3 units with a standard deviation of 3.5 (Cohen’s <em>d</em> = 0.86) you need at least <strong>23</strong> observations per group.</p>
+</section>
+<section id="correlations" class="level2">
+<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>correlation.coefficient <span class="ot">&lt;-</span> <span class="fl">0.6</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>cor.power.result <span class="ot">&lt;-</span> <span class="fu">pwr.r.test</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">r         =</span> correlation.coefficient,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sig.level =</span> false.negative.rate,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">power     =</span> statistical.power</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">r</span><span class="st">`</span>           <span class="ot">=</span> correlation.coefficient,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">R-squared</span><span class="st">`</span>   <span class="ot">=</span> <span class="fu">round</span>(correlation.coefficient<span class="sc">^</span><span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">n</span><span class="st">`</span>           <span class="ot">=</span> <span class="fu">ceiling</span>(cor.power.result<span class="sc">$</span>n),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Alpha</span><span class="st">`</span>       <span class="ot">=</span> false.negative.rate,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Power</span><span class="st">`</span>       <span class="ot">=</span> statistical.power</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Power analysis for a correlation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Power analysis for a correlation</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">r</th>
+<th style="text-align: right;">R-squared</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">Alpha</th>
+<th style="text-align: right;">Power</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>To detect a correlation of at least <em>r</em> = 0.6 (R² = 0.36) you need at least <strong>19</strong> observations.</p>
+</section>
 </section>
 <section id="pairwise-testing" class="level1">
 <h1>Pairwise Testing</h1>
-<p>If you have two groups (and two groups only) that you want to know if they are different, you will normally want to do a pairwise test. This is <strong>not</strong> the case if you have paired data (before and after for example). The most common of these is something called a Student’s <em>t</em>-test, but this test has two key assumptions:</p>
-<ul>
-<li>The data are normally distributed</li>
-<li>The two groups have equal variance</li>
-</ul>
-<section id="testing-the-assumptions" class="level2">
-<h2 class="anchored" data-anchor-id="testing-the-assumptions">Testing the Assumptions</h2>
-<p>Best practice is to first test for normality, and if that test passes, to then test for equal variance</p>
-<section id="testing-normality" class="level3">
-<h3 class="anchored" data-anchor-id="testing-normality">Testing Normality</h3>
-<p>To test normality, we use a Shapiro-Wilk test (details on <a href="https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test">Wikipedia</a> on each of your two groups). Below is an example where there are two groups:</p>
+<p>If you have exactly two groups to compare, use a pairwise test. The most common choice is a <em>t</em>-test.</p>
+<section id="always-use-welchs-t-test" class="level2">
+<h2 class="anchored" data-anchor-id="always-use-welchs-t-test">Always Use Welch’s <em>t</em>-Test</h2>
+<p>There are two common variants of the <em>t</em>-test: Student’s (assumes equal variances between groups) and Welch’s (does not). A common workflow is to pre-test for equal variances with Levene’s test and then choose between them based on the result. <strong>This pre-test approach should be avoided</strong> because it conditions the final inference on the outcome of a prior test, which inflates Type I error rates <span class="citation" data-cites="delacre2017">(<a href="#ref-delacre2017" role="doc-biblioref">Delacre, Lakens, and Leys 2017</a>)</span>.</p>
+<p>The practical solution is to <strong>generally always use Welch’s <em>t</em>-test by default</strong>. When variances happen to be equal, Welch’s performs nearly identically to Student’s. When they are not, Welch’s is correct and Student’s is not. There is no meaningful downside to using Welch’s by default <span class="citation" data-cites="delacre2017">(<a href="#ref-delacre2017" role="doc-biblioref">Delacre, Lakens, and Leys 2017</a>)</span>.</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create seed for reproducibility</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1265</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>test.data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Treatment=</span><span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Experiment"</span>,<span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">"Control"</span>,<span class="dv">6</span>)),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">Result =</span> <span class="fu">rnorm</span>(<span class="at">n=</span><span class="dv">12</span>, <span class="at">mean=</span><span class="dv">10</span>, <span class="at">sd=</span><span class="dv">3</span>))</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#test.data$Treatment &lt;- as.factor(test.data$Treatment)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(test.data, <span class="at">caption=</span><span class="st">"The test data used in the following examples"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1265</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>test.data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treatment =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Experiment"</span>, <span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">"Control"</span>, <span class="dv">6</span>)),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Result    =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">12</span>, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">3</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Treatment =</span> <span class="fu">factor</span>(Treatment, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Experiment"</span>)))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(test.data, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Example data for pairwise tests"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>The test data used in the following examples</caption>
+<caption>Example data for pairwise tests</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Treatment</th>
@@ -320,192 +383,13 @@ Attaching package: 'dplyr'</code></pre>
 </table>
 </div>
 </div>
-<p>Each of the two groups, in this case <strong>Test</strong> and <strong>Control</strong> must have Shapiro-Wilk tests done separately. Some sample code for this is below (requires dplyr to be loaded):</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#filter only for the control data</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>control.data <span class="ot">&lt;-</span> <span class="fu">filter</span>(test.data, Treatment<span class="sc">==</span><span class="st">"Control"</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#The broom package makes the results of the test appear in a table, with the tidy command</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#run the Shapiro-Wilk test on the values</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(control.data<span class="sc">$</span>Result) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Shapiro-Wilk test for normality of control data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Result <span class="sc">~</span> Treatment, <span class="at">data =</span> test.data, <span class="at">var.equal =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Welch's t-test (recommended default for two-group comparisons)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Shapiro-Wilk test for normality of control data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-<th style="text-align: left;">method</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.968</td>
-<td style="text-align: right;">0.88</td>
-<td style="text-align: left;">Shapiro-Wilk normality test</td>
-</tr>
-</tbody>
-</table>
-</div>
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>experiment.data <span class="ot">&lt;-</span> <span class="fu">filter</span>(test.data, Treatment<span class="sc">==</span><span class="st">"Experiment"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(test.data<span class="sc">$</span>Result) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Shapiro-Wilk test for normality of the test data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Shapiro-Wilk test for normality of the test data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-<th style="text-align: left;">method</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.93</td>
-<td style="text-align: right;">0.377</td>
-<td style="text-align: left;">Shapiro-Wilk normality test</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Based on these results, since both p-values are &gt;0.05 we do not reject the presumption of normality and can go on. If one or more of the p-values were less than 0.05 we would then use a Mann-Whitney test (also known as a Wilcoxon rank sum test) will be done, see below for more details.</p>
-</section>
-<section id="testing-for-equal-variance" class="level3">
-<h3 class="anchored" data-anchor-id="testing-for-equal-variance">Testing for Equal Variance</h3>
-<p>We generally use the <a href="https://cran.r-project.org/web/packages/car/index.html">car</a> package which contains code for <a href="https://en.wikipedia.org/wiki/Levene%27s_test">Levene’s Test</a> to see if two groups can be assumed to have equal variance. For more details see <span class="citation" data-cites="car">Fox and Weisberg (<a href="#ref-car" role="doc-biblioref">2019</a>)</span>:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#load the car package</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: carData</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'car'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:dplyr':
-
-    recode</code></pre>
-</div>
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#runs the test, grouping by the Treatment variable</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">leveneTest</span>(Result <span class="sc">~</span> Treatment, <span class="at">data=</span>test.data) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Levene's test on test data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in leveneTest.default(y = y, group = group, ...): group coerced to
-factor.</code></pre>
-</div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Levene’s test on test data</caption>
-<thead>
-<tr class="header">
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-<th style="text-align: right;">df</th>
-<th style="text-align: right;">df.residual</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.368</td>
-<td style="text-align: right;">0.558</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">10</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-</section>
-<section id="performing-the-appropriate-pairwise-test" class="level2">
-<h2 class="anchored" data-anchor-id="performing-the-appropriate-pairwise-test">Performing the Appropriate Pairwise Test</h2>
-<p>The logic to follow is:</p>
-<ul>
-<li>If the Shapiro-Wilk test passes, do Levene’s test. If it fails for either group, move on to a <strong>Wilcoxon Rank Sum Test</strong>.</li>
-<li>If Levene’s test <em>passes</em>, do a Student’s <em>t</em> Test, which assumes equal variance.</li>
-<li>If Levene’s test <em>fails</em>, do a Welch’s <em>t</em> Test, which does not assume equal variance.</li>
-</ul>
-<section id="students-t-test" class="level3">
-<h3 class="anchored" data-anchor-id="students-t-test">Student’s <em>t</em> Test</h3>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be TRUE</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Result<span class="sc">~</span>Treatment,<span class="at">data=</span>test.data, <span class="at">var.equal=</span>T) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Student's t test for test data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Student’s t test for test data</caption>
-<colgroup>
-<col style="width: 8%">
-<col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 9%">
-<col style="width: 7%">
-<col style="width: 9%">
-<col style="width: 8%">
-<col style="width: 9%">
-<col style="width: 16%">
-<col style="width: 11%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: right;">estimate</th>
-<th style="text-align: right;">estimate1</th>
-<th style="text-align: right;">estimate2</th>
-<th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
-<th style="text-align: right;">parameter</th>
-<th style="text-align: right;">conf.low</th>
-<th style="text-align: right;">conf.high</th>
-<th style="text-align: left;">method</th>
-<th style="text-align: left;">alternative</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">-1.1</td>
-<td style="text-align: right;">8.79</td>
-<td style="text-align: right;">9.89</td>
-<td style="text-align: right;">-0.992</td>
-<td style="text-align: right;">0.345</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">-3.56</td>
-<td style="text-align: right;">1.37</td>
-<td style="text-align: left;">Two Sample t-test</td>
-<td style="text-align: left;">two.sided</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</section>
-<section id="welchs-t-test" class="level3">
-<h3 class="anchored" data-anchor-id="welchs-t-test">Welch’s <em>t</em> Test</h3>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#The default for t.test in R is Welch's, so you need to set the var.equal variable to be FALSE, or leave the default</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Result<span class="sc">~</span>Treatment,<span class="at">data=</span>test.data, <span class="at">var.equal=</span>F) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Welch's t test for test data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Welch’s t test for test data</caption>
+<caption>Welch’s t-test (recommended default for two-group comparisons)</caption>
 <colgroup>
 <col style="width: 8%">
 <col style="width: 8%">
@@ -534,14 +418,155 @@ factor.</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">-1.1</td>
-<td style="text-align: right;">8.79</td>
-<td style="text-align: right;">9.89</td>
+<td style="text-align: right;">-1.098</td>
+<td style="text-align: right;">8.788</td>
+<td style="text-align: right;">9.887</td>
 <td style="text-align: right;">-0.992</td>
 <td style="text-align: right;">0.345</td>
-<td style="text-align: right;">9.72</td>
-<td style="text-align: right;">-3.57</td>
-<td style="text-align: right;">1.38</td>
+<td style="text-align: right;">9.725</td>
+<td style="text-align: right;">-3.574</td>
+<td style="text-align: right;">1.378</td>
+<td style="text-align: left;">Welch Two Sample t-test</td>
+<td style="text-align: left;">two.sided</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><code>var.equal = FALSE</code> is R’s default, so <code>t.test(Result ~ Treatment, data = test.data)</code> gives the same result.</p>
+</section>
+<section id="assessing-normality" class="level2">
+<h2 class="anchored" data-anchor-id="assessing-normality">Assessing Normality</h2>
+<p>The <em>t</em>-test assumes the within-group observations are approximately normally distributed. Rather than using a Shapiro-Wilk test as a gate to decide which test to run — a pre-testing approach with the same inferential problems described above — assess normality through:</p>
+<ul>
+<li><strong>Visual inspection</strong>: Q-Q plots and histograms are more informative than formal tests, especially at small n.</li>
+<li><strong>Subject-matter knowledge</strong>: Does the data-generating process suggest a particular distribution? Concentrations, fold changes, and enzyme activities are often log-normally distributed by the nature of the biological mechanism. Knowing this is more reliable than any hypothesis test.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test.data, <span class="fu">aes</span>(<span class="at">sample =</span> Result)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>() <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>() <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Treatment) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Normal Q-Q plots by treatment group"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general-statistics_files/figure-html/normality-check-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>test.data <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Treatment) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">W       =</span> <span class="fu">shapiro.test</span>(Result)<span class="sc">$</span>statistic,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.value =</span> <span class="fu">shapiro.test</span>(Result)<span class="sc">$</span>p.value,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Shapiro-Wilk test by group (visual check preferred; see text)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Shapiro-Wilk test by group (visual check preferred; see text)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Treatment</th>
+<th style="text-align: right;">W</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Control</td>
+<td style="text-align: right;">0.968</td>
+<td style="text-align: right;">0.880</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Experiment</td>
+<td style="text-align: right;">0.889</td>
+<td style="text-align: right;">0.314</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>With n = 6 per group the Shapiro-Wilk test has very low power and will almost never reject normality regardless of the true distribution. A non-significant result provides little assurance of normality.</p>
+</section>
+</section>
+<section id="when-normality-is-doubtful" class="level1">
+<h1>When Normality is Doubtful</h1>
+<p>If visual inspection or subject-matter knowledge suggests the normality assumption is untenable, there are three main options. The right choice depends on the nature of the data and what scientific question you are asking.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>skewed.data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treatment =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Experiment"</span>), <span class="at">each =</span> <span class="dv">12</span>),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Result    =</span> <span class="fu">c</span>(<span class="fu">rlnorm</span>(<span class="dv">12</span>, <span class="at">meanlog =</span> <span class="fl">1.0</span>, <span class="at">sdlog =</span> <span class="fl">0.6</span>),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rlnorm</span>(<span class="dv">12</span>, <span class="at">meanlog =</span> <span class="fl">1.5</span>, <span class="at">sdlog =</span> <span class="fl">0.6</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Treatment =</span> <span class="fu">factor</span>(Treatment, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Experiment"</span>)))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(skewed.data, <span class="fu">aes</span>(<span class="at">x =</span> Result, <span class="at">fill =</span> Treatment)) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">15</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Right-skewed data typical of biological measurements"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general-statistics_files/figure-html/skewed-data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="option-1-log-transformation" class="level2">
+<h2 class="anchored" data-anchor-id="option-1-log-transformation">Option 1: Log Transformation</h2>
+<p><strong>When to use:</strong> Data are strictly positive and right-skewed, arising from a multiplicative biological process — concentrations, fold changes, enzyme activities, hormone levels. These are often log-normally distributed.</p>
+<p><strong>What it tests:</strong> A <em>t</em>-test on the log scale tests whether the <em>ratio</em> of geometric means differs from 1. This is often the more natural question for biological data (e.g.&nbsp;“is treatment 2-fold higher than control?”).</p>
+<p><strong>Limitation:</strong> Only valid for strictly positive data. Back-transform the estimate and confidence interval by exponentiating to report a fold-change on the original scale.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>skewed.data <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_Result =</span> <span class="fu">log</span>(Result)) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  (\(d) <span class="fu">t.test</span>(log_Result <span class="sc">~</span> Treatment, <span class="at">data =</span> d, <span class="at">var.equal =</span> <span class="cn">FALSE</span>))() <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Welch's t-test on log-transformed data (estimate is log fold-change; exponentiate for ratio)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Welch’s t-test on log-transformed data (estimate is log fold-change; exponentiate for ratio)</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 21%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">estimate1</th>
+<th style="text-align: right;">estimate2</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">parameter</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: left;">method</th>
+<th style="text-align: left;">alternative</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.267</td>
+<td style="text-align: right;">1.453</td>
+<td style="text-align: right;">1.186</td>
+<td style="text-align: right;">0.963</td>
+<td style="text-align: right;">0.347</td>
+<td style="text-align: right;">19.79</td>
+<td style="text-align: right;">-0.311</td>
+<td style="text-align: right;">0.845</td>
 <td style="text-align: left;">Welch Two Sample t-test</td>
 <td style="text-align: left;">two.sided</td>
 </tr>
@@ -550,17 +575,140 @@ factor.</code></pre>
 </div>
 </div>
 </section>
-<section id="wilcoxon-rank-sum-test" class="level3">
-<h3 class="anchored" data-anchor-id="wilcoxon-rank-sum-test">Wilcoxon Rank Sum Test</h3>
+<section id="option-2-glm-with-an-appropriate-distribution-family" class="level2">
+<h2 class="anchored" data-anchor-id="option-2-glm-with-an-appropriate-distribution-family">Option 2: GLM with an Appropriate Distribution Family</h2>
+<p><strong>When to use:</strong> The data-generating process clearly implies a specific non-normal distribution, or log-transformation does not adequately stabilise the variance. This is the most principled approach because the variance structure is explicitly modelled rather than assumed away by transformation.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Data type</th>
+<th>Family</th>
+<th>Typical example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Positive continuous, right-skewed</td>
+<td><code>Gamma(link = "log")</code></td>
+<td>Metabolite concentrations, assay readouts</td>
+</tr>
+<tr class="even">
+<td>Non-negative integers, low counts</td>
+<td><code>poisson</code></td>
+<td>Colony counts (if not overdispersed)</td>
+</tr>
+<tr class="odd">
+<td>Non-negative integers, overdispersed</td>
+<td>negative binomial</td>
+<td>RNA-seq counts, cell counts</td>
+</tr>
+<tr class="even">
+<td>Proportions bounded 0–1</td>
+<td><code>binomial</code> or <code>quasibinomial</code></td>
+<td>Percent positive cells, survival fractions</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How to interpret:</strong> Coefficients from a log-link GLM are on the log scale. Exponentiate (<code>exp(estimate)</code>) to express the result as a ratio of means on the original scale.</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># no need to specify anything about variance</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wilcox.test</span>(Result<span class="sc">~</span>Treatment,<span class="at">data=</span>test.data) <span class="sc">%&gt;%</span> tidy <span class="sc">%&gt;%</span> <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Mann-Whitney test for test data"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(Result <span class="sc">~</span> Treatment, <span class="at">data =</span> skewed.data,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="fu">Gamma</span>(<span class="at">link =</span> <span class="st">"log"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Gamma GLM for positive continuous data (coefficients on log scale)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<caption>Mann-Whitney test for test data</caption>
+<caption>Gamma GLM for positive continuous data (coefficients on log scale)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">1.596</td>
+<td style="text-align: right;">0.186</td>
+<td style="text-align: right;">8.604</td>
+<td style="text-align: right;">0.000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TreatmentExperiment</td>
+<td style="text-align: right;">-0.156</td>
+<td style="text-align: right;">0.262</td>
+<td style="text-align: right;">-0.594</td>
+<td style="text-align: right;">0.559</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>count.data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Treatment =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Experiment"</span>), <span class="at">each =</span> <span class="dv">12</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">counts    =</span> <span class="fu">c</span>(<span class="fu">rnbinom</span>(<span class="dv">12</span>, <span class="at">mu =</span> <span class="dv">10</span>, <span class="at">size =</span> <span class="dv">2</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">rnbinom</span>(<span class="dv">12</span>, <span class="at">mu =</span> <span class="dv">25</span>, <span class="at">size =</span> <span class="dv">2</span>))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Treatment =</span> <span class="fu">factor</span>(Treatment, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Experiment"</span>)))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">glm.nb</span>(counts <span class="sc">~</span> Treatment, <span class="at">data =</span> count.data) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Negative binomial GLM for overdispersed count data (coefficients on log scale)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Negative binomial GLM for overdispersed count data (coefficients on log scale)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">statistic</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">2.037</td>
+<td style="text-align: right;">0.239</td>
+<td style="text-align: right;">8.523</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TreatmentExperiment</td>
+<td style="text-align: right;">1.259</td>
+<td style="text-align: right;">0.326</td>
+<td style="text-align: right;">3.859</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="option-3-wilcoxon-rank-sum-test" class="level2">
+<h2 class="anchored" data-anchor-id="option-3-wilcoxon-rank-sum-test">Option 3: Wilcoxon Rank-Sum Test</h2>
+<p><strong>When to use:</strong> The data are ordinal, the <em>median</em> is genuinely the quantity of scientific interest, or severe outliers that cannot be removed are distorting the mean. Also a reasonable fallback when no distributional assumption is defensible.</p>
+<p><strong>Important distinction:</strong> The Wilcoxon rank-sum test does not test for a difference in means — it tests for a <em>location shift</em> (whether one distribution tends to produce larger values than the other). If your scientific question concerns means, switching to Wilcoxon changes the question you are answering, not just the test you are using. Be explicit about this when reporting.</p>
+<p><strong>Limitation:</strong> Less powerful than parametric tests when the parametric assumptions hold, and does not extend naturally to factorial designs.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wilcox.test</span>(Result <span class="sc">~</span> Treatment, <span class="at">data =</span> skewed.data) <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Wilcoxon rank-sum test (tests location shift, not difference in means)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Wilcoxon rank-sum test (tests location shift, not difference in means)</caption>
 <thead>
 <tr class="header">
 <th style="text-align: right;">statistic</th>
@@ -571,8 +719,8 @@ factor.</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">0.394</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">0.671</td>
 <td style="text-align: left;">Wilcoxon rank sum exact test</td>
 <td style="text-align: left;">two.sided</td>
 </tr>
@@ -581,75 +729,137 @@ factor.</code></pre>
 </div>
 </div>
 </section>
-</section>
-</section>
-<section id="corrections-for-multiple-observations" class="level1">
-<h1>Corrections for Multiple Observations</h1>
-<p>The best illustration I have seen for the need for multiple observation corrections is this cartoon from XKCD (see http://xkcd.com/882/):</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="http://imgs.xkcd.com/comics/significant.png" title="Significance by XKCD. Image is from http://imgs.xkcd.com/comics/significant.png" class="img-fluid figure-img"></p>
-<figcaption>Significance by XKCD. Image is from http://imgs.xkcd.com/comics/significant.png</figcaption>
-</figure>
-</div>
-<p>Any conceptually coherent set of observations must therefore be corrected for multiple observations. In most cases, we will use the method of <span class="citation" data-cites="Benjamini1995">Benjamini and Hochberg (<a href="#ref-Benjamini1995" role="doc-biblioref">1995</a>)</span> since our p-values are not entirely independent. Some sample code for this is here:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>p.values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.023</span>, <span class="fl">0.043</span>, <span class="fl">0.056</span>, <span class="fl">0.421</span>, <span class="fl">0.012</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">unadjusted =</span> p.values, <span class="at">adjusted=</span><span class="fu">p.adjust</span>(p.values, <span class="at">method=</span><span class="st">"BH"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">caption=</span><span class="st">"Effects of adjusting p-values by the method of Benjamini-Hochberg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Effects of adjusting p-values by the method of Benjamini-Hochberg</caption>
+<section id="choosing-between-options" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-between-options">Choosing Between Options</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: right;">unadjusted</th>
-<th style="text-align: right;">adjusted</th>
+<th>Situation</th>
+<th>Recommended approach</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.023</td>
-<td style="text-align: right;">0.057</td>
+<td>Positive, right-skewed, multiplicative process</td>
+<td>Log-transform then Welch’s <em>t</em>-test</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.043</td>
-<td style="text-align: right;">0.070</td>
+<td>Continuous positive, variance proportional to mean</td>
+<td>Gamma GLM</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.056</td>
-<td style="text-align: right;">0.070</td>
+<td>Count data (RNA-seq, cell counts, colonies)</td>
+<td>Negative binomial or Poisson GLM</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.421</td>
-<td style="text-align: right;">0.421</td>
+<td>Proportion or binary outcome</td>
+<td>Binomial GLM</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.012</td>
-<td style="text-align: right;">0.057</td>
+<td>Ordinal data, or median is the target estimand</td>
+<td>Wilcoxon rank-sum</td>
+</tr>
+<tr class="even">
+<td>Severe outliers, no distributional assumption defensible</td>
+<td>Wilcoxon rank-sum</td>
 </tr>
 </tbody>
 </table>
+</section>
+</section>
+<section id="corrections-for-multiple-comparisons" class="level1">
+<h1>Corrections for Multiple Comparisons</h1>
+<p>When testing multiple hypotheses simultaneously, the probability of at least one false positive increases with the number of tests. This is illustrated well by the <a href="https://xkcd.com/882/">XKCD comic on significance</a>.</p>
+<p>Any conceptually coherent set of comparisons must be corrected for multiple testing. We use the Benjamini-Hochberg (BH) false discovery rate method <span class="citation" data-cites="Benjamini1995">(<a href="#ref-Benjamini1995" role="doc-biblioref">Benjamini and Hochberg 1995</a>)</span>, which controls the expected proportion of false positives among the rejected tests. It is less conservative than Bonferroni correction and better suited to the correlated p-values typical in biological experiments.</p>
+<p>The critical principle is to define the complete set of tests <em>before</em> applying the correction:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>p.values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.023</span>, <span class="fl">0.043</span>, <span class="fl">0.056</span>, <span class="fl">0.421</span>, <span class="fl">0.012</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">test           =</span> <span class="fu">paste</span>(<span class="st">"Comparison"</span>, <span class="fu">seq_along</span>(p.values)),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">p.value        =</span> p.values,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">p.adj.BH       =</span> <span class="fu">p.adjust</span>(p.values, <span class="at">method =</span> <span class="st">"BH"</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">p.adj.Bonf     =</span> <span class="fu">p.adjust</span>(p.values, <span class="at">method =</span> <span class="st">"bonferroni"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Raw p-values and two common corrections (BH = Benjamini-Hochberg; Bonf = Bonferroni)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Raw p-values and two common corrections (BH = Benjamini-Hochberg; Bonf = Bonferroni)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">test</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">p.adj.BH</th>
+<th style="text-align: right;">p.adj.Bonf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Comparison 1</td>
+<td style="text-align: right;">0.023</td>
+<td style="text-align: right;">0.057</td>
+<td style="text-align: right;">0.115</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Comparison 2</td>
+<td style="text-align: right;">0.043</td>
+<td style="text-align: right;">0.070</td>
+<td style="text-align: right;">0.215</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comparison 3</td>
+<td style="text-align: right;">0.056</td>
+<td style="text-align: right;">0.070</td>
+<td style="text-align: right;">0.280</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Comparison 4</td>
+<td style="text-align: right;">0.421</td>
+<td style="text-align: right;">0.421</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comparison 5</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">0.057</td>
+<td style="text-align: right;">0.060</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>For adjusting across many outcomes in a factorial design (e.g.&nbsp;multiple proteins or genes), see the Multiple Testing section of the <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/anova-example.html">ANOVA tutorial</a>.</p>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Benjamini1995" class="csl-entry" role="listitem">
+Benjamini, Yoav, and Yosef Hochberg. 1995. <span>“Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 57 (1): 289–300. <a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">https://doi.org/10.1111/j.2517-6161.1995.tb02031.x</a>.
+</div>
+<div id="ref-pwr" class="csl-entry" role="listitem">
+Champely, Stephane. 2017. <em>Pwr: Basic Functions for Power Analysis</em>. <a href="https://CRAN.R-project.org/package=pwr">https://CRAN.R-project.org/package=pwr</a>.
+</div>
+<div id="ref-delacre2017" class="csl-entry" role="listitem">
+Delacre, Marie, Daniël Lakens, and Christophe Leys. 2017. <span>“Why Psychologists Should by Default Use <span>Welch</span>’s <em>t</em>-Test Instead of <span>Student</span>’s <em>t</em>-Test.”</span> <em>International Review of Social Psychology</em> 30 (1): 92–101. <a href="https://doi.org/10.5334/irsp.82">https://doi.org/10.5334/irsp.82</a>.
 </div>
 </div>
 </section>
 <section id="session-information" class="level1">
 <h1>Session Information</h1>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.4.1 (2024-06-14)
-Platform: x86_64-apple-darwin20
-Running under: macOS Sonoma 14.7
+<pre><code>R version 4.5.3 (2026-03-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -661,29 +871,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] car_3.1-2     carData_3.0-5 broom_1.0.6   dplyr_1.1.4   tidyr_1.3.1  
-[6] knitr_1.48   
+ [1] MASS_7.3-65     car_3.1-3       carData_3.0-5   pwr_1.3-0      
+ [5] knitr_1.51      broom_1.0.11    lubridate_1.9.4 forcats_1.0.1  
+ [9] stringr_1.6.0   dplyr_1.1.4     purrr_1.2.1     readr_2.1.6    
+[13] tidyr_1.3.2     tibble_3.3.1    ggplot2_4.0.1   tidyverse_2.0.0
 
 loaded via a namespace (and not attached):
- [1] vctrs_0.6.5       cli_3.6.3         rlang_1.1.4       xfun_0.47        
- [5] purrr_1.0.2       generics_0.1.3    jsonlite_1.8.8    glue_1.7.0       
- [9] backports_1.5.0   htmltools_0.5.8.1 fansi_1.0.6       rmarkdown_2.28   
-[13] abind_1.4-8       evaluate_0.24.0   tibble_3.2.1      fastmap_1.2.0    
-[17] yaml_2.3.10       lifecycle_1.0.4   compiler_4.4.1    htmlwidgets_1.6.4
-[21] pkgconfig_2.0.3   rstudioapi_0.16.0 digest_0.6.37     R6_2.5.1         
-[25] tidyselect_1.2.1  utf8_1.2.4        pillar_1.9.0      magrittr_2.0.3   
-[29] withr_3.0.1       tools_4.4.1      </code></pre>
-</div>
-</div>
-</section>
-<section id="references" class="level1">
-<h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-Benjamini1995" class="csl-entry" role="listitem">
-Benjamini, Yoav, and Yosef Hochberg. 1995. <span>“Controlling the <span>False Discovery Rate</span>: <span>A Practical</span> and <span>Powerful Approach</span> to <span>Multiple Testing</span>.”</span> <em>Journal of the Royal Statistical Society. Series B</em> 57 (1): 289–300.
-</div>
-<div id="ref-car" class="csl-entry" role="listitem">
-Fox, John, and Sanford Weisberg. 2019. <em>An <span>R</span> Companion to Applied Regression</em>. Third. Thousand Oaks <span>CA</span>: Sage. <a href="https://socialsciences.mcmaster.ca/jfox/Books/Companion/">https://socialsciences.mcmaster.ca/jfox/Books/Companion/</a>.
+ [1] generics_0.1.4     stringi_1.8.7      hms_1.1.4          digest_0.6.39     
+ [5] magrittr_2.0.4     evaluate_1.0.5     grid_4.5.3         timechange_0.3.0  
+ [9] RColorBrewer_1.1-3 fastmap_1.2.0      jsonlite_2.0.0     backports_1.5.0   
+[13] Formula_1.2-5      scales_1.4.0       abind_1.4-8        cli_3.6.5         
+[17] rlang_1.1.7        withr_3.0.2        yaml_2.3.12        otel_0.2.0        
+[21] tools_4.5.3        tzdb_0.5.0         vctrs_0.6.5        R6_2.6.1          
+[25] lifecycle_1.0.5    htmlwidgets_1.6.4  pkgconfig_2.0.3    pillar_1.11.1     
+[29] gtable_0.3.6       glue_1.8.0         xfun_0.55          tidyselect_1.2.1  
+[33] rstudioapi_0.17.1  dichromat_2.0-0.1  farver_2.1.2       htmltools_0.5.9   
+[37] labeling_0.4.3     rmarkdown_2.30     compiler_4.5.3     S7_0.2.1          </code></pre>
 </div>
 </div>
 </section>
@@ -691,239 +894,243 @@ Fox, John, and Sanford Weisberg. 2019. <em>An <span>R</span> Companion to Applie
 </main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -931,185 +1138,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 
 
