@@ -1133,8 +1133,9 @@ window.Quarto = {
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior        =</span> priors_expect,</span>
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,                <span class="co"># required for hypothesis()</span></span>
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-expect"</span>  <span class="co"># cached on disk after first run</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-expect"</span>,   <span class="co"># cached on disk after first run</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_refit   =</span> <span class="st">"on_change"</span>            <span class="co"># refit automatically if formula/data change</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm.expect) <span class="sc">|&gt;</span></span>
@@ -1269,8 +1270,9 @@ window.Quarto = {
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior        =</span> priors_skeptical,</span>
 <span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-skeptical"</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-skeptical"</span>,</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_refit   =</span> <span class="st">"on_change"</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm.skeptical) <span class="sc">|&gt;</span></span>
@@ -1521,10 +1523,11 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.</c
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior   =</span> <span class="fu">c</span>(<span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="dv">1</span> <span class="sc">*</span> sd_y), <span class="at">class =</span> <span class="st">"b"</span>),</span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>              <span class="fu">prior</span>(<span class="fu">student_t</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">2.5</span>), <span class="at">class =</span> sigma)),</span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">file    =</span> <span class="st">"fits/anova-additive"</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>loo_comparison <span class="ot">&lt;-</span> <span class="fu">loo_compare</span>(<span class="fu">loo</span>(brm.expect), <span class="fu">loo</span>(brm.add))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">file    =</span> <span class="st">"fits/anova-additive"</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">file_refit =</span> <span class="st">"on_change"</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>loo_comparison <span class="ot">&lt;-</span> <span class="fu">loo_compare</span>(<span class="fu">loo</span>(brm.expect), <span class="fu">loo</span>(brm.add))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>loo_comparison <span class="sc">|&gt;</span></span>
@@ -1945,29 +1948,28 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6          tensorA_0.36.2.1      QuickJSR_1.9.2       
- [4] xfun_0.57             processx_3.9.0        inline_0.3.21        
- [7] lattice_0.22-9        callr_3.7.6           tzdb_0.5.0           
-[10] vctrs_0.7.3           tools_4.6.0           generics_0.1.4       
-[13] stats4_4.6.0          parallel_4.6.0        pkgconfig_2.0.3      
-[16] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
-[19] S7_0.2.2              distributional_0.7.0  RcppParallel_5.1.11-2
-[22] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
-[25] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
-[28] bayesplot_1.15.0      yaml_2.3.12           Formula_1.2-5        
-[31] furrr_0.4.0           pillar_1.11.1         StanHeaders_2.32.10  
-[34] bridgesampling_1.2-1  abind_1.4-8           parallelly_1.47.0    
-[37] nlme_3.1-169          rstan_2.32.7          posterior_1.7.0      
-[40] tidyselect_1.2.1      digest_0.6.39         future_1.70.0        
-[43] mvtnorm_1.3-7         stringi_1.8.7         listenv_0.10.1       
-[46] splines_4.6.0         fastmap_1.2.0         grid_4.6.0           
-[49] cli_3.6.6             magrittr_2.0.5        loo_2.9.0            
-[52] pkgbuild_1.4.8        withr_3.0.2           scales_1.4.0         
-[55] backports_1.5.1       estimability_1.5.1    timechange_0.4.0     
-[58] rmarkdown_2.31        globals_0.19.1        matrixStats_1.5.0    
-[61] gridExtra_2.3         hms_1.1.4             coda_0.19-4.1        
-[64] evaluate_1.0.5        rstantools_2.6.0      rlang_1.2.0          
-[67] glue_1.8.1            rstudioapi_0.18.0     jsonlite_2.0.0       
-[70] R6_2.6.1             </code></pre>
+ [4] xfun_0.57             inline_0.3.21         lattice_0.22-9       
+ [7] tzdb_0.5.0            vctrs_0.7.3           tools_4.6.0          
+[10] generics_0.1.4        stats4_4.6.0          parallel_4.6.0       
+[13] pkgconfig_2.0.3       Matrix_1.7-5          checkmate_2.3.4      
+[16] RColorBrewer_1.1-3    S7_0.2.2              distributional_0.7.0 
+[19] RcppParallel_5.1.11-2 lifecycle_1.0.5       compiler_4.6.0       
+[22] farver_2.1.2          Brobdingnag_1.2-9     codetools_0.2-20     
+[25] htmltools_0.5.9       bayesplot_1.15.0      yaml_2.3.12          
+[28] Formula_1.2-5         furrr_0.4.0           pillar_1.11.1        
+[31] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
+[34] parallelly_1.47.0     nlme_3.1-169          rstan_2.32.7         
+[37] posterior_1.7.0       tidyselect_1.2.1      digest_0.6.39        
+[40] future_1.70.0         mvtnorm_1.3-7         stringi_1.8.7        
+[43] listenv_0.10.1        splines_4.6.0         fastmap_1.2.0        
+[46] grid_4.6.0            cli_3.6.6             magrittr_2.0.5       
+[49] loo_2.9.0             pkgbuild_1.4.8        withr_3.0.2          
+[52] scales_1.4.0          backports_1.5.1       estimability_1.5.1   
+[55] timechange_0.4.0      rmarkdown_2.31        globals_0.19.1       
+[58] matrixStats_1.5.0     gridExtra_2.3         hms_1.1.4            
+[61] coda_0.19-4.1         evaluate_1.0.5        rstantools_2.6.0     
+[64] rlang_1.2.0           glue_1.8.1            rstudioapi_0.18.0    
+[67] jsonlite_2.0.0        R6_2.6.1             </code></pre>
 </div>
 </div>
 </section>

@@ -618,7 +618,8 @@ brm.expect <- brm(
   prior        = priors_expect,
   sample_prior = TRUE,                # required for hypothesis()
   chains = 4, cores = 4, seed = 42,
-  file         = "fits/anova-expect"  # cached on disk after first run
+  file         = "fits/anova-expect",   # cached on disk after first run
+  file_refit   = "on_change"            # refit automatically if formula/data change
 )
 ```
 :::
@@ -677,7 +678,8 @@ brm.skeptical <- brm(
   prior        = priors_skeptical,
   sample_prior = TRUE,
   chains = 4, cores = 4, seed = 42,
-  file         = "fits/anova-skeptical"
+  file         = "fits/anova-skeptical",
+  file_refit   = "on_change"
 )
 ```
 :::
@@ -826,7 +828,8 @@ brm.add <- brm(
   prior   = c(prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
               prior(student_t(3, 0, 2.5), class = sigma)),
   chains  = 4, cores = 4, seed = 42,
-  file    = "fits/anova-additive"
+  file    = "fits/anova-additive",
+  file_refit = "on_change"
 )
 
 loo_comparison <- loo_compare(loo(brm.expect), loo(brm.add))
@@ -1098,29 +1101,28 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] gtable_0.3.6          tensorA_0.36.2.1      QuickJSR_1.9.2       
- [4] xfun_0.57             processx_3.9.0        inline_0.3.21        
- [7] lattice_0.22-9        callr_3.7.6           tzdb_0.5.0           
-[10] vctrs_0.7.3           tools_4.6.0           generics_0.1.4       
-[13] stats4_4.6.0          parallel_4.6.0        pkgconfig_2.0.3      
-[16] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
-[19] S7_0.2.2              distributional_0.7.0  RcppParallel_5.1.11-2
-[22] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
-[25] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
-[28] bayesplot_1.15.0      yaml_2.3.12           Formula_1.2-5        
-[31] furrr_0.4.0           pillar_1.11.1         StanHeaders_2.32.10  
-[34] bridgesampling_1.2-1  abind_1.4-8           parallelly_1.47.0    
-[37] nlme_3.1-169          rstan_2.32.7          posterior_1.7.0      
-[40] tidyselect_1.2.1      digest_0.6.39         future_1.70.0        
-[43] mvtnorm_1.3-7         stringi_1.8.7         listenv_0.10.1       
-[46] splines_4.6.0         fastmap_1.2.0         grid_4.6.0           
-[49] cli_3.6.6             magrittr_2.0.5        loo_2.9.0            
-[52] pkgbuild_1.4.8        withr_3.0.2           scales_1.4.0         
-[55] backports_1.5.1       estimability_1.5.1    timechange_0.4.0     
-[58] rmarkdown_2.31        globals_0.19.1        matrixStats_1.5.0    
-[61] gridExtra_2.3         hms_1.1.4             coda_0.19-4.1        
-[64] evaluate_1.0.5        rstantools_2.6.0      rlang_1.2.0          
-[67] glue_1.8.1            rstudioapi_0.18.0     jsonlite_2.0.0       
-[70] R6_2.6.1             
+ [4] xfun_0.57             inline_0.3.21         lattice_0.22-9       
+ [7] tzdb_0.5.0            vctrs_0.7.3           tools_4.6.0          
+[10] generics_0.1.4        stats4_4.6.0          parallel_4.6.0       
+[13] pkgconfig_2.0.3       Matrix_1.7-5          checkmate_2.3.4      
+[16] RColorBrewer_1.1-3    S7_0.2.2              distributional_0.7.0 
+[19] RcppParallel_5.1.11-2 lifecycle_1.0.5       compiler_4.6.0       
+[22] farver_2.1.2          Brobdingnag_1.2-9     codetools_0.2-20     
+[25] htmltools_0.5.9       bayesplot_1.15.0      yaml_2.3.12          
+[28] Formula_1.2-5         furrr_0.4.0           pillar_1.11.1        
+[31] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
+[34] parallelly_1.47.0     nlme_3.1-169          rstan_2.32.7         
+[37] posterior_1.7.0       tidyselect_1.2.1      digest_0.6.39        
+[40] future_1.70.0         mvtnorm_1.3-7         stringi_1.8.7        
+[43] listenv_0.10.1        splines_4.6.0         fastmap_1.2.0        
+[46] grid_4.6.0            cli_3.6.6             magrittr_2.0.5       
+[49] loo_2.9.0             pkgbuild_1.4.8        withr_3.0.2          
+[52] scales_1.4.0          backports_1.5.1       estimability_1.5.1   
+[55] timechange_0.4.0      rmarkdown_2.31        globals_0.19.1       
+[58] matrixStats_1.5.0     gridExtra_2.3         hms_1.1.4            
+[61] coda_0.19-4.1         evaluate_1.0.5        rstantools_2.6.0     
+[64] rlang_1.2.0           glue_1.8.1            rstudioapi_0.18.0    
+[67] jsonlite_2.0.0        R6_2.6.1             
 ```
 
 

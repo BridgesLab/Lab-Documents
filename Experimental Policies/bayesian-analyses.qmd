@@ -18,40 +18,63 @@ While we most often use classical frequentist statistical approaches, the norm i
 
 ### How Much Protein is Optimal Post-Exercise
 
-One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there wsa no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper [@trommelenAnabolicResponseProtein2023] came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words by prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likliehood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is found on this  [Wikipedia Article on Bayesian Inference](https://en.wikipedia.org/wiki/Bayesian_inference):
+One example is the question of how much protein is optimal post-resistance training workout. I had been teaching for years that the max was 20-30g and beyond that there was no advantage. This was based on several feeding experiments with whey protein looking at muscle protein synthesis as the endpoint. However in December a provocative paper [@trommelenAnabolicResponseProtein2023] came out showing that up to 100g could be absorbed and stored and that the true maximum may be higher. There are several important differences in this study including a more natural protein source (milk proteins mostly a combination of whey and casein, compared with casein alone) and much more rigorous endpoints by the use of stable isotopes. I am a cynical person by nature, but this paper made me change my opinion greatly. In other words my prior hypothesis (max protein uptake is 20-30g) was updated by new data (this new paper) and my new posterior opinion suggests the levels might be higher. Fundamentally this happens to me a lot when newer (or better) data updates our understanding of the world and we update the likelihood of something being true. This is an example of inferential Bayesian reasoning. The math behind this is found on this [Wikipedia Article on Bayesian Inference](https://en.wikipedia.org/wiki/Bayesian_inference):
 
--   $P(H|E)$ is the probability of hypothesis given that the evidence (E) was obtained. Also known as the *posterior probability*.
--   $P(E|H)$ is the probability of observing the evidence given this hypothesis.  This is also known as the *likelihood*.
--   $P(H)$ is the probability of the hypothesis before the data is observed (the *prior probability*).  Think of this as how likely you think the result is before you see the data.
--   $P(E)$ is the probability of the evidence, or the *marginal liklihood*.  This is true for all hypotheses being tested.
+-   $P(H|E)$ is the probability of the hypothesis given that the evidence (E) was obtained. Also known as the *posterior probability*.
+-   $P(E|H)$ is the probability of observing the evidence given this hypothesis. This is also known as the *likelihood*.
+-   $P(H)$ is the probability of the hypothesis before the data are observed (the *prior probability*). Think of this as how likely you think the result is before you see the data.
+-   $P(E)$ is the probability of the evidence, or the *marginal likelihood*. This is the same regardless of which hypothesis is being tested — it is the probability of the observed data averaged across all hypotheses.
 
-Together these are connected by Bayes' rule
+Together these are connected by Bayes' rule:
 
-$$P(H|E) = \frac{P(E|H)P(H)}{P(E)} $$ In other words my prior hypothesis (max protein post workout is 20-30g; $P(H)$ was updated by this new data (represented by $\frac{P(E|H)}{P(E)}$) to give me an updated posterior probability of that hypothesis being true given this evidence ($P(H|E)$). Roughly I would say i had about 70% certainty that 20-30g was the maximum before the study but now only about \~10% certainty after reading that study, so re-arranging we would get:
+$$P(H|E) = \frac{P(E|H)P(H)}{P(E)}$$
+
+In other words my prior hypothesis (max protein post workout is 20-30g; $P(H)$) was updated by this new data (represented by the **Bayesian update factor** $\frac{P(E|H)}{P(E)}$) to give me an updated posterior probability of that hypothesis being true given this evidence ($P(H|E)$). Roughly I would say I had about 70% certainty that 20-30g was the maximum before the study but now only about \~10% certainty after reading that study, so re-arranging we would get:
 
 $$
 0.1 = \frac{P(E|H)}{P(E)} \times 0.7
-$$ $$
-\frac{P(E|H)}{P(E)} = 0.1/0.7 = 0.07
+$$
+$$
+\frac{P(E|H)}{P(E)} = 0.1 / 0.7 \approx 0.14
 $$
 
-0.07 is much less than one, so based on my rough estimate the study changed my opinion by $1/0.07=~14$ fold. Another way to think about this is to compare the **posterior** probabilities of two hypotheses or models ($BF=\frac{Pr(E|H_1)}{Pr(E|H_2)}$) a value which is known as the Bayes Factor. The $P(E)$ term is not expected to change depending on the hypothesis, because it is the overall probability of the observed data.
+The update factor of 0.14 (i.e. ~1/7) tells us by how much the data divided my belief in the original hypothesis. **This is not a Bayes factor**, although it is sometimes loosely called one — a Bayes factor compares two competing hypotheses, not a hypothesis against the marginal evidence. To get a proper Bayes factor for this example we need to compare H ("max is 20-30g") against ¬H ("max is higher").
+
+The Bayes factor is defined as the ratio of marginal likelihoods under two hypotheses,
+
+$$BF_{12} = \frac{P(E|H_1)}{P(E|H_2)}$$
+
+and it is the multiplier that converts prior odds into posterior odds:
+
+$$\text{posterior odds} = BF \times \text{prior odds}$$
+
+For the protein example:
+
+- Prior odds for H: $P(H)/P(\neg H) = 0.7/0.3 \approx 2.33$
+- Posterior odds for H: $P(H|E)/P(\neg H|E) = 0.1/0.9 \approx 0.11$
+- Bayes factor for H over ¬H: $BF_{H,\neg H} = 0.11 / 2.33 \approx 0.048$
+
+Equivalently, $BF_{\neg H, H} \approx 21$ — the data are about 21 times more consistent with the alternative (max is higher) than with the original hypothesis. This counts as "strong to very strong" evidence on the conventions described below.
 
 ### Interpreting a Bayesian Analysis
 
-After this kind of analysis, there are two things we coould report. A *poster probability* ($P(H|E)$; or its distribution) or a Bayes Factor. In one case we are saying that based on our prior probability and our baysian factor we report the posterior probability that a hypothesis is true given the evidence. This means that we use both the Bayes Factor and our prior probability (which could vary among investigators). If we report a Bayes Factor we are reporting how much we expect that these data should modify any prior probability ($P(H)$). This is an important distinction because a Bayes Factor does not make any claims about what the scientist initially thought about how likely a hypothesis was, so is more generalizable. Maybe I had some reason to think that the probability that protein intake max was 20-30g was 70% but another scientist thought it was closer to 90%, we would get different posterior probabilities but the same BF (0.07):
+After this kind of analysis, there are two things we could report: a *posterior probability* ($P(H|E)$, or its distribution) or a Bayes factor. In the first case we are saying that based on our prior probability and the data, the posterior probability of the hypothesis is some value — this requires us to commit to a specific prior, which could vary among investigators. If we report a Bayes factor we are reporting how much the data should modify *any* prior odds. This is an important distinction because a Bayes factor does not make any claims about what the scientist initially thought about how likely a hypothesis was, so is more generalizable. Two scientists with different priors will get different posterior probabilities from the same data, but the same Bayes factor.
 
-There is no p-value in either case. Here we are reporting either a Bayes Factor or a posterior probability (or both). For standardization, Bayes Factors are classified in several ways, for example by [@leeBayesianCognitiveModeling2014] as:
+There are no p-values in either case. Here we are reporting either a Bayes factor or a posterior probability (or both). For standardization, Bayes factors are classified in several ways — the table below follows the conventions of [@leeBayesianCognitiveModeling2014]. Because BF is symmetric (BF₁₂ = 1/BF₂₁), the same scale applies in both directions:
 
--   $<1-3$ anecdoctal or barely worth mentioning
-
--   $3-10$ moderate evidence
-
--   $10-30$ strong evidence
-
--   $30-100$ extremely strong evidence
-
--   $>100$ extreme evidence
+| Bayes factor (BF₁₂) | Interpretation |
+|---|---|
+| > 100         | Extreme evidence for $H_1$ |
+| 30 – 100      | Very strong evidence for $H_1$ |
+| 10 – 30       | Strong evidence for $H_1$ |
+| 3 – 10        | Moderate evidence for $H_1$ |
+| 1 – 3         | Anecdotal evidence for $H_1$ |
+| 1             | No evidence either way |
+| 1/3 – 1       | Anecdotal evidence for $H_2$ |
+| 1/10 – 1/3    | Moderate evidence for $H_2$ |
+| 1/30 – 1/10   | Strong evidence for $H_2$ |
+| 1/100 – 1/30  | Very strong evidence for $H_2$ |
+| < 1/100       | Extreme evidence for $H_2$ |
 
 ### How Does a Bayes Factor Affect Posterior Probability
 
@@ -85,7 +108,7 @@ As you can see, in all cases as your prior probability ($P(H)$) increases so doe
 
 ## How to perform Bayesian Analyses
 
-There are several useful R packages to help with this, but i will focus on the [brms package](https://paul-buerkner.github.io/brms/) by Paul-Christian Bürkner. For comparason first lets look at a conventional analysis using the Iris dataset.
+There are several useful R packages to help with this, but I will focus on the [brms package](https://paul-buerkner.github.io/brms/) by Paul-Christian Bürkner. For comparison let's first look at a conventional analysis using the Iris dataset.
 
 ```{r iris-standard}
 library(knitr)
@@ -109,9 +132,15 @@ Using brms the model specification is the same, though it takes a few seconds lo
 ```{r brm}
 #| output: false
 library(brms)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+
 brms.fit <- brm(Sepal.Length~0+Species, data=iris,
                 family = gaussian(),
-                sample_prior = TRUE) #required for hypothesis testing
+                sample_prior = TRUE,             # required for hypothesis testing
+                file = "fits/iris-default-priors",
+                file_refit = "on_change")
 ```
 
 Lets walk through this.  First the model call looks similar to before.  We expect the residual errors to be normally distributed so used a gaussian distribution (which is the same thing for this package).  The main difference is that we should set our priors probabilities.
@@ -124,22 +153,22 @@ We may not have noticed this but in the call above we just used the default prio
 prior_summary(brms.fit) %>% kable(caption="Default priors for a brms model of Sepal Length")
 ```
 
-This means that for the beta coefficients (b) teh priors were set as flat priors.  The intercept wsa set as Student's *t* distribution (three degrees of freedom, location 5.8, scale $\sigma$ of 2.5) and the sigma (error) was set to a similar distributiob but centered around zero.  Where did these defaults come from?  Well the mean sepal lenghti is `r mean(iris$Sepal.Length)` which is why the intercept was set to that, this seems reasonable.  But what about the distributions chosen
+This means that for the beta coefficients (b) the priors were set as flat priors. The intercept was set as a Student's *t* distribution (three degrees of freedom, location at the median of the response, and scale set to the larger of 2.5 or a robust estimate of the response SD). The sigma (residual error) was set to a similar distribution but centered at zero. Where did these defaults come from? The mean sepal length is `r mean(iris$Sepal.Length)`, which is close to the median brms uses for the intercept location. But what about the distributions chosen?
 
-* **Flat Prior** means the b coefficient is equally likely to be any value, this is a non-informative prior.
-* **Students' t** distributions have heavier tails than normal/gaussian distributions so allow for outliers more easily to be modelled.  Again,  for the Interecept it is centered around the mean for the data.  
+* **Flat prior** means the b coefficient is equally likely to be any value, which is technically improper but conceptually a non-informative prior.
+* **Student's *t*** distributions have heavier tails than normal/Gaussian distributions, so allow for outliers more easily to be modelled. For the intercept it is centered around the median of the data.
 
-This is the default, and presumes you know little about your data, of course since this is a Bayesian approach you could provide more or less information about the model parameters based on your prior knowledge.
+This is the default, and presumes you know little about your data. Since this is a Bayesian approach, you could provide more or less information about the model parameters based on your prior knowledge.
 
-There are three methods by which you could thinkg about your prior distributions.  You could have *weakly informative priors* as we have above, or *strongly informative priors* if you know a lot about the system.  
+There is a continuum of how informative your priors can be. You could have *weakly informative priors* as in the defaults above, or *strongly informative priors* if you know a lot about the system from prior literature.
 
-Lets say we have some information about Iris because we have been working on this for a while, but havent investigated the effect of species.  We could therefore set our priors as follows:
+Let's say we have some information about Iris because we have been working on this for a while, but haven't investigated the effect of species. We could therefore set our priors as follows:
 
-* Intercept is a value of `r mean(iris$Sepal.Length)` with a sd of `r sd(iris$Sepal.Length)`, fit to a normal distribution
-* Beta coefficients are set to a value of zero with a sd of 0.5, also fit to a normal distribution.
-* Set the residual standard deviation (sigma) as mean zero, three degrees of freedom with a sd of 0.5 set to a Student's *t* distribution.
+* Intercept is a value of `r mean(iris$Sepal.Length)` with an SD of `r sd(iris$Sepal.Length)`, fit to a normal distribution.
+* Beta coefficients are set to a value of zero with an SD of 0.5, also fit to a normal distribution.
+* Set the residual standard deviation (sigma) as mean zero, three degrees of freedom with a scale of 2.5, fit to a Student's *t* distribution.
 
-Both of these are somewhat non-informative priors and presume we something but not a lot about the data.  We could also set lower or upper bounds for these distributions if needed (lb and ub) but we will skip that for now.
+These are *weakly informative* priors — they encode some general knowledge (the intercept should be near the response mean, effect sizes shouldn't be enormous) without strongly committing to specific values. We could also set lower or upper bounds for these distributions if needed (`lb` and `ub`) but we will skip that for now.
 
 ```{r set-priors}
 sepal_length_mean <- mean(iris$Sepal.Length)
@@ -160,7 +189,9 @@ Now lets re-run the analysis
 brms.fit.new.priors <- brm(Sepal.Length~0+Species, data=iris,
                 family = gaussian(),
                 prior = new.priors,
-                sample_prior = TRUE) 
+                sample_prior = TRUE,
+                file = "fits/iris-new-priors",
+                file_refit = "on_change")
 ```
 
 #### Comparing the Results
@@ -198,7 +229,7 @@ combined.posteriors %>%
   facet_grid(Factor~.) +
   labs(y="Density",
        x="Sepal Length",
-       title="Comparason of Model Priors") +
+       title="Comparison of Model Priors") +
   theme_classic(base_size=14) +
   theme(legend.position=c(0.75,0.9))
 ```

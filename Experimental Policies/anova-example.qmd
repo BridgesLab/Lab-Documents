@@ -299,7 +299,8 @@ brm.expect <- brm(
   prior        = priors_expect,
   sample_prior = TRUE,                # required for hypothesis()
   chains = 4, cores = 4, seed = 42,
-  file         = "fits/anova-expect"  # cached on disk after first run
+  file         = "fits/anova-expect",   # cached on disk after first run
+  file_refit   = "on_change"            # refit automatically if formula/data change
 )
 ```
 
@@ -330,7 +331,8 @@ brm.skeptical <- brm(
   prior        = priors_skeptical,
   sample_prior = TRUE,
   chains = 4, cores = 4, seed = 42,
-  file         = "fits/anova-skeptical"
+  file         = "fits/anova-skeptical",
+  file_refit   = "on_change"
 )
 ```
 
@@ -382,7 +384,8 @@ brm.add <- brm(
   prior   = c(prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
               prior(student_t(3, 0, 2.5), class = sigma)),
   chains  = 4, cores = 4, seed = 42,
-  file    = "fits/anova-additive"
+  file    = "fits/anova-additive",
+  file_refit = "on_change"
 )
 
 loo_comparison <- loo_compare(loo(brm.expect), loo(brm.add))

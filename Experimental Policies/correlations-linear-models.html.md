@@ -529,13 +529,19 @@ We set an illustrative informative prior based on published estimates (here ~\$1
 
 ```{.r .cell-code}
 library(brms)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+
 housing.priors <- prior(normal(1663, 602), class = b, coef = sqft_living)
 brm.1 <- brm(
   price ~ sqft_living,
   data         = house_prices,
   prior        = housing.priors,
   family       = student(),
-  sample_prior = TRUE
+  sample_prior = TRUE,
+  file         = "fits/housing-prices",
+  file_refit   = "on_change"
 )
 ```
 :::
@@ -734,13 +740,13 @@ pp_check(brm.1, type = "dens_overlay")
 ::: {.cell-output .cell-output-stdout}
 
 ```
-R version 4.5.3 (2026-03-11)
-Platform: aarch64-apple-darwin20
+R version 4.6.0 (2026-04-24)
+Platform: aarch64-apple-darwin23
 Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -753,44 +759,40 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] broom.mixed_0.2.9.6 brms_2.23.0         Rcpp_1.1.1         
- [4] knitr_1.51          broom_1.0.11        moderndive_0.7.0   
- [7] lubridate_1.9.4     forcats_1.0.1       stringr_1.6.0      
-[10] dplyr_1.1.4         purrr_1.2.1         readr_2.1.6        
-[13] tidyr_1.3.2         tibble_3.3.1        ggplot2_4.0.1      
+ [1] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
+ [4] knitr_1.51          broom_1.0.12        moderndive_0.7.0   
+ [7] lubridate_1.9.5     forcats_1.0.1       stringr_1.6.0      
+[10] dplyr_1.2.1         purrr_1.2.2         readr_2.2.0        
+[13] tidyr_1.3.2         tibble_3.3.1        ggplot2_4.0.3      
 [16] tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.1      farver_2.1.2          loo_2.9.0            
- [4] S7_0.2.1              fastmap_1.2.0         TH.data_1.1-5        
- [7] tensorA_0.36.2.1      janitor_2.2.1         digest_0.6.39        
-[10] timechange_0.3.0      estimability_1.5.1    lifecycle_1.0.5      
-[13] StanHeaders_2.32.10   processx_3.8.6        survival_3.8-6       
-[16] magrittr_2.0.4        posterior_1.6.1       compiler_4.5.3       
-[19] rlang_1.1.7           tools_4.5.3           yaml_2.3.12          
-[22] labeling_0.4.3        bridgesampling_1.2-1  htmlwidgets_1.6.4    
-[25] pkgbuild_1.4.8        plyr_1.8.9            RColorBrewer_1.1-3   
-[28] abind_1.4-8           multcomp_1.4-29       withr_3.0.2          
-[31] stats4_4.5.3          grid_4.5.3            future_1.68.0        
-[34] colorspace_2.1-2      inline_0.3.21         xtable_1.8-4         
-[37] globals_0.18.0        emmeans_2.0.1         scales_1.4.0         
-[40] MASS_7.3-65           dichromat_2.0-0.1     cli_3.6.5            
-[43] mvtnorm_1.3-3         rmarkdown_2.30        generics_0.1.4       
-[46] otel_0.2.0            RcppParallel_5.1.11-1 rstudioapi_0.17.1    
-[49] reshape2_1.4.5        tzdb_0.5.0            rstan_2.32.7         
-[52] operator.tools_1.6.3  bayesplot_1.15.0      parallel_4.5.3       
-[55] infer_1.1.0           matrixStats_1.5.0     vctrs_0.6.5          
-[58] Matrix_1.7-4          sandwich_3.1-1        jsonlite_2.0.0       
-[61] callr_3.7.6           hms_1.1.4             listenv_0.10.0       
-[64] parallelly_1.46.1     glue_1.8.0            ps_1.9.1             
-[67] codetools_0.2-20      distributional_0.5.0  stringi_1.8.7        
-[70] gtable_0.3.6          QuickJSR_1.8.1        furrr_0.3.1          
-[73] pillar_1.11.1         htmltools_0.5.9       Brobdingnag_1.2-9    
-[76] R6_2.6.1              formula.tools_1.7.1   evaluate_1.0.5       
-[79] lattice_0.22-9        backports_1.5.0       snakecase_0.11.1     
-[82] rstantools_2.6.0      gridExtra_2.3         coda_0.19-4.1        
-[85] nlme_3.1-168          checkmate_2.3.3       mgcv_1.9-4           
-[88] xfun_0.55             zoo_1.8-15            pkgconfig_2.0.3      
+ [1] tidyselect_1.2.1       farver_2.1.2           loo_2.9.0             
+ [4] S7_0.2.2               fastmap_1.2.0          tensorA_0.36.2.1      
+ [7] janitor_2.2.1          digest_0.6.39          timechange_0.4.0      
+[10] estimability_1.5.1     lifecycle_1.0.5        StanHeaders_2.32.10   
+[13] processx_3.9.0         magrittr_2.0.5         posterior_1.7.0       
+[16] compiler_4.6.0         rlang_1.2.0            tools_4.6.0           
+[19] yaml_2.3.12            labeling_0.4.3         bridgesampling_1.2-1  
+[22] pkgbuild_1.4.8         plyr_1.8.9             RColorBrewer_1.1-3    
+[25] abind_1.4-8            withr_3.0.2            grid_4.6.0            
+[28] stats4_4.6.0           future_1.70.0          inline_0.3.21         
+[31] globals_0.19.1         emmeans_2.0.3          scales_1.4.0          
+[34] cli_3.6.6              mvtnorm_1.3-7          rmarkdown_2.31        
+[37] generics_0.1.4         RcppParallel_5.1.11-2  rstudioapi_0.18.0     
+[40] reshape2_1.4.5         tzdb_0.5.0             rstan_2.32.7          
+[43] operator.tools_1.6.3.1 bayesplot_1.15.0       parallel_4.6.0        
+[46] infer_1.1.0            matrixStats_1.5.0      vctrs_0.7.3           
+[49] Matrix_1.7-5           jsonlite_2.0.0         callr_3.7.6           
+[52] hms_1.1.4              listenv_0.10.1         parallelly_1.47.0     
+[55] glue_1.8.1             codetools_0.2-20       distributional_0.7.0  
+[58] stringi_1.8.7          gtable_0.3.6           QuickJSR_1.9.2        
+[61] furrr_0.4.0            pillar_1.11.1          htmltools_0.5.9       
+[64] Brobdingnag_1.2-9      R6_2.6.1               formula.tools_1.7.1   
+[67] evaluate_1.0.5         lattice_0.22-9         backports_1.5.1       
+[70] snakecase_0.11.1       rstantools_2.6.0       coda_0.19-4.1         
+[73] gridExtra_2.3          nlme_3.1-169           checkmate_2.3.4       
+[76] mgcv_1.9-4             xfun_0.57              pkgconfig_2.0.3       
 ```
 
 

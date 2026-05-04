@@ -256,13 +256,19 @@ We set an illustrative informative prior based on published estimates (here ~\$1
 ```{r brms-linear-regression}
 #| output: false
 library(brms)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+
 housing.priors <- prior(normal(1663, 602), class = b, coef = sqft_living)
 brm.1 <- brm(
   price ~ sqft_living,
   data         = house_prices,
   prior        = housing.priors,
   family       = student(),
-  sample_prior = TRUE
+  sample_prior = TRUE,
+  file         = "fits/housing-prices",
+  file_refit   = "on_change"
 )
 ```
 
