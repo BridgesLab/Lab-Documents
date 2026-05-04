@@ -140,15 +140,25 @@ window.Quarto = {
   </ul></li>
   <li><a href="#two-way-anova" id="toc-two-way-anova" class="nav-link" data-scroll-target="#two-way-anova">Two-Way ANOVA</a>
   <ul class="collapse">
-  <li><a href="#for-a-22-design-always-fit-the-full-interaction-model" id="toc-for-a-22-design-always-fit-the-full-interaction-model" class="nav-link" data-scroll-target="#for-a-22-design-always-fit-the-full-interaction-model">For a 2×2 Design, Always Fit the Full Interaction Model</a>
+  <li><a href="#standard-frequentist-approach" id="toc-standard-frequentist-approach" class="nav-link" data-scroll-target="#standard-frequentist-approach">Standard (Frequentist) Approach</a>
   <ul class="collapse">
-  <li><a href="#why-not-drop-the-interaction-and-refit-an-additive-model" id="toc-why-not-drop-the-interaction-and-refit-an-additive-model" class="nav-link" data-scroll-target="#why-not-drop-the-interaction-and-refit-an-additive-model">Why Not Drop the Interaction and Refit an Additive Model?</a></li>
-  </ul></li>
+  <li><a href="#for-a-22-design-always-fit-the-full-interaction-model" id="toc-for-a-22-design-always-fit-the-full-interaction-model" class="nav-link" data-scroll-target="#for-a-22-design-always-fit-the-full-interaction-model">For a 2×2 Design, Always Fit the Full Interaction Model</a></li>
   <li><a href="#cell-means" id="toc-cell-means" class="nav-link" data-scroll-target="#cell-means">Cell Means</a></li>
   <li><a href="#marginal-main-effects" id="toc-marginal-main-effects" class="nav-link" data-scroll-target="#marginal-main-effects">Marginal Main Effects</a></li>
   <li><a href="#simple-effects" id="toc-simple-effects" class="nav-link" data-scroll-target="#simple-effects">Simple Effects</a></li>
   <li><a href="#what-to-report" id="toc-what-to-report" class="nav-link" data-scroll-target="#what-to-report">What to Report</a></li>
   <li><a href="#multiple-testing-across-many-outcomes" id="toc-multiple-testing-across-many-outcomes" class="nav-link" data-scroll-target="#multiple-testing-across-many-outcomes">Multiple Testing Across Many Outcomes</a></li>
+  </ul></li>
+  <li><a href="#bayesian-approach" id="toc-bayesian-approach" class="nav-link" data-scroll-target="#bayesian-approach">Bayesian Approach</a>
+  <ul class="collapse">
+  <li><a href="#pre-specifying-your-interaction-hypothesis" id="toc-pre-specifying-your-interaction-hypothesis" class="nav-link" data-scroll-target="#pre-specifying-your-interaction-hypothesis">Pre-specifying Your Interaction Hypothesis</a></li>
+  <li><a href="#setting-up-the-model" id="toc-setting-up-the-model" class="nav-link" data-scroll-target="#setting-up-the-model">Setting Up the Model</a></li>
+  <li><a href="#scenario-a-you-expect-an-interaction" id="toc-scenario-a-you-expect-an-interaction" class="nav-link" data-scroll-target="#scenario-a-you-expect-an-interaction">Scenario A: You Expect an Interaction</a></li>
+  <li><a href="#scenario-b-youd-be-surprised-by-an-interaction" id="toc-scenario-b-youd-be-surprised-by-an-interaction" class="nav-link" data-scroll-target="#scenario-b-youd-be-surprised-by-an-interaction">Scenario B: You’d Be Surprised by an Interaction</a></li>
+  <li><a href="#examining-the-interaction-posterior" id="toc-examining-the-interaction-posterior" class="nav-link" data-scroll-target="#examining-the-interaction-posterior">Examining the Interaction Posterior</a></li>
+  <li><a href="#cell-means-and-contrasts-via-emmeans" id="toc-cell-means-and-contrasts-via-emmeans" class="nav-link" data-scroll-target="#cell-means-and-contrasts-via-emmeans">Cell Means and Contrasts via <code>emmeans</code></a></li>
+  <li><a href="#what-to-report-1" id="toc-what-to-report-1" class="nav-link" data-scroll-target="#what-to-report-1">What to Report</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#assumptions-of-anova-analyses" id="toc-assumptions-of-anova-analyses" class="nav-link" data-scroll-target="#assumptions-of-anova-analyses">Assumptions of ANOVA Analyses</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -568,9 +578,11 @@ window.Quarto = {
 </section>
 <section id="two-way-anova" class="level1">
 <h1>Two-Way ANOVA</h1>
-<p>Use a two-way ANOVA when two categorical predictors may jointly affect your outcome.</p>
-<section id="for-a-22-design-always-fit-the-full-interaction-model" class="level2">
-<h2 class="anchored" data-anchor-id="for-a-22-design-always-fit-the-full-interaction-model">For a 2×2 Design, Always Fit the Full Interaction Model</h2>
+<p>Use a two-way ANOVA when two categorical predictors may jointly affect your outcome. There are two principled approaches: a standard (frequentist) workflow using <code>lm()</code> and <code>emmeans</code>, and a Bayesian workflow using <code>brms</code> and <code>emmeans</code>. Both fit the full interaction model and use <code>emmeans</code> for follow-up — they differ in how the interaction is regularised and how uncertainty is quantified.</p>
+<section id="standard-frequentist-approach" class="level2">
+<h2 class="anchored" data-anchor-id="standard-frequentist-approach">Standard (Frequentist) Approach</h2>
+<section id="for-a-22-design-always-fit-the-full-interaction-model" class="level3">
+<h3 class="anchored" data-anchor-id="for-a-22-design-always-fit-the-full-interaction-model">For a 2×2 Design, Always Fit the Full Interaction Model</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>balloon.lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(size <span class="sc">~</span> color <span class="sc">*</span> shape, <span class="at">data =</span> balloon.data)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -631,8 +643,8 @@ window.Quarto = {
 </div>
 <p><code>car::Anova()</code> with <code>type = "III"</code> gives each term’s F-test conditioned on all other terms in the model. This is equivalent to <code>anova()</code> for balanced designs but gives the correct result for unbalanced designs (unequal group sizes), where the base-R <code>anova()</code> function uses sequential Type I sums of squares whose values depend on the order terms are written in the formula. Using Type III throughout is the safer habit.</p>
 <p>The interaction p-value tests whether the effect of color depends on shape (and vice versa).</p>
-<section id="why-not-drop-the-interaction-and-refit-an-additive-model" class="level3">
-<h3 class="anchored" data-anchor-id="why-not-drop-the-interaction-and-refit-an-additive-model">Why Not Drop the Interaction and Refit an Additive Model?</h3>
+<section id="why-not-drop-the-interaction-and-refit-an-additive-model" class="level4">
+<h4 class="anchored" data-anchor-id="why-not-drop-the-interaction-and-refit-an-additive-model">Why Not Drop the Interaction and Refit an Additive Model?</h4>
 <p>A common but problematic workflow is: <em>if the interaction p ≥ 0.05, drop the term and refit <code>size ~ color + shape</code></em>. This should be avoided for three reasons <span class="citation" data-cites="mundry2009 gelman2005">(<a href="#ref-mundry2009" role="doc-biblioref">Mundry and Nunn 2009</a>; <a href="#ref-gelman2005" role="doc-biblioref">Gelman 2005</a>)</span>:</p>
 <ol type="1">
 <li><p><strong>Pre-testing inflates Type I error.</strong> Conditioning the reported main-effect inference on the outcome of the interaction test miscalibrates standard errors and p-values in the second model. Type I error rates can drift to 7–10% even when the nominal level is 5%.</p></li>
@@ -643,8 +655,8 @@ window.Quarto = {
 <p><strong>When does this advice apply?</strong> For a designed experiment with a small number of primary factors (e.g.&nbsp;a 2×2 diet × treatment design), the interaction is scientifically plausible and pre-specified, so it should stay in the model regardless of its p-value. The argument is weaker when your model contains many covariates: with <span class="math inline">\(k\)</span> predictors there are <span class="math inline">\(k(k-1)/2\)</span> pairwise interactions, and including them all burns degrees of freedom, causes collinearity, and risks overfitting. For nuisance covariates included only to improve precision (e.g.&nbsp;body weight in an ANCOVA), their interaction with the primary factor is usually not of scientific interest and need not be fitted. The key principle is that interactions should be included because they are scientifically motivated, not because a pre-test happened to reject — and excluded for the same reason, not because a pre-test failed to reject.</p>
 </section>
 </section>
-<section id="cell-means" class="level2">
-<h2 class="anchored" data-anchor-id="cell-means">Cell Means</h2>
+<section id="cell-means" class="level3">
+<h3 class="anchored" data-anchor-id="cell-means">Cell Means</h3>
 <p>Cell means are the model-predicted group averages at every combination of the two factors.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(balloon.lm, <span class="sc">~</span> color <span class="sc">*</span> shape) <span class="sc">|&gt;</span></span>
@@ -724,8 +736,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="marginal-main-effects" class="level2">
-<h2 class="anchored" data-anchor-id="marginal-main-effects">Marginal Main Effects</h2>
+<section id="marginal-main-effects" class="level3">
+<h3 class="anchored" data-anchor-id="marginal-main-effects">Marginal Main Effects</h3>
 <p>Marginal main effects answer: <em>what is the average effect of color, averaging across all shapes?</em> These should always be reported alongside the interaction test.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Average effect of color (averaged over both shapes)</span></span>
@@ -807,8 +819,8 @@ window.Quarto = {
 </div>
 <p>These contrasts come from the same interaction model — <code>emmeans</code> computes them by averaging the cell means over the levels of the other factor. They represent the <em>average</em> simple effect, without assuming the effect is constant across levels of the other factor.</p>
 </section>
-<section id="simple-effects" class="level2">
-<h2 class="anchored" data-anchor-id="simple-effects">Simple Effects</h2>
+<section id="simple-effects" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects">Simple Effects</h3>
 <p>Simple effects answer: <em>what is the effect of color within each level of shape separately?</em> Report these when the interaction term is large or scientifically meaningful.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Effect of color within each shape</span></span>
@@ -940,8 +952,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="what-to-report" class="level2">
-<h2 class="anchored" data-anchor-id="what-to-report">What to Report</h2>
+<section id="what-to-report" class="level3">
+<h3 class="anchored" data-anchor-id="what-to-report">What to Report</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -980,8 +992,8 @@ window.Quarto = {
 </table>
 <p>Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.</p>
 </section>
-<section id="multiple-testing-across-many-outcomes" class="level2">
-<h2 class="anchored" data-anchor-id="multiple-testing-across-many-outcomes">Multiple Testing Across Many Outcomes</h2>
+<section id="multiple-testing-across-many-outcomes" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-testing-across-many-outcomes">Multiple Testing Across Many Outcomes</h3>
 <p>If you test the same design across many outcomes (e.g.&nbsp;multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table <em>before</em> adjusting, so the correction spans the full set of tests.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect marginal contrasts for both factors into one table, then adjust together</span></span>
@@ -1061,13 +1073,772 @@ window.Quarto = {
 </div>
 </section>
 </section>
+<section id="bayesian-approach" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-approach">Bayesian Approach</h2>
+<p>A Bayesian fit of the same model adds two important things: explicit pre-specification of how surprising you would find an interaction (encoded in the prior), and direct probabilistic statements about the parameters (credible intervals and posterior probabilities). The follow-up workflow with <code>emmeans</code> is identical.</p>
+<p>This section covers only the decisions specific to a 2×2 / factorial ANOVA. For general principles of Bayesian reporting — priors, convergence diagnostics (<span class="math inline">\(\hat{R}\)</span>, ESS), posterior predictive checks, and what to include in a manuscript — see the <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html">BARG (Bayesian Analysis Reporting Guidelines) tutorial</a>.</p>
+<section id="pre-specifying-your-interaction-hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="pre-specifying-your-interaction-hypothesis">Pre-specifying Your Interaction Hypothesis</h3>
+<p>In the frequentist workflow above, the interaction is included with no prior structure — the data alone determine the estimate. In the Bayesian workflow, <strong>you must specify a prior on the interaction coefficients before fitting, and that prior is your hypothesis about the interaction.</strong> There is no “uninformative” choice that avoids this — even a flat prior is a strong claim that all interaction sizes are equally plausible.</p>
+<p>This is not a drawback of the Bayesian approach; it is the same choice the frequentist workflow makes implicitly. Dropping the interaction after a non-significant test is equivalent to a tight prior at zero with infinite confidence; keeping it with default <code>lm()</code> is equivalent to a flat prior. The Bayesian framework just makes the choice explicit and allows graded positions between those two extremes.</p>
+<p>The pre-specification should be made and documented <strong>before fitting the model</strong>, ideally before collecting the data. Changing it after seeing the data is a form of post-hoc analysis that invalidates the inferential interpretation of the posterior. Two common positions:</p>
+<ul>
+<li><p><strong>You expect an interaction.</strong> A 2×2 designed experiment where biological mechanism suggests synergy or antagonism between the two factors. Use a <em>weakly informative</em> prior on the interaction coefficients with a scale comparable to the main effects.</p></li>
+<li><p><strong>You would be surprised by an interaction.</strong> Main effects are well-established and an interaction would be unexpected. Use a <em>regularising</em> prior centred at zero with a tight scale. This is the principled equivalent of “I would normally drop this term” — the interaction stays in the model but gets shrunk toward zero unless the data strongly contradict the prior.</p></li>
+</ul>
+<p>A third position — <em>strong prior expectation of a specific non-zero interaction</em> — is occasionally appropriate (e.g.&nbsp;replicating a published result) but requires more careful justification of the prior mean and is not covered here.</p>
+</section>
+<section id="setting-up-the-model" class="level3">
+<h3 class="anchored" data-anchor-id="setting-up-the-model">Setting Up the Model</h3>
+<p>We use <code>brms</code> to fit the same <code>size ~ color * shape</code> model. The choice of likelihood (Gaussian here, since the balloon <code>size</code> values are continuous and approximately normal) is independent of the prior choice on the interaction.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom.mixed)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># directory for cached model fits — brms reuses these on re-render</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"fits"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Before specifying interaction-specific priors, check the coefficient names produced by R’s default contrast coding:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(<span class="fu">model.matrix</span>(<span class="sc">~</span> color <span class="sc">*</span> shape, <span class="at">data =</span> balloon.data))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "(Intercept)"            "colorgreen"             "colorred"              
+[4] "shapesquare"            "colorgreen:shapesquare" "colorred:shapesquare"  </code></pre>
+</div>
+</div>
+<p>The interaction terms will be <code>colorgreen:shapesquare</code> and <code>colorred:shapesquare</code> — one fewer than the product of factor levels because <code>blue</code> and <code>circle</code> are the reference categories.</p>
+<p>To make the prior specifications generic and reusable across outcomes on different scales, we scale them by the SD of the response variable. A <code>normal(0, 1 × sd_y)</code> prior on a regression coefficient says “I expect the effect to be at most around one outcome-SD,” regardless of whether the outcome is fold-change, mass, or concentration. <code>rstanarm</code> automates this with an <code>autoscale = TRUE</code> argument; <code>brms</code> does not, so we compute <code>sd_y</code> manually and pass it into <code>prior_string()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sd_y <span class="ot">&lt;-</span> <span class="fu">sd</span>(balloon.data<span class="sc">$</span>size)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>sd_y</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.374944</code></pre>
+</div>
+</div>
+<p><code>sd_y</code> is in the same units as the outcome — here, whatever units <code>size</code> is measured in (grams if it were body weight, ng/mL if it were a hormone concentration, etc.). The prior numbers below (<code>1 × sd_y</code>, <code>0.25 × sd_y</code>) express expected effect magnitudes as fractions of one outcome-SD, so the same code works unchanged for any continuous outcome.</p>
+</section>
+<section id="scenario-a-you-expect-an-interaction" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-a-you-expect-an-interaction">Scenario A: You Expect an Interaction</h3>
+<p>All coefficients (main effects and interactions) get the same weakly informative <code>normal(0, 1)</code> autoscaled prior, expressing that effects of up to roughly one response-SD are plausible.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>priors_expect <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="dv">1</span> <span class="sc">*</span> sd_y), <span class="at">class =</span> <span class="st">"b"</span>),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">student_t</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">2.5</span>), <span class="at">class =</span> sigma)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>brm.expect <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  size <span class="sc">~</span> color <span class="sc">*</span> shape,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> balloon.data,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">family       =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior        =</span> priors_expect,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,                <span class="co"># required for hypothesis()</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-expect"</span>  <span class="co"># cached on disk after first run</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm.expect) <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Posterior summary under the weakly informative (expecting interaction) prior"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Posterior summary under the weakly informative (expecting interaction) prior</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 31%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">6.925</td>
+<td style="text-align: right;">0.971</td>
+<td style="text-align: right;">5.048</td>
+<td style="text-align: right;">8.891</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorgreen</td>
+<td style="text-align: right;">-0.683</td>
+<td style="text-align: right;">1.252</td>
+<td style="text-align: right;">-3.182</td>
+<td style="text-align: right;">1.747</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorred</td>
+<td style="text-align: right;">-1.076</td>
+<td style="text-align: right;">1.270</td>
+<td style="text-align: right;">-3.599</td>
+<td style="text-align: right;">1.422</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">shapesquare</td>
+<td style="text-align: right;">-0.535</td>
+<td style="text-align: right;">1.177</td>
+<td style="text-align: right;">-2.811</td>
+<td style="text-align: right;">1.823</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorgreen:shapesquare</td>
+<td style="text-align: right;">0.479</td>
+<td style="text-align: right;">1.569</td>
+<td style="text-align: right;">-2.569</td>
+<td style="text-align: right;">3.547</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorred:shapesquare</td>
+<td style="text-align: right;">0.605</td>
+<td style="text-align: right;">1.570</td>
+<td style="text-align: right;">-2.461</td>
+<td style="text-align: right;">3.625</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">2.575</td>
+<td style="text-align: right;">0.408</td>
+<td style="text-align: right;">1.915</td>
+<td style="text-align: right;">3.532</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">2.827</td>
+<td style="text-align: right;">3.350</td>
+<td style="text-align: right;">0.077</td>
+<td style="text-align: right;">11.225</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The intercept is the predicted <code>size</code> for the reference cell (blue × circle). Each <code>b_*</code> row gives a coefficient with its 95% credible interval. The two interaction rows (<code>colorgreen:shapesquare</code>, <code>colorred:shapesquare</code>) are the deviations from additivity — if they are concentrated near zero, the data show no meaningful interaction; if their credible intervals exclude zero, the data support an interaction.</p>
+</section>
+<section id="scenario-b-youd-be-surprised-by-an-interaction" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-b-youd-be-surprised-by-an-interaction">Scenario B: You’d Be Surprised by an Interaction</h3>
+<p>The interaction coefficients receive a much tighter autoscaled prior, while the main effects keep the same <code>normal(0, 1)</code> prior as scenario A. This regularisation pulls the interaction coefficients toward zero unless the data strongly disagree.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>priors_skeptical <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="dv">1</span> <span class="sc">*</span> sd_y),    <span class="at">class =</span> <span class="st">"b"</span>),                                       <span class="co"># main effects ~1 SD</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="fl">0.25</span> <span class="sc">*</span> sd_y), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">coef =</span> <span class="st">"colorgreen:shapesquare"</span>),     <span class="co"># tight on interaction</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="fl">0.25</span> <span class="sc">*</span> sd_y), <span class="at">class =</span> <span class="st">"b"</span>, <span class="at">coef =</span> <span class="st">"colorred:shapesquare"</span>),       <span class="co"># tight on interaction</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prior</span>(<span class="fu">student_t</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">2.5</span>), <span class="at">class =</span> sigma)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>brm.skeptical <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  size <span class="sc">~</span> color <span class="sc">*</span> shape,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data         =</span> balloon.data,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family       =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior        =</span> priors_skeptical,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">file         =</span> <span class="st">"fits/anova-skeptical"</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(brm.skeptical) <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Posterior summary under the regularising (sceptical of interaction) prior"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Posterior summary under the regularising (sceptical of interaction) prior</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 31%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">effect</th>
+<th style="text-align: left;">component</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">6.816</td>
+<td style="text-align: right;">0.926</td>
+<td style="text-align: right;">4.945</td>
+<td style="text-align: right;">8.606</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorgreen</td>
+<td style="text-align: right;">-0.529</td>
+<td style="text-align: right;">1.100</td>
+<td style="text-align: right;">-2.645</td>
+<td style="text-align: right;">1.637</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorred</td>
+<td style="text-align: right;">-0.872</td>
+<td style="text-align: right;">1.121</td>
+<td style="text-align: right;">-3.023</td>
+<td style="text-align: right;">1.337</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">shapesquare</td>
+<td style="text-align: right;">-0.269</td>
+<td style="text-align: right;">0.960</td>
+<td style="text-align: right;">-2.167</td>
+<td style="text-align: right;">1.608</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorgreen:shapesquare</td>
+<td style="text-align: right;">0.057</td>
+<td style="text-align: right;">0.566</td>
+<td style="text-align: right;">-1.041</td>
+<td style="text-align: right;">1.156</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">colorred:shapesquare</td>
+<td style="text-align: right;">0.075</td>
+<td style="text-align: right;">0.563</td>
+<td style="text-align: right;">-1.052</td>
+<td style="text-align: right;">1.201</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">sigma</td>
+<td style="text-align: right;">2.536</td>
+<td style="text-align: right;">0.399</td>
+<td style="text-align: right;">1.898</td>
+<td style="text-align: right;">3.437</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">priorcolorgreen</td>
+<td style="text-align: right;">0.021</td>
+<td style="text-align: right;">2.315</td>
+<td style="text-align: right;">-4.575</td>
+<td style="text-align: right;">4.537</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">priorcolorred</td>
+<td style="text-align: right;">-0.010</td>
+<td style="text-align: right;">2.370</td>
+<td style="text-align: right;">-4.525</td>
+<td style="text-align: right;">4.659</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">priorshapesquare</td>
+<td style="text-align: right;">0.051</td>
+<td style="text-align: right;">2.378</td>
+<td style="text-align: right;">-4.524</td>
+<td style="text-align: right;">4.743</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fixed</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">priorcolorgreen:shapesquare</td>
+<td style="text-align: right;">0.003</td>
+<td style="text-align: right;">0.603</td>
+<td style="text-align: right;">-1.194</td>
+<td style="text-align: right;">1.191</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">sd__Observation</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.587</td>
+<td style="text-align: right;">-1.175</td>
+<td style="text-align: right;">1.150</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ran_pars</td>
+<td style="text-align: left;">cond</td>
+<td style="text-align: left;">Residual</td>
+<td style="text-align: left;">prior_sigma__NA.NA.prior_sigma</td>
+<td style="text-align: right;">2.717</td>
+<td style="text-align: right;">3.543</td>
+<td style="text-align: right;">0.081</td>
+<td style="text-align: right;">9.890</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Compare the interaction rows in the two summary tables: under the sceptical prior the posterior credible intervals for the interaction coefficients are narrower and pulled closer to zero. The main-effect estimates should be very similar across the two priors — the prior choice mostly affects what the model says about the interaction.</p>
+<p>The ratio between the two interaction scales (here 0.25 vs 1, a 4-fold tighter prior) encodes how much shrinkage you want. Tighter values mean stronger scepticism. Because both priors are scaled by <code>sd_y</code>, the same multiplier values (1 and 0.25) can be reused for any continuous outcome — only <code>sd_y</code> changes when you swap in a different outcome.</p>
+</section>
+<section id="examining-the-interaction-posterior" class="level3">
+<h3 class="anchored" data-anchor-id="examining-the-interaction-posterior">Examining the Interaction Posterior</h3>
+<p>Three complementary ways to assess the interaction, in increasing rigour:</p>
+<p><strong>1. Posterior summary.</strong> The credible interval and probability of direction give a continuous statement of evidence — no binary decision required.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixef</span>(brm.expect) <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"term"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(term, <span class="st">":"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Posterior summaries for interaction coefficients (95% CrI), expecting-interaction prior"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Posterior summaries for interaction coefficients (95% CrI), expecting-interaction prior</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Est.Error</th>
+<th style="text-align: right;">Q2.5</th>
+<th style="text-align: right;">Q97.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">colorgreen:shapesquare</td>
+<td style="text-align: right;">0.479</td>
+<td style="text-align: right;">1.569</td>
+<td style="text-align: right;">-2.569</td>
+<td style="text-align: right;">3.547</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">colorred:shapesquare</td>
+<td style="text-align: right;">0.605</td>
+<td style="text-align: right;">1.570</td>
+<td style="text-align: right;">-2.461</td>
+<td style="text-align: right;">3.625</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>If both 95% credible intervals straddle zero, the data provide no convincing evidence of an interaction under this prior. Interactions whose intervals exclude zero are supported by the data.</p>
+<p><strong>2. Bayes factor via <code>hypothesis()</code>.</strong> Computes a Savage-Dickey ratio comparing prior and posterior density at zero. <code>Evid.Ratio</code> &gt;3 favours the null (no interaction); &lt;1/3 favours the alternative.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm.expect, <span class="st">"colorgreen:shapesquare = 0"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (colorgreen:shape... = 0     0.48      1.57    -2.57     3.55       1.43
+  Post.Prob Star
+1      0.59     
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hypothesis</span>(brm.expect, <span class="st">"colorred:shapesquare = 0"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (colorred:shapesq... = 0      0.6      1.57    -2.46     3.63       1.32
+  Post.Prob Star
+1      0.57     
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.</code></pre>
+</div>
+</div>
+<p>The <code>Evid.Ratio</code> is the Bayes factor BF₀₁ (null over alternative). Values like 5–10 mean the data are 5–10 times more consistent with no interaction than with the broad prior allowed for it under scenario A. Values near 1 mean the data are equivocal; values below 1/3 favour the alternative. The <code>Post.Prob</code> column is the posterior probability of the null at the chosen prior model probability (default 0.5).</p>
+<p><strong>3. LOO model comparison.</strong> Fits the additive model and compares predictive performance via expected log pointwise predictive density.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>brm.add <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  size <span class="sc">~</span> color <span class="sc">+</span> shape,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data    =</span> balloon.data,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family  =</span> <span class="fu">gaussian</span>(),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior   =</span> <span class="fu">c</span>(<span class="fu">prior_string</span>(<span class="fu">sprintf</span>(<span class="st">"normal(0, %.4f)"</span>, <span class="dv">1</span> <span class="sc">*</span> sd_y), <span class="at">class =</span> <span class="st">"b"</span>),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>              <span class="fu">prior</span>(<span class="fu">student_t</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="fl">2.5</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains  =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>, <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">file    =</span> <span class="st">"fits/anova-additive"</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>loo_comparison <span class="ot">&lt;-</span> <span class="fu">loo_compare</span>(<span class="fu">loo</span>(brm.expect), <span class="fu">loo</span>(brm.add))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>loo_comparison <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"model"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"LOO comparison: additive vs interaction model"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>LOO comparison: additive vs interaction model</caption>
+<colgroup>
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 11%">
+<col style="width: 8%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">elpd_diff</th>
+<th style="text-align: right;">se_diff</th>
+<th style="text-align: right;">elpd_loo</th>
+<th style="text-align: right;">se_elpd_loo</th>
+<th style="text-align: right;">p_loo</th>
+<th style="text-align: right;">se_p_loo</th>
+<th style="text-align: right;">looic</th>
+<th style="text-align: right;">se_looic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">brm.add</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">-58.53</td>
+<td style="text-align: right;">2.99</td>
+<td style="text-align: right;">4.00</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">117.07</td>
+<td style="text-align: right;">5.98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">brm.expect</td>
+<td style="text-align: right;">-0.91</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">-59.44</td>
+<td style="text-align: right;">3.03</td>
+<td style="text-align: right;">4.97</td>
+<td style="text-align: right;">1.09</td>
+<td style="text-align: right;">118.88</td>
+<td style="text-align: right;">6.07</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The model with the higher (less negative) ELPD appears at the top with <code>elpd_diff = 0</code>. The other model’s <code>elpd_diff</code> is its disadvantage relative to the best model. A difference smaller than ~4 × <code>se_diff</code> is not strong evidence either way; larger differences indicate genuinely better predictive performance. If the additive model wins by a small margin or ties, the data are well described without an interaction term.</p>
+</section>
+<section id="cell-means-and-contrasts-via-emmeans" class="level3">
+<h3 class="anchored" data-anchor-id="cell-means-and-contrasts-via-emmeans">Cell Means and Contrasts via <code>emmeans</code></h3>
+<p><code>emmeans</code> works directly on <code>brmsfit</code> objects with the same syntax as for <code>lm()</code> — but the contrast output uses credible intervals (<code>lower.HPD</code>, <code>upper.HPD</code>) instead of confidence intervals.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(brm.expect, <span class="sc">~</span> color <span class="sc">*</span> shape) <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Posterior cell means (95% HPD)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Posterior cell means (95% HPD)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">color</th>
+<th style="text-align: left;">shape</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">lower.HPD</th>
+<th style="text-align: right;">upper.HPD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">blue</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">6.93</td>
+<td style="text-align: right;">4.92</td>
+<td style="text-align: right;">8.73</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">green</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">6.24</td>
+<td style="text-align: right;">4.17</td>
+<td style="text-align: right;">8.48</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">red</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">5.85</td>
+<td style="text-align: right;">3.59</td>
+<td style="text-align: right;">7.93</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">blue</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">6.38</td>
+<td style="text-align: right;">4.35</td>
+<td style="text-align: right;">8.39</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">green</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">6.18</td>
+<td style="text-align: right;">3.88</td>
+<td style="text-align: right;">8.51</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">red</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">5.90</td>
+<td style="text-align: right;">3.52</td>
+<td style="text-align: right;">8.07</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Each row is a posterior median for one cell, with the 95% highest posterior density interval. These are directly comparable to the frequentist cell means above — they just carry an explicit posterior-probability interpretation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(brm.expect, <span class="sc">~</span> color) <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>() <span class="sc">|&gt;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Marginal contrasts for color (posterior)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Marginal contrasts for color (posterior)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">lower.HPD</th>
+<th style="text-align: right;">upper.HPD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">blue - green</td>
+<td style="text-align: right;">0.450</td>
+<td style="text-align: right;">-1.731</td>
+<td style="text-align: right;">2.524</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">blue - red</td>
+<td style="text-align: right;">0.789</td>
+<td style="text-align: right;">-1.509</td>
+<td style="text-align: right;">2.959</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">green - red</td>
+<td style="text-align: right;">0.333</td>
+<td style="text-align: right;">-2.100</td>
+<td style="text-align: right;">2.801</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(brm.expect, <span class="sc">~</span> shape) <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>() <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Marginal contrast for shape (posterior)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Marginal contrast for shape (posterior)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">lower.HPD</th>
+<th style="text-align: right;">upper.HPD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">circle - square</td>
+<td style="text-align: right;">0.174</td>
+<td style="text-align: right;">-1.759</td>
+<td style="text-align: right;">2.14</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Marginal main effects answer the same questions as in the frequentist workflow — the average effect of one factor across levels of the other — but report posterior medians and HPD intervals.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(brm.expect, <span class="sc">~</span> color <span class="sc">|</span> shape) <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>() <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Simple effects: color within each shape (posterior)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Simple effects: color within each shape (posterior)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: left;">shape</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">lower.HPD</th>
+<th style="text-align: right;">upper.HPD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">blue - green</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">0.665</td>
+<td style="text-align: right;">-1.780</td>
+<td style="text-align: right;">3.132</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">blue - red</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">1.084</td>
+<td style="text-align: right;">-1.368</td>
+<td style="text-align: right;">3.624</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">green - red</td>
+<td style="text-align: left;">circle</td>
+<td style="text-align: right;">0.397</td>
+<td style="text-align: right;">-2.633</td>
+<td style="text-align: right;">3.304</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">blue - green</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">0.193</td>
+<td style="text-align: right;">-2.599</td>
+<td style="text-align: right;">3.022</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">blue - red</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">0.470</td>
+<td style="text-align: right;">-2.398</td>
+<td style="text-align: right;">3.272</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">green - red</td>
+<td style="text-align: left;">square</td>
+<td style="text-align: right;">0.285</td>
+<td style="text-align: right;">-3.170</td>
+<td style="text-align: right;">3.409</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Simple effects break the marginal contrasts apart by levels of the other factor. Report these when the interaction posterior is concentrated away from zero; if the interaction is small, the simple effects within each shape will be close to the marginal contrasts.</p>
+<p>Tukey-style multiple-comparisons adjustment is not needed: the prior already provides regularisation, and Bayesian inference does not have the multiple-comparisons problem in the frequentist sense (no error-rate inflation from looking at multiple contrasts of one posterior).</p>
+</section>
+<section id="what-to-report-1" class="level3">
+<h3 class="anchored" data-anchor-id="what-to-report-1">What to Report</h3>
+<p>Following <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html">BARG</a>, report:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>What to include</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Priors</td>
+<td>The exact prior on each parameter, the rationale for the interaction prior (expecting vs sceptical), and confirmation that priors were finalised before fitting</td>
+</tr>
+<tr class="even">
+<td>Model</td>
+<td>Likelihood family, formula, software version, number of chains and iterations</td>
+</tr>
+<tr class="odd">
+<td>Convergence</td>
+<td><span class="math inline">\(\hat{R}\)</span>, ESS (bulk and tail), divergent transitions — see <a href="https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html">BARG</a></td>
+</tr>
+<tr class="even">
+<td>Interaction</td>
+<td>Posterior median + 95% HPD for each interaction coefficient; Bayes factor or LOO ELPD difference</td>
+</tr>
+<tr class="odd">
+<td>Cell means</td>
+<td>Posterior median + 95% HPD per cell (from <code>emmeans</code>)</td>
+</tr>
+<tr class="even">
+<td>Contrasts</td>
+<td>Marginal main effects always; simple effects when the interaction posterior is concentrated away from zero</td>
+</tr>
+<tr class="odd">
+<td>Sensitivity</td>
+<td>If the interaction conclusion would change under a different reasonable prior, report the alternative result alongside</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
 <section id="assumptions-of-anova-analyses" class="level1">
 <h1>Assumptions of ANOVA Analyses</h1>
 <p>Although ANOVA is fairly robust to non-normality when group sizes are equal, the assumptions should be verified. Checking normality on the model residuals (rather than cell-by-cell) is the primary approach — it directly tests what the model assumes and uses all residuals together for better power.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(<span class="fu">residuals</span>(balloon.lm)) <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Shapiro-Wilk test on model residuals"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(<span class="fu">residuals</span>(balloon.lm)) <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Shapiro-Wilk test on model residuals"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Shapiro-Wilk test on model residuals</caption>
@@ -1089,7 +1860,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(balloon.lm, <span class="at">which =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(balloon.lm, <span class="at">which =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1100,9 +1871,9 @@ window.Quarto = {
 </div>
 <p>If data are non-normal, consider transforming the dependent variable (e.g.&nbsp;<code>log(size)</code>). For one-way designs a non-parametric Kruskal-Wallis test is also available, though it does not extend naturally to factorial designs.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kruskal.test</span>(size <span class="sc">~</span> color, <span class="at">data =</span> balloon.data) <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Kruskal-Wallis test (one-way non-parametric alternative)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kruskal.test</span>(size <span class="sc">~</span> color, <span class="at">data =</span> balloon.data) <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>, <span class="at">caption =</span> <span class="st">"Kruskal-Wallis test (one-way non-parametric alternative)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Kruskal-Wallis test (one-way non-parametric alternative)</caption>
@@ -1147,13 +1918,13 @@ Mundry, Roger, and Charles L. Nunn. 2009. <span>“Stepwise Model Fitting and St
 <h1>Session Information</h1>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>R version 4.5.3 (2026-03-11)
-Platform: aarch64-apple-darwin20
+<pre><code>R version 4.6.0 (2026-04-24)
+Platform: aarch64-apple-darwin23
 Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -1165,26 +1936,38 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] knitr_1.51      broom_1.0.11    car_3.1-3       carData_3.0-5  
- [5] emmeans_2.0.1   lubridate_1.9.4 forcats_1.0.1   stringr_1.6.0  
- [9] dplyr_1.1.4     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    
-[13] tibble_3.3.1    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
+ [4] knitr_1.51          broom_1.0.12        car_3.1-5          
+ [7] carData_3.0-6       emmeans_2.0.3       lubridate_1.9.5    
+[10] forcats_1.0.1       stringr_1.6.0       dplyr_1.2.1        
+[13] purrr_1.2.2         readr_2.2.0         tidyr_1.3.2        
+[16] tibble_3.3.1        ggplot2_4.0.3       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] sandwich_3.1-1     generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
- [5] hms_1.1.4          digest_0.6.39      magrittr_2.0.4     evaluate_1.0.5    
- [9] grid_4.5.3         timechange_0.3.0   estimability_1.5.1 RColorBrewer_1.1-3
-[13] mvtnorm_1.3-3      fastmap_1.2.0      Matrix_1.7-4       jsonlite_2.0.0    
-[17] backports_1.5.0    Formula_1.2-5      survival_3.8-6     multcomp_1.4-29   
-[21] scales_1.4.0       TH.data_1.1-5      codetools_0.2-20   abind_1.4-8       
-[25] cli_3.6.5          rlang_1.1.7        splines_4.5.3      withr_3.0.2       
-[29] yaml_2.3.12        otel_0.2.0         tools_4.5.3        tzdb_0.5.0        
-[33] coda_0.19-4.1      vctrs_0.6.5        R6_2.6.1           zoo_1.8-15        
-[37] lifecycle_1.0.5    htmlwidgets_1.6.4  MASS_7.3-65        pkgconfig_2.0.3   
-[41] pillar_1.11.1      gtable_0.3.6       glue_1.8.0         xfun_0.55         
-[45] tidyselect_1.2.1   rstudioapi_0.17.1  dichromat_2.0-0.1  xtable_1.8-4      
-[49] farver_2.1.2       htmltools_0.5.9    rmarkdown_2.30     compiler_4.5.3    
-[53] S7_0.2.1          </code></pre>
+ [1] gtable_0.3.6          tensorA_0.36.2.1      QuickJSR_1.9.2       
+ [4] xfun_0.57             processx_3.9.0        inline_0.3.21        
+ [7] lattice_0.22-9        callr_3.7.6           tzdb_0.5.0           
+[10] vctrs_0.7.3           tools_4.6.0           generics_0.1.4       
+[13] stats4_4.6.0          parallel_4.6.0        pkgconfig_2.0.3      
+[16] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
+[19] S7_0.2.2              distributional_0.7.0  RcppParallel_5.1.11-2
+[22] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
+[25] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
+[28] bayesplot_1.15.0      yaml_2.3.12           Formula_1.2-5        
+[31] furrr_0.4.0           pillar_1.11.1         StanHeaders_2.32.10  
+[34] bridgesampling_1.2-1  abind_1.4-8           parallelly_1.47.0    
+[37] nlme_3.1-169          rstan_2.32.7          posterior_1.7.0      
+[40] tidyselect_1.2.1      digest_0.6.39         future_1.70.0        
+[43] mvtnorm_1.3-7         stringi_1.8.7         listenv_0.10.1       
+[46] splines_4.6.0         fastmap_1.2.0         grid_4.6.0           
+[49] cli_3.6.6             magrittr_2.0.5        loo_2.9.0            
+[52] pkgbuild_1.4.8        withr_3.0.2           scales_1.4.0         
+[55] backports_1.5.1       estimability_1.5.1    timechange_0.4.0     
+[58] rmarkdown_2.31        globals_0.19.1        matrixStats_1.5.0    
+[61] gridExtra_2.3         hms_1.1.4             coda_0.19-4.1        
+[64] evaluate_1.0.5        rstantools_2.6.0      rlang_1.2.0          
+[67] glue_1.8.1            rstudioapi_0.18.0     jsonlite_2.0.0       
+[70] R6_2.6.1             </code></pre>
 </div>
 </div>
 </section>

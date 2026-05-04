@@ -268,9 +268,11 @@ Table: Pairwise contrasts (Tukey-adjusted)
 
 # Two-Way ANOVA
 
-Use a two-way ANOVA when two categorical predictors may jointly affect your outcome.
+Use a two-way ANOVA when two categorical predictors may jointly affect your outcome. There are two principled approaches: a standard (frequentist) workflow using `lm()` and `emmeans`, and a Bayesian workflow using `brms` and `emmeans`. Both fit the full interaction model and use `emmeans` for follow-up — they differ in how the interaction is regularised and how uncertainty is quantified.
 
-## For a 2×2 Design, Always Fit the Full Interaction Model
+## Standard (Frequentist) Approach
+
+### For a 2×2 Design, Always Fit the Full Interaction Model
 
 
 ::: {.cell}
@@ -305,7 +307,7 @@ Table: Type III ANOVA table
 
 The interaction p-value tests whether the effect of color depends on shape (and vice versa).
 
-### Why Not Drop the Interaction and Refit an Additive Model?
+#### Why Not Drop the Interaction and Refit an Additive Model?
 
 A common but problematic workflow is: *if the interaction p ≥ 0.05, drop the term and refit `size ~ color + shape`*. This should be avoided for three reasons [@mundry2009; @gelman2005]:
 
@@ -319,7 +321,7 @@ The solution is to **retain the interaction model and use `emmeans` to extract t
 
 **When does this advice apply?** For a designed experiment with a small number of primary factors (e.g. a 2×2 diet × treatment design), the interaction is scientifically plausible and pre-specified, so it should stay in the model regardless of its p-value. The argument is weaker when your model contains many covariates: with $k$ predictors there are $k(k-1)/2$ pairwise interactions, and including them all burns degrees of freedom, causes collinearity, and risks overfitting. For nuisance covariates included only to improve precision (e.g. body weight in an ANCOVA), their interaction with the primary factor is usually not of scientific interest and need not be fitted. The key principle is that interactions should be included because they are scientifically motivated, not because a pre-test happened to reject — and excluded for the same reason, not because a pre-test failed to reject.
 
-## Cell Means
+### Cell Means
 
 Cell means are the model-predicted group averages at every combination of the two factors.
 
@@ -351,7 +353,7 @@ Table: Cell means (estimated marginal means)
 :::
 
 
-## Marginal Main Effects
+### Marginal Main Effects
 
 Marginal main effects answer: *what is the average effect of color, averaging across all shapes?* These should always be reported alongside the interaction test.
 
@@ -404,7 +406,7 @@ Table: Marginal contrast for shape (Tukey-adjusted)
 
 These contrasts come from the same interaction model — `emmeans` computes them by averaging the cell means over the levels of the other factor. They represent the *average* simple effect, without assuming the effect is constant across levels of the other factor.
 
-## Simple Effects
+### Simple Effects
 
 Simple effects answer: *what is the effect of color within each level of shape separately?* Report these when the interaction term is large or scientifically meaningful.
 
@@ -460,7 +462,7 @@ Table: Simple effects: shape within each color (Tukey-adjusted)
 :::
 
 
-## What to Report
+### What to Report
 
 | Quantity | Question answered | Code |
 |---|---|---|
@@ -471,7 +473,7 @@ Table: Simple effects: shape within each color (Tukey-adjusted)
 
 Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.
 
-## Multiple Testing Across Many Outcomes
+### Multiple Testing Across Many Outcomes
 
 If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
 
@@ -512,6 +514,485 @@ Table: All marginal contrasts with BH-adjusted p-values
 :::
 :::
 
+
+## Bayesian Approach
+
+A Bayesian fit of the same model adds two important things: explicit pre-specification of how surprising you would find an interaction (encoded in the prior), and direct probabilistic statements about the parameters (credible intervals and posterior probabilities). The follow-up workflow with `emmeans` is identical.
+
+This section covers only the decisions specific to a 2×2 / factorial ANOVA. For general principles of Bayesian reporting — priors, convergence diagnostics ($\hat{R}$, ESS), posterior predictive checks, and what to include in a manuscript — see the [BARG (Bayesian Analysis Reporting Guidelines) tutorial](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html).
+
+### Pre-specifying Your Interaction Hypothesis
+
+In the frequentist workflow above, the interaction is included with no prior structure — the data alone determine the estimate. In the Bayesian workflow, **you must specify a prior on the interaction coefficients before fitting, and that prior is your hypothesis about the interaction.** There is no "uninformative" choice that avoids this — even a flat prior is a strong claim that all interaction sizes are equally plausible.
+
+This is not a drawback of the Bayesian approach; it is the same choice the frequentist workflow makes implicitly. Dropping the interaction after a non-significant test is equivalent to a tight prior at zero with infinite confidence; keeping it with default `lm()` is equivalent to a flat prior. The Bayesian framework just makes the choice explicit and allows graded positions between those two extremes.
+
+The pre-specification should be made and documented **before fitting the model**, ideally before collecting the data. Changing it after seeing the data is a form of post-hoc analysis that invalidates the inferential interpretation of the posterior. Two common positions:
+
+- **You expect an interaction.** A 2×2 designed experiment where biological mechanism suggests synergy or antagonism between the two factors. Use a *weakly informative* prior on the interaction coefficients with a scale comparable to the main effects.
+
+- **You would be surprised by an interaction.** Main effects are well-established and an interaction would be unexpected. Use a *regularising* prior centred at zero with a tight scale. This is the principled equivalent of "I would normally drop this term" — the interaction stays in the model but gets shrunk toward zero unless the data strongly contradict the prior.
+
+A third position — *strong prior expectation of a specific non-zero interaction* — is occasionally appropriate (e.g. replicating a published result) but requires more careful justification of the prior mean and is not covered here.
+
+### Setting Up the Model
+
+We use `brms` to fit the same `size ~ color * shape` model. The choice of likelihood (Gaussian here, since the balloon `size` values are continuous and approximately normal) is independent of the prior choice on the interaction.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+library(brms)
+library(broom.mixed)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+```
+:::
+
+
+Before specifying interaction-specific priors, check the coefficient names produced by R's default contrast coding:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+colnames(model.matrix(~ color * shape, data = balloon.data))
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1] "(Intercept)"            "colorgreen"             "colorred"              
+[4] "shapesquare"            "colorgreen:shapesquare" "colorred:shapesquare"  
+```
+
+
+:::
+:::
+
+
+The interaction terms will be `colorgreen:shapesquare` and `colorred:shapesquare` — one fewer than the product of factor levels because `blue` and `circle` are the reference categories.
+
+To make the prior specifications generic and reusable across outcomes on different scales, we scale them by the SD of the response variable. A `normal(0, 1 × sd_y)` prior on a regression coefficient says "I expect the effect to be at most around one outcome-SD," regardless of whether the outcome is fold-change, mass, or concentration. `rstanarm` automates this with an `autoscale = TRUE` argument; `brms` does not, so we compute `sd_y` manually and pass it into `prior_string()`.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+sd_y <- sd(balloon.data$size)
+sd_y
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+[1] 2.374944
+```
+
+
+:::
+:::
+
+
+`sd_y` is in the same units as the outcome — here, whatever units `size` is measured in (grams if it were body weight, ng/mL if it were a hormone concentration, etc.). The prior numbers below (`1 × sd_y`, `0.25 × sd_y`) express expected effect magnitudes as fractions of one outcome-SD, so the same code works unchanged for any continuous outcome.
+
+### Scenario A: You Expect an Interaction
+
+All coefficients (main effects and interactions) get the same weakly informative `normal(0, 1)` autoscaled prior, expressing that effects of up to roughly one response-SD are plausible.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+priors_expect <- c(
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
+  prior(student_t(3, 0, 2.5), class = sigma)
+)
+
+brm.expect <- brm(
+  size ~ color * shape,
+  data         = balloon.data,
+  family       = gaussian(),
+  prior        = priors_expect,
+  sample_prior = TRUE,                # required for hypothesis()
+  chains = 4, cores = 4, seed = 42,
+  file         = "fits/anova-expect"  # cached on disk after first run
+)
+```
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+tidy(brm.expect) |>
+  kable(digits = 3, caption = "Posterior summary under the weakly informative (expecting interaction) prior")
+```
+
+::: {.cell-output-display}
+
+
+Table: Posterior summary under the weakly informative (expecting interaction) prior
+
+|effect   |component |group    |term                           | estimate| std.error| conf.low| conf.high|
+|:--------|:---------|:--------|:------------------------------|--------:|---------:|--------:|---------:|
+|fixed    |cond      |NA       |(Intercept)                    |    6.925|     0.971|    5.048|     8.891|
+|fixed    |cond      |NA       |colorgreen                     |   -0.683|     1.252|   -3.182|     1.747|
+|fixed    |cond      |NA       |colorred                       |   -1.076|     1.270|   -3.599|     1.422|
+|fixed    |cond      |NA       |shapesquare                    |   -0.535|     1.177|   -2.811|     1.823|
+|fixed    |cond      |NA       |colorgreen:shapesquare         |    0.479|     1.569|   -2.569|     3.547|
+|fixed    |cond      |NA       |colorred:shapesquare           |    0.605|     1.570|   -2.461|     3.625|
+|ran_pars |cond      |Residual |sd__Observation                |    2.575|     0.408|    1.915|     3.532|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |    2.827|     3.350|    0.077|    11.225|
+
+
+:::
+:::
+
+
+The intercept is the predicted `size` for the reference cell (blue × circle). Each `b_*` row gives a coefficient with its 95% credible interval. The two interaction rows (`colorgreen:shapesquare`, `colorred:shapesquare`) are the deviations from additivity — if they are concentrated near zero, the data show no meaningful interaction; if their credible intervals exclude zero, the data support an interaction.
+
+### Scenario B: You'd Be Surprised by an Interaction
+
+The interaction coefficients receive a much tighter autoscaled prior, while the main effects keep the same `normal(0, 1)` prior as scenario A. This regularisation pulls the interaction coefficients toward zero unless the data strongly disagree.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+priors_skeptical <- c(
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                       # main effects ~1 SD
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),     # tight on interaction
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),       # tight on interaction
+  prior(student_t(3, 0, 2.5), class = sigma)
+)
+
+brm.skeptical <- brm(
+  size ~ color * shape,
+  data         = balloon.data,
+  family       = gaussian(),
+  prior        = priors_skeptical,
+  sample_prior = TRUE,
+  chains = 4, cores = 4, seed = 42,
+  file         = "fits/anova-skeptical"
+)
+```
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+tidy(brm.skeptical) |>
+  kable(digits = 3, caption = "Posterior summary under the regularising (sceptical of interaction) prior")
+```
+
+::: {.cell-output-display}
+
+
+Table: Posterior summary under the regularising (sceptical of interaction) prior
+
+|effect   |component |group    |term                           | estimate| std.error| conf.low| conf.high|
+|:--------|:---------|:--------|:------------------------------|--------:|---------:|--------:|---------:|
+|fixed    |cond      |NA       |(Intercept)                    |    6.816|     0.926|    4.945|     8.606|
+|fixed    |cond      |NA       |colorgreen                     |   -0.529|     1.100|   -2.645|     1.637|
+|fixed    |cond      |NA       |colorred                       |   -0.872|     1.121|   -3.023|     1.337|
+|fixed    |cond      |NA       |shapesquare                    |   -0.269|     0.960|   -2.167|     1.608|
+|fixed    |cond      |NA       |colorgreen:shapesquare         |    0.057|     0.566|   -1.041|     1.156|
+|fixed    |cond      |NA       |colorred:shapesquare           |    0.075|     0.563|   -1.052|     1.201|
+|fixed    |cond      |NA       |sigma                          |    2.536|     0.399|    1.898|     3.437|
+|fixed    |cond      |NA       |priorcolorgreen                |    0.021|     2.315|   -4.575|     4.537|
+|fixed    |cond      |NA       |priorcolorred                  |   -0.010|     2.370|   -4.525|     4.659|
+|fixed    |cond      |NA       |priorshapesquare               |    0.051|     2.378|   -4.524|     4.743|
+|fixed    |cond      |NA       |priorcolorgreen:shapesquare    |    0.003|     0.603|   -1.194|     1.191|
+|ran_pars |cond      |Residual |sd__Observation                |    0.007|     0.587|   -1.175|     1.150|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |    2.717|     3.543|    0.081|     9.890|
+
+
+:::
+:::
+
+
+Compare the interaction rows in the two summary tables: under the sceptical prior the posterior credible intervals for the interaction coefficients are narrower and pulled closer to zero. The main-effect estimates should be very similar across the two priors — the prior choice mostly affects what the model says about the interaction.
+
+The ratio between the two interaction scales (here 0.25 vs 1, a 4-fold tighter prior) encodes how much shrinkage you want. Tighter values mean stronger scepticism. Because both priors are scaled by `sd_y`, the same multiplier values (1 and 0.25) can be reused for any continuous outcome — only `sd_y` changes when you swap in a different outcome.
+
+### Examining the Interaction Posterior
+
+Three complementary ways to assess the interaction, in increasing rigour:
+
+**1. Posterior summary.** The credible interval and probability of direction give a continuous statement of evidence — no binary decision required.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+fixef(brm.expect) |>
+  as.data.frame() |>
+  rownames_to_column("term") |>
+  filter(str_detect(term, ":")) |>
+  kable(digits = 3, caption = "Posterior summaries for interaction coefficients (95% CrI), expecting-interaction prior")
+```
+
+::: {.cell-output-display}
+
+
+Table: Posterior summaries for interaction coefficients (95% CrI), expecting-interaction prior
+
+|term                   | Estimate| Est.Error|   Q2.5| Q97.5|
+|:----------------------|--------:|---------:|------:|-----:|
+|colorgreen:shapesquare |    0.479|     1.569| -2.569| 3.547|
+|colorred:shapesquare   |    0.605|     1.570| -2.461| 3.625|
+
+
+:::
+:::
+
+
+If both 95% credible intervals straddle zero, the data provide no convincing evidence of an interaction under this prior. Interactions whose intervals exclude zero are supported by the data.
+
+**2. Bayes factor via `hypothesis()`.** Computes a Savage-Dickey ratio comparing prior and posterior density at zero. `Evid.Ratio` >3 favours the null (no interaction); <1/3 favours the alternative.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+hypothesis(brm.expect, "colorgreen:shapesquare = 0")
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (colorgreen:shape... = 0     0.48      1.57    -2.57     3.55       1.43
+  Post.Prob Star
+1      0.59     
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+
+
+:::
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+hypothesis(brm.expect, "colorred:shapesquare = 0")
+```
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Hypothesis Tests for class b:
+                Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+1 (colorred:shapesq... = 0      0.6      1.57    -2.46     3.63       1.32
+  Post.Prob Star
+1      0.57     
+---
+'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+'*': For one-sided hypotheses, the posterior probability exceeds 95%;
+for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+Posterior probabilities of point hypotheses assume equal prior probabilities.
+```
+
+
+:::
+:::
+
+
+The `Evid.Ratio` is the Bayes factor BF₀₁ (null over alternative). Values like 5–10 mean the data are 5–10 times more consistent with no interaction than with the broad prior allowed for it under scenario A. Values near 1 mean the data are equivocal; values below 1/3 favour the alternative. The `Post.Prob` column is the posterior probability of the null at the chosen prior model probability (default 0.5).
+
+**3. LOO model comparison.** Fits the additive model and compares predictive performance via expected log pointwise predictive density.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+brm.add <- brm(
+  size ~ color + shape,
+  data    = balloon.data,
+  family  = gaussian(),
+  prior   = c(prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
+              prior(student_t(3, 0, 2.5), class = sigma)),
+  chains  = 4, cores = 4, seed = 42,
+  file    = "fits/anova-additive"
+)
+
+loo_comparison <- loo_compare(loo(brm.expect), loo(brm.add))
+```
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+loo_comparison |>
+  as.data.frame() |>
+  rownames_to_column("model") |>
+  kable(digits = 2, caption = "LOO comparison: additive vs interaction model")
+```
+
+::: {.cell-output-display}
+
+
+Table: LOO comparison: additive vs interaction model
+
+|model      | elpd_diff| se_diff| elpd_loo| se_elpd_loo| p_loo| se_p_loo|  looic| se_looic|
+|:----------|---------:|-------:|--------:|-----------:|-----:|--------:|------:|--------:|
+|brm.add    |      0.00|    0.00|   -58.53|        2.99|  4.00|     0.86| 117.07|     5.98|
+|brm.expect |     -0.91|    0.37|   -59.44|        3.03|  4.97|     1.09| 118.88|     6.07|
+
+
+:::
+:::
+
+
+The model with the higher (less negative) ELPD appears at the top with `elpd_diff = 0`. The other model's `elpd_diff` is its disadvantage relative to the best model. A difference smaller than ~4 × `se_diff` is not strong evidence either way; larger differences indicate genuinely better predictive performance. If the additive model wins by a small margin or ties, the data are well described without an interaction term.
+
+### Cell Means and Contrasts via `emmeans`
+
+`emmeans` works directly on `brmsfit` objects with the same syntax as for `lm()` — but the contrast output uses credible intervals (`lower.HPD`, `upper.HPD`) instead of confidence intervals.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+emmeans(brm.expect, ~ color * shape) |>
+  as_tibble() |>
+  kable(digits = 2, caption = "Posterior cell means (95% HPD)")
+```
+
+::: {.cell-output-display}
+
+
+Table: Posterior cell means (95% HPD)
+
+|color |shape  | emmean| lower.HPD| upper.HPD|
+|:-----|:------|------:|---------:|---------:|
+|blue  |circle |   6.93|      4.92|      8.73|
+|green |circle |   6.24|      4.17|      8.48|
+|red   |circle |   5.85|      3.59|      7.93|
+|blue  |square |   6.38|      4.35|      8.39|
+|green |square |   6.18|      3.88|      8.51|
+|red   |square |   5.90|      3.52|      8.07|
+
+
+:::
+:::
+
+
+Each row is a posterior median for one cell, with the 95% highest posterior density interval. These are directly comparable to the frequentist cell means above — they just carry an explicit posterior-probability interpretation.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+emmeans(brm.expect, ~ color) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrasts for color (posterior)")
+```
+
+::: {.cell-output-display}
+
+
+Table: Marginal contrasts for color (posterior)
+
+|contrast     | estimate| lower.HPD| upper.HPD|
+|:------------|--------:|---------:|---------:|
+|blue - green |    0.450|    -1.731|     2.524|
+|blue - red   |    0.789|    -1.509|     2.959|
+|green - red  |    0.333|    -2.100|     2.801|
+
+
+:::
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+emmeans(brm.expect, ~ shape) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrast for shape (posterior)")
+```
+
+::: {.cell-output-display}
+
+
+Table: Marginal contrast for shape (posterior)
+
+|contrast        | estimate| lower.HPD| upper.HPD|
+|:---------------|--------:|---------:|---------:|
+|circle - square |    0.174|    -1.759|      2.14|
+
+
+:::
+:::
+
+
+Marginal main effects answer the same questions as in the frequentist workflow — the average effect of one factor across levels of the other — but report posterior medians and HPD intervals.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+emmeans(brm.expect, ~ color | shape) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Simple effects: color within each shape (posterior)")
+```
+
+::: {.cell-output-display}
+
+
+Table: Simple effects: color within each shape (posterior)
+
+|contrast     |shape  | estimate| lower.HPD| upper.HPD|
+|:------------|:------|--------:|---------:|---------:|
+|blue - green |circle |    0.665|    -1.780|     3.132|
+|blue - red   |circle |    1.084|    -1.368|     3.624|
+|green - red  |circle |    0.397|    -2.633|     3.304|
+|blue - green |square |    0.193|    -2.599|     3.022|
+|blue - red   |square |    0.470|    -2.398|     3.272|
+|green - red  |square |    0.285|    -3.170|     3.409|
+
+
+:::
+:::
+
+
+Simple effects break the marginal contrasts apart by levels of the other factor. Report these when the interaction posterior is concentrated away from zero; if the interaction is small, the simple effects within each shape will be close to the marginal contrasts.
+
+Tukey-style multiple-comparisons adjustment is not needed: the prior already provides regularisation, and Bayesian inference does not have the multiple-comparisons problem in the frequentist sense (no error-rate inflation from looking at multiple contrasts of one posterior).
+
+### What to Report
+
+Following [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html), report:
+
+| Quantity | What to include |
+|---|---|
+| Priors | The exact prior on each parameter, the rationale for the interaction prior (expecting vs sceptical), and confirmation that priors were finalised before fitting |
+| Model | Likelihood family, formula, software version, number of chains and iterations |
+| Convergence | $\hat{R}$, ESS (bulk and tail), divergent transitions — see [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html) |
+| Interaction | Posterior median + 95% HPD for each interaction coefficient; Bayes factor or LOO ELPD difference |
+| Cell means | Posterior median + 95% HPD per cell (from `emmeans`) |
+| Contrasts | Marginal main effects always; simple effects when the interaction posterior is concentrated away from zero |
+| Sensitivity | If the interaction conclusion would change under a different reasonable prior, report the alternative result alongside |
 
 # Assumptions of ANOVA Analyses
 
@@ -590,13 +1071,13 @@ Table: Kruskal-Wallis test (one-way non-parametric alternative)
 ::: {.cell-output .cell-output-stdout}
 
 ```
-R version 4.5.3 (2026-03-11)
-Platform: aarch64-apple-darwin20
+R version 4.6.0 (2026-04-24)
+Platform: aarch64-apple-darwin23
 Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -608,26 +1089,38 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] knitr_1.51      broom_1.0.11    car_3.1-3       carData_3.0-5  
- [5] emmeans_2.0.1   lubridate_1.9.4 forcats_1.0.1   stringr_1.6.0  
- [9] dplyr_1.1.4     purrr_1.2.1     readr_2.1.6     tidyr_1.3.2    
-[13] tibble_3.3.1    ggplot2_4.0.1   tidyverse_2.0.0
+ [1] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
+ [4] knitr_1.51          broom_1.0.12        car_3.1-5          
+ [7] carData_3.0-6       emmeans_2.0.3       lubridate_1.9.5    
+[10] forcats_1.0.1       stringr_1.6.0       dplyr_1.2.1        
+[13] purrr_1.2.2         readr_2.2.0         tidyr_1.3.2        
+[16] tibble_3.3.1        ggplot2_4.0.3       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] sandwich_3.1-1     generics_0.1.4     stringi_1.8.7      lattice_0.22-9    
- [5] hms_1.1.4          digest_0.6.39      magrittr_2.0.4     evaluate_1.0.5    
- [9] grid_4.5.3         timechange_0.3.0   estimability_1.5.1 RColorBrewer_1.1-3
-[13] mvtnorm_1.3-3      fastmap_1.2.0      Matrix_1.7-4       jsonlite_2.0.0    
-[17] backports_1.5.0    Formula_1.2-5      survival_3.8-6     multcomp_1.4-29   
-[21] scales_1.4.0       TH.data_1.1-5      codetools_0.2-20   abind_1.4-8       
-[25] cli_3.6.5          rlang_1.1.7        splines_4.5.3      withr_3.0.2       
-[29] yaml_2.3.12        otel_0.2.0         tools_4.5.3        tzdb_0.5.0        
-[33] coda_0.19-4.1      vctrs_0.6.5        R6_2.6.1           zoo_1.8-15        
-[37] lifecycle_1.0.5    htmlwidgets_1.6.4  MASS_7.3-65        pkgconfig_2.0.3   
-[41] pillar_1.11.1      gtable_0.3.6       glue_1.8.0         xfun_0.55         
-[45] tidyselect_1.2.1   rstudioapi_0.17.1  dichromat_2.0-0.1  xtable_1.8-4      
-[49] farver_2.1.2       htmltools_0.5.9    rmarkdown_2.30     compiler_4.5.3    
-[53] S7_0.2.1          
+ [1] gtable_0.3.6          tensorA_0.36.2.1      QuickJSR_1.9.2       
+ [4] xfun_0.57             processx_3.9.0        inline_0.3.21        
+ [7] lattice_0.22-9        callr_3.7.6           tzdb_0.5.0           
+[10] vctrs_0.7.3           tools_4.6.0           generics_0.1.4       
+[13] stats4_4.6.0          parallel_4.6.0        pkgconfig_2.0.3      
+[16] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
+[19] S7_0.2.2              distributional_0.7.0  RcppParallel_5.1.11-2
+[22] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
+[25] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
+[28] bayesplot_1.15.0      yaml_2.3.12           Formula_1.2-5        
+[31] furrr_0.4.0           pillar_1.11.1         StanHeaders_2.32.10  
+[34] bridgesampling_1.2-1  abind_1.4-8           parallelly_1.47.0    
+[37] nlme_3.1-169          rstan_2.32.7          posterior_1.7.0      
+[40] tidyselect_1.2.1      digest_0.6.39         future_1.70.0        
+[43] mvtnorm_1.3-7         stringi_1.8.7         listenv_0.10.1       
+[46] splines_4.6.0         fastmap_1.2.0         grid_4.6.0           
+[49] cli_3.6.6             magrittr_2.0.5        loo_2.9.0            
+[52] pkgbuild_1.4.8        withr_3.0.2           scales_1.4.0         
+[55] backports_1.5.1       estimability_1.5.1    timechange_0.4.0     
+[58] rmarkdown_2.31        globals_0.19.1        matrixStats_1.5.0    
+[61] gridExtra_2.3         hms_1.1.4             coda_0.19-4.1        
+[64] evaluate_1.0.5        rstantools_2.6.0      rlang_1.2.0          
+[67] glue_1.8.1            rstudioapi_0.18.0     jsonlite_2.0.0       
+[70] R6_2.6.1             
 ```
 
 

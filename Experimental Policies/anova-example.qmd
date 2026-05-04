@@ -119,9 +119,11 @@ emmeans(balloon.lm.color, ~ color) |>
 
 # Two-Way ANOVA
 
-Use a two-way ANOVA when two categorical predictors may jointly affect your outcome.
+Use a two-way ANOVA when two categorical predictors may jointly affect your outcome. There are two principled approaches: a standard (frequentist) workflow using `lm()` and `emmeans`, and a Bayesian workflow using `brms` and `emmeans`. Both fit the full interaction model and use `emmeans` for follow-up — they differ in how the interaction is regularised and how uncertainty is quantified.
 
-## For a 2×2 Design, Always Fit the Full Interaction Model
+## Standard (Frequentist) Approach
+
+### For a 2×2 Design, Always Fit the Full Interaction Model
 
 ```{r two-way-fit}
 balloon.lm <- lm(size ~ color * shape, data = balloon.data)
@@ -135,7 +137,7 @@ car::Anova(balloon.lm, type = "III") |>
 
 The interaction p-value tests whether the effect of color depends on shape (and vice versa).
 
-### Why Not Drop the Interaction and Refit an Additive Model?
+#### Why Not Drop the Interaction and Refit an Additive Model?
 
 A common but problematic workflow is: *if the interaction p ≥ 0.05, drop the term and refit `size ~ color + shape`*. This should be avoided for three reasons [@mundry2009; @gelman2005]:
 
@@ -149,7 +151,7 @@ The solution is to **retain the interaction model and use `emmeans` to extract t
 
 **When does this advice apply?** For a designed experiment with a small number of primary factors (e.g. a 2×2 diet × treatment design), the interaction is scientifically plausible and pre-specified, so it should stay in the model regardless of its p-value. The argument is weaker when your model contains many covariates: with $k$ predictors there are $k(k-1)/2$ pairwise interactions, and including them all burns degrees of freedom, causes collinearity, and risks overfitting. For nuisance covariates included only to improve precision (e.g. body weight in an ANCOVA), their interaction with the primary factor is usually not of scientific interest and need not be fitted. The key principle is that interactions should be included because they are scientifically motivated, not because a pre-test happened to reject — and excluded for the same reason, not because a pre-test failed to reject.
 
-## Cell Means
+### Cell Means
 
 Cell means are the model-predicted group averages at every combination of the two factors.
 
@@ -159,7 +161,7 @@ emmeans(balloon.lm, ~ color * shape) |>
   kable(digits = 2, caption = "Cell means (estimated marginal means)")
 ```
 
-## Marginal Main Effects
+### Marginal Main Effects
 
 Marginal main effects answer: *what is the average effect of color, averaging across all shapes?* These should always be reported alongside the interaction test.
 
@@ -179,7 +181,7 @@ emmeans(balloon.lm, ~ shape) |>
 
 These contrasts come from the same interaction model — `emmeans` computes them by averaging the cell means over the levels of the other factor. They represent the *average* simple effect, without assuming the effect is constant across levels of the other factor.
 
-## Simple Effects
+### Simple Effects
 
 Simple effects answer: *what is the effect of color within each level of shape separately?* Report these when the interaction term is large or scientifically meaningful.
 
@@ -197,7 +199,7 @@ emmeans(balloon.lm, ~ shape | color) |>
   kable(digits = 3, caption = "Simple effects: shape within each color (Tukey-adjusted)")
 ```
 
-## What to Report
+### What to Report
 
 | Quantity | Question answered | Code |
 |---|---|---|
@@ -208,7 +210,7 @@ emmeans(balloon.lm, ~ shape | color) |>
 
 Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.
 
-## Multiple Testing Across Many Outcomes
+### Multiple Testing Across Many Outcomes
 
 If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
 
@@ -229,6 +231,224 @@ bind_rows(color_contrasts, shape_contrasts) |>
   select(factor, contrast, estimate, SE, df, t.ratio, p.value, p.adj) |>
   kable(digits = 3, caption = "All marginal contrasts with BH-adjusted p-values")
 ```
+
+## Bayesian Approach
+
+A Bayesian fit of the same model adds two important things: explicit pre-specification of how surprising you would find an interaction (encoded in the prior), and direct probabilistic statements about the parameters (credible intervals and posterior probabilities). The follow-up workflow with `emmeans` is identical.
+
+This section covers only the decisions specific to a 2×2 / factorial ANOVA. For general principles of Bayesian reporting — priors, convergence diagnostics ($\hat{R}$, ESS), posterior predictive checks, and what to include in a manuscript — see the [BARG (Bayesian Analysis Reporting Guidelines) tutorial](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html).
+
+### Pre-specifying Your Interaction Hypothesis
+
+In the frequentist workflow above, the interaction is included with no prior structure — the data alone determine the estimate. In the Bayesian workflow, **you must specify a prior on the interaction coefficients before fitting, and that prior is your hypothesis about the interaction.** There is no "uninformative" choice that avoids this — even a flat prior is a strong claim that all interaction sizes are equally plausible.
+
+This is not a drawback of the Bayesian approach; it is the same choice the frequentist workflow makes implicitly. Dropping the interaction after a non-significant test is equivalent to a tight prior at zero with infinite confidence; keeping it with default `lm()` is equivalent to a flat prior. The Bayesian framework just makes the choice explicit and allows graded positions between those two extremes.
+
+The pre-specification should be made and documented **before fitting the model**, ideally before collecting the data. Changing it after seeing the data is a form of post-hoc analysis that invalidates the inferential interpretation of the posterior. Two common positions:
+
+- **You expect an interaction.** A 2×2 designed experiment where biological mechanism suggests synergy or antagonism between the two factors. Use a *weakly informative* prior on the interaction coefficients with a scale comparable to the main effects.
+
+- **You would be surprised by an interaction.** Main effects are well-established and an interaction would be unexpected. Use a *regularising* prior centred at zero with a tight scale. This is the principled equivalent of "I would normally drop this term" — the interaction stays in the model but gets shrunk toward zero unless the data strongly contradict the prior.
+
+A third position — *strong prior expectation of a specific non-zero interaction* — is occasionally appropriate (e.g. replicating a published result) but requires more careful justification of the prior mean and is not covered here.
+
+### Setting Up the Model
+
+We use `brms` to fit the same `size ~ color * shape` model. The choice of likelihood (Gaussian here, since the balloon `size` values are continuous and approximately normal) is independent of the prior choice on the interaction.
+
+```{r brms-libraries}
+library(brms)
+library(broom.mixed)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+```
+
+Before specifying interaction-specific priors, check the coefficient names produced by R's default contrast coding:
+
+```{r coef-names}
+colnames(model.matrix(~ color * shape, data = balloon.data))
+```
+
+The interaction terms will be `colorgreen:shapesquare` and `colorred:shapesquare` — one fewer than the product of factor levels because `blue` and `circle` are the reference categories.
+
+To make the prior specifications generic and reusable across outcomes on different scales, we scale them by the SD of the response variable. A `normal(0, 1 × sd_y)` prior on a regression coefficient says "I expect the effect to be at most around one outcome-SD," regardless of whether the outcome is fold-change, mass, or concentration. `rstanarm` automates this with an `autoscale = TRUE` argument; `brms` does not, so we compute `sd_y` manually and pass it into `prior_string()`.
+
+```{r sd-y}
+sd_y <- sd(balloon.data$size)
+sd_y
+```
+
+`sd_y` is in the same units as the outcome — here, whatever units `size` is measured in (grams if it were body weight, ng/mL if it were a hormone concentration, etc.). The prior numbers below (`1 × sd_y`, `0.25 × sd_y`) express expected effect magnitudes as fractions of one outcome-SD, so the same code works unchanged for any continuous outcome.
+
+### Scenario A: You Expect an Interaction
+
+All coefficients (main effects and interactions) get the same weakly informative `normal(0, 1)` autoscaled prior, expressing that effects of up to roughly one response-SD are plausible.
+
+```{r brms-expect}
+#| output: false
+priors_expect <- c(
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
+  prior(student_t(3, 0, 2.5), class = sigma)
+)
+
+brm.expect <- brm(
+  size ~ color * shape,
+  data         = balloon.data,
+  family       = gaussian(),
+  prior        = priors_expect,
+  sample_prior = TRUE,                # required for hypothesis()
+  chains = 4, cores = 4, seed = 42,
+  file         = "fits/anova-expect"  # cached on disk after first run
+)
+```
+
+```{r brms-expect-summary}
+tidy(brm.expect) |>
+  kable(digits = 3, caption = "Posterior summary under the weakly informative (expecting interaction) prior")
+```
+
+The intercept is the predicted `size` for the reference cell (blue × circle). Each `b_*` row gives a coefficient with its 95% credible interval. The two interaction rows (`colorgreen:shapesquare`, `colorred:shapesquare`) are the deviations from additivity — if they are concentrated near zero, the data show no meaningful interaction; if their credible intervals exclude zero, the data support an interaction.
+
+### Scenario B: You'd Be Surprised by an Interaction
+
+The interaction coefficients receive a much tighter autoscaled prior, while the main effects keep the same `normal(0, 1)` prior as scenario A. This regularisation pulls the interaction coefficients toward zero unless the data strongly disagree.
+
+```{r brms-skeptical}
+#| output: false
+priors_skeptical <- c(
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                       # main effects ~1 SD
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),     # tight on interaction
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),       # tight on interaction
+  prior(student_t(3, 0, 2.5), class = sigma)
+)
+
+brm.skeptical <- brm(
+  size ~ color * shape,
+  data         = balloon.data,
+  family       = gaussian(),
+  prior        = priors_skeptical,
+  sample_prior = TRUE,
+  chains = 4, cores = 4, seed = 42,
+  file         = "fits/anova-skeptical"
+)
+```
+
+```{r brms-skeptical-summary}
+tidy(brm.skeptical) |>
+  kable(digits = 3, caption = "Posterior summary under the regularising (sceptical of interaction) prior")
+```
+
+Compare the interaction rows in the two summary tables: under the sceptical prior the posterior credible intervals for the interaction coefficients are narrower and pulled closer to zero. The main-effect estimates should be very similar across the two priors — the prior choice mostly affects what the model says about the interaction.
+
+The ratio between the two interaction scales (here 0.25 vs 1, a 4-fold tighter prior) encodes how much shrinkage you want. Tighter values mean stronger scepticism. Because both priors are scaled by `sd_y`, the same multiplier values (1 and 0.25) can be reused for any continuous outcome — only `sd_y` changes when you swap in a different outcome.
+
+### Examining the Interaction Posterior
+
+Three complementary ways to assess the interaction, in increasing rigour:
+
+**1. Posterior summary.** The credible interval and probability of direction give a continuous statement of evidence — no binary decision required.
+
+```{r brms-posterior}
+fixef(brm.expect) |>
+  as.data.frame() |>
+  rownames_to_column("term") |>
+  filter(str_detect(term, ":")) |>
+  kable(digits = 3, caption = "Posterior summaries for interaction coefficients (95% CrI), expecting-interaction prior")
+```
+
+If both 95% credible intervals straddle zero, the data provide no convincing evidence of an interaction under this prior. Interactions whose intervals exclude zero are supported by the data.
+
+**2. Bayes factor via `hypothesis()`.** Computes a Savage-Dickey ratio comparing prior and posterior density at zero. `Evid.Ratio` >3 favours the null (no interaction); <1/3 favours the alternative.
+
+```{r brms-hypothesis-green}
+hypothesis(brm.expect, "colorgreen:shapesquare = 0")
+```
+
+```{r brms-hypothesis-red}
+hypothesis(brm.expect, "colorred:shapesquare = 0")
+```
+
+The `Evid.Ratio` is the Bayes factor BF₀₁ (null over alternative). Values like 5–10 mean the data are 5–10 times more consistent with no interaction than with the broad prior allowed for it under scenario A. Values near 1 mean the data are equivocal; values below 1/3 favour the alternative. The `Post.Prob` column is the posterior probability of the null at the chosen prior model probability (default 0.5).
+
+**3. LOO model comparison.** Fits the additive model and compares predictive performance via expected log pointwise predictive density.
+
+```{r brms-loo}
+#| output: false
+brm.add <- brm(
+  size ~ color + shape,
+  data    = balloon.data,
+  family  = gaussian(),
+  prior   = c(prior_string(sprintf("normal(0, %.4f)", 1 * sd_y), class = "b"),
+              prior(student_t(3, 0, 2.5), class = sigma)),
+  chains  = 4, cores = 4, seed = 42,
+  file    = "fits/anova-additive"
+)
+
+loo_comparison <- loo_compare(loo(brm.expect), loo(brm.add))
+```
+
+```{r brms-loo-display}
+loo_comparison |>
+  as.data.frame() |>
+  rownames_to_column("model") |>
+  kable(digits = 2, caption = "LOO comparison: additive vs interaction model")
+```
+
+The model with the higher (less negative) ELPD appears at the top with `elpd_diff = 0`. The other model's `elpd_diff` is its disadvantage relative to the best model. A difference smaller than ~4 × `se_diff` is not strong evidence either way; larger differences indicate genuinely better predictive performance. If the additive model wins by a small margin or ties, the data are well described without an interaction term.
+
+### Cell Means and Contrasts via `emmeans`
+
+`emmeans` works directly on `brmsfit` objects with the same syntax as for `lm()` — but the contrast output uses credible intervals (`lower.HPD`, `upper.HPD`) instead of confidence intervals.
+
+```{r brms-cell-means}
+emmeans(brm.expect, ~ color * shape) |>
+  as_tibble() |>
+  kable(digits = 2, caption = "Posterior cell means (95% HPD)")
+```
+
+Each row is a posterior median for one cell, with the 95% highest posterior density interval. These are directly comparable to the frequentist cell means above — they just carry an explicit posterior-probability interpretation.
+
+```{r brms-marginal-color}
+emmeans(brm.expect, ~ color) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrasts for color (posterior)")
+```
+
+```{r brms-marginal-shape}
+emmeans(brm.expect, ~ shape) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Marginal contrast for shape (posterior)")
+```
+
+Marginal main effects answer the same questions as in the frequentist workflow — the average effect of one factor across levels of the other — but report posterior medians and HPD intervals.
+
+```{r brms-simple-effects}
+emmeans(brm.expect, ~ color | shape) |>
+  pairs() |>
+  as_tibble() |>
+  kable(digits = 3, caption = "Simple effects: color within each shape (posterior)")
+```
+
+Simple effects break the marginal contrasts apart by levels of the other factor. Report these when the interaction posterior is concentrated away from zero; if the interaction is small, the simple effects within each shape will be close to the marginal contrasts.
+
+Tukey-style multiple-comparisons adjustment is not needed: the prior already provides regularisation, and Bayesian inference does not have the multiple-comparisons problem in the frequentist sense (no error-rate inflation from looking at multiple contrasts of one posterior).
+
+### What to Report
+
+Following [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html), report:
+
+| Quantity | What to include |
+|---|---|
+| Priors | The exact prior on each parameter, the rationale for the interaction prior (expecting vs sceptical), and confirmation that priors were finalised before fitting |
+| Model | Likelihood family, formula, software version, number of chains and iterations |
+| Convergence | $\hat{R}$, ESS (bulk and tail), divergent transitions — see [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html) |
+| Interaction | Posterior median + 95% HPD for each interaction coefficient; Bayes factor or LOO ELPD difference |
+| Cell means | Posterior median + 95% HPD per cell (from `emmeans`) |
+| Contrasts | Marginal main effects always; simple effects when the interaction posterior is concentrated away from zero |
+| Sensitivity | If the interaction conclusion would change under a different reasonable prior, report the alternative result alongside |
 
 # Assumptions of ANOVA Analyses
 
