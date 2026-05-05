@@ -20,8 +20,8 @@ As a general rule we do four analyses fairly commonly in the Bridges Lab, summar
 | Dependent Variable        | Independent Variable      | Analysis                                    |
 |------------------------|--------------------------|-----------------------|
 | Continuous                | Continuous                | Linear Regression                           |
-| Continuous                | Counts (Yes/No or Groups) | Binomial Regression                         |
-| Counts (Yes/No or Groups) | Continuous                | Pairwise Test (*t*-test/Mann-Whitney/ANOVA) |
+| Continuous                | Counts (Yes/No or Groups) | Pairwise Test (*t*-test/Mann-Whitney/ANOVA) |
+| Counts (Yes/No or Groups) | Continuous                | Binomial Regression                         |
 | Counts (Yes/No or Groups) | Counts (Yes/No or Groups) | $\chi^2$ or Fisher's Test                   |
 
 Lets take a Bayesian approach to each of these using the Mtcars dataset, which looks like this after a bit of fiddling.
@@ -42,13 +42,19 @@ kable(mtcars.data,caption="The mtcars dataset")
 
 ## What is a Pairwise Testing Equivalent?
 
-Lets start by testing if there is a relationship between one quantitative variables, the mpg (miles per gallon) and a categorical variable - transmission (manual or automatic transmission) using the default priors
+Let's start by testing if there is a relationship between a quantitative variable — mpg (miles per gallon) — and a categorical variable — transmission (manual or automatic) — using the default priors.
 
 ```{r brms-pairwise}
 #| output: false
 library(brms)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+
 pairwise.fit <- brm(mpg~transmission,data=mtcars.data,
-                    sample_prior = TRUE)
+                    sample_prior = TRUE,
+                    file = "fits/mtcars-pairwise",
+                    file_refit = "on_change")
 ```
 
 ```{r pairwise-analysis}
@@ -56,7 +62,7 @@ library(broom.mixed)
 tidy(pairwise.fit) %>% kable(caption="Summary of model fit for mpg versus transmission")
 
 plot(pairwise.fit)
-hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tramsmission has higher mpg
+hypothesis(pairwise.fit, "transmissionmanual>0") # testing whether manual transmission has higher mpg
 ```
 
 As you can see, this analysis estimates that the manual transmission has a `r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Estimate` higher mpg ($\pm$ `r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Est.Error`) with a very high Bayes Factor (`r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Evid.Ratio`) and posterior probability (`r hypothesis(pairwise.fit, "transmissionmanual>0")$hypothesis$Post.Prob`).
@@ -75,7 +81,7 @@ as_draws_df(pairwise.fit) %>%
   theme_classic(base_size=16)
 ```
 
-We didnt specify the model type (gausian is the default). We also used the default priors here, which were
+We didn't specify the model type (Gaussian is the default). We also used the default priors here, which were
 
 ```{r pairwise-priors}
 prior_summary(pairwise.fit) %>% kable(caption="Default priors for a pairwise analysis of mpg vs transmission in the mtcars data")
@@ -85,26 +91,43 @@ This includes flat priors for the beta coefficients, student's *t* distributions
 
 ### How about an ANOVA
 
-Lets say we want to test across groups (rather than testing effects between groups)
-.  For that we can use the number of cylindars as a factor
+Let's say we want to test across groups (rather than testing effects between two groups). For that we can use the number of cylinders as a factor.
 
+**Important note on Bayes factors with default priors:** `bayes_factor()` uses bridge sampling to estimate marginal likelihoods, which requires *proper* (integrable) priors on every parameter. The default `brms` priors include flat (improper) priors on the beta coefficients — under those priors the marginal likelihood is undefined and any number `bayes_factor()` returns is unreliable. So before doing model comparison we need to set proper priors explicitly.
 
 ```{r brms-anova}
 #| output: false
-anova.fit <- brm(mpg~0+cylindars,data=mtcars.data, #zero makes sure each cylindar gets its own intercept
-                    sample_prior = TRUE)
-anova.fit.null <- brm(mpg~0,data=mtcars.data, #null model not including cylindars
-                    sample_prior = TRUE)
+anova.priors <- c(
+  prior(normal(20, 10), class = b),                # weakly informative on cylinder means
+  prior(student_t(3, 0, 5), class = sigma)
+)
+
+anova.fit <- brm(mpg ~ 0 + cylindars, data = mtcars.data,   # zero gives each cylinder its own intercept
+                 prior = anova.priors,
+                 sample_prior = TRUE,
+                 save_pars = save_pars(all = TRUE),         # required for bayes_factor()
+                 file = "fits/mtcars-anova",
+                 file_refit = "on_change")
+
+# Null model: a single intercept (no cylinder effect). Use the same proper prior
+# class so the marginal likelihood is well-defined.
+anova.fit.null <- brm(mpg ~ 1, data = mtcars.data,
+                      prior = c(prior(normal(20, 10), class = Intercept),
+                                prior(student_t(3, 0, 5), class = sigma)),
+                      sample_prior = TRUE,
+                      save_pars = save_pars(all = TRUE),
+                      file = "fits/mtcars-anova-null",
+                      file_refit = "on_change")
 ```
 
-The analysis here is a little bit different than before.  We can still plot the posterior distributions for each model but the relevant test is now to compare the model with the cylindars to a null model, without that term.
+The analysis here is a little different than before. We can still plot the posterior distributions for each model but the relevant test is now to compare the model with cylinders to a null model without that term.
 
 ```{r brms-anova-analysis}
-tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylindars")
+tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylinders")
 
 plot(anova.fit)
-# extracts the bayes factor comparing the models
-bayes_factor(anova.fit,anova.fit.null) -> anova.bf 
+# extracts the bayes factor comparing the models (well-defined now that priors are proper)
+bayes_factor(anova.fit, anova.fit.null) -> anova.bf
 
 library(tidyr)
 as_draws_df(anova.fit) %>%
@@ -123,7 +146,7 @@ as_draws_df(anova.fit) %>%
   theme(legend.position="top")
 ```
 
-In this case the Bayes Factor for the hypothesis that this term is relevant is `r anova.bf$bf`.
+In this case the Bayes Factor for the hypothesis that the cylinder term is relevant is `r anova.bf$bf`.
 
 We can still do post-hoc tests using the hypothesis command:
 
@@ -131,7 +154,7 @@ We can still do post-hoc tests using the hypothesis command:
 rbind(hypothesis(anova.fit, "cylindars4>cylindars6")$hypothesis,
       hypothesis(anova.fit, "cylindars4>cylindars8")$hypothesis,
       hypothesis(anova.fit, "cylindars6>cylindars8")$hypothesis) %>%
-  kable(caption="Pairwise hypothesis tests for cylindars on mpg")
+  kable(caption="Pairwise hypothesis tests for cylinders on mpg")
 ```
 
 
@@ -142,7 +165,9 @@ Lets start by testing if there is a relationship between two quantitative variab
 ```{r brms-linear-regression}
 #| output: false
 linear.fit <- brm(mpg~wt,data=mtcars,
-                  sample_prior = TRUE)
+                  sample_prior = TRUE,
+                  file = "fits/mtcars-linear",
+                  file_refit = "on_change")
 ```
 
 Lets see what this looks like
@@ -185,7 +210,7 @@ ggplot(data=r2.probs, aes(x=R2)) +
 
 ## What is a Chi-Squared Equivalent
 
-First lets do an example with a standard $\chi^2$ test (and a Fisher's test since the counts are quite low) on whether there is a relationship bewteen engine type and transmission type.
+First let's do an example with a standard $\chi^2$ test (and a Fisher's test since the counts are quite low) on whether there is a relationship between engine type and transmission type.
 
 ```{r brms-chisq-data}
 library(tidyr) #for pivot wider
@@ -206,9 +231,11 @@ Both agree, not much of a relationship here. For the brms modelling we need to m
 ```{r brms-chisq}
 #| output: false
 # Fit the model
-counts.model <- brm(engine ~ transmission, 
-           data = mtcars.data, 
-           family = bernoulli())
+counts.model <- brm(engine ~ transmission,
+           data = mtcars.data,
+           family = bernoulli(),
+           file = "fits/mtcars-engine-transmission",
+           file_refit = "on_change")
 ```
 
 Lets look at these results
@@ -218,7 +245,7 @@ prior_summary(counts.model) %>% kable(caption="Prior summary for effects of tran
 tidy(counts.model) %>% kable(caption="Summary of model fit for transmission versus engine type")
 
 plot(counts.model)
-hypothesis(counts.model, "transmissionmanual<0") # testing for whether weight has a negative effect on mpg
+hypothesis(counts.model, "transmissionmanual<0") # testing whether manual transmission decreases the log-odds of a V-shaped engine
 
 as_draws_df(counts.model) %>%
   ggplot(aes(x=b_transmissionmanual)) +
@@ -230,18 +257,20 @@ as_draws_df(counts.model) %>%
   theme_classic(base_size=16)
 ```
 
-Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=`r fixef(counts.model)['transmissionmanual',"Estimate"]` $\pm$ `r fixef(counts.model)['transmissionmanual',"Est.Error"]`) with a Bayes Factor of `r hypothesis(counts.model, "transmissionmanual<0")$hypothesis$Evid.Ratio` and a Posterior Probability of `r hypothesis(counts.model, "transmissionmanual<0")$hypothesis$Post.Prob`.
+Now in this case there is moderate evidence for a negative relationship between transmission and engine type ($\beta$=`r fixef(counts.model)['transmissionmanual',"Estimate"]` $\pm$ `r fixef(counts.model)['transmissionmanual',"Est.Error"]`) with a Bayes Factor of `r hypothesis(counts.model, "transmissionmanual<0")$hypothesis$Evid.Ratio` and a Posterior Probability of `r hypothesis(counts.model, "transmissionmanual<0")$hypothesis$Post.Prob`.
 
 ## What is a Binomial Regression Equivalent?
 
-Lets now look at the relationsbip between transmission type (binomial variable) and weight (continuous variable). Again we will use a bernouli distribution (which will use, by default a logit link function)
+Let's now look at the relationship between transmission type (binomial variable) and weight (continuous variable). Again we will use a Bernoulli distribution (which uses a logit link function by default).
 
 ```{r brms-binomial}
 #| output: false
 # Fit the model
-binomial.fit <- brm(transmission ~ wt, 
-           data = mtcars.data, 
-           family = bernoulli())
+binomial.fit <- brm(transmission ~ wt,
+           data = mtcars.data,
+           family = bernoulli(),
+           file = "fits/mtcars-binomial",
+           file_refit = "on_change")
 ```
 
 ```{r binomial-analysis}
@@ -249,7 +278,7 @@ prior_summary(binomial.fit) %>% kable(caption="Prior summary for effects of tran
 tidy(binomial.fit) %>% kable(caption="Summary of model fit for transmission versus engine type")
 
 plot(binomial.fit)
-hypothesis(binomial.fit, "wt<0") # testing for whether weight has a negative effect on mpg
+hypothesis(binomial.fit, "wt<0") # testing whether weight decreases the log-odds of a manual transmission
 
 as_draws_df(binomial.fit) %>%
   ggplot(aes(x=b_wt)) +

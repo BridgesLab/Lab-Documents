@@ -13,8 +13,6 @@ execute:
   warning: false
 ---
 
-
-
 ## Some Common Analyses
 
 As a general rule we do four analyses fairly commonly in the Bridges Lab, summarized here based on the nature of the independent and dependent variables:
@@ -22,8 +20,8 @@ As a general rule we do four analyses fairly commonly in the Bridges Lab, summar
 | Dependent Variable        | Independent Variable      | Analysis                                    |
 |------------------------|--------------------------|-----------------------|
 | Continuous                | Continuous                | Linear Regression                           |
-| Continuous                | Counts (Yes/No or Groups) | Binomial Regression                         |
-| Counts (Yes/No or Groups) | Continuous                | Pairwise Test (*t*-test/Mann-Whitney/ANOVA) |
+| Continuous                | Counts (Yes/No or Groups) | Pairwise Test (*t*-test/Mann-Whitney/ANOVA) |
+| Counts (Yes/No or Groups) | Continuous                | Binomial Regression                         |
 | Counts (Yes/No or Groups) | Counts (Yes/No or Groups) | $\chi^2$ or Fisher's Test                   |
 
 Lets take a Bayesian approach to each of these using the Mtcars dataset, which looks like this after a bit of fiddling.
@@ -92,17 +90,25 @@ Table: The mtcars dataset
 
 ## What is a Pairwise Testing Equivalent?
 
-Lets start by testing if there is a relationship between one quantitative variables, the mpg (miles per gallon) and a categorical variable - transmission (manual or automatic transmission) using the default priors
+Let's start by testing if there is a relationship between a quantitative variable — mpg (miles per gallon) — and a categorical variable — transmission (manual or automatic) — using the default priors.
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
 library(brms)
+
+# directory for cached model fits — brms reuses these on re-render
+dir.create("fits", showWarnings = FALSE)
+
 pairwise.fit <- brm(mpg~transmission,data=mtcars.data,
-                    sample_prior = TRUE)
+                    sample_prior = TRUE,
+                    file = "fits/mtcars-pairwise",
+                    file_refit = "on_change")
 ```
 :::
+
+
 
 ::: {.cell}
 
@@ -118,10 +124,10 @@ Table: Summary of model fit for mpg versus transmission
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 17.097677| 1.1364917| 14.9012782| 19.316796|
-|fixed    |cond      |NA       |transmissionmanual             |  7.264199| 1.8109926|  3.6689723| 10.864794|
-|ran_pars |cond      |Residual |sd__Observation                |  5.028371| 0.6561548|  3.9331937|  6.495243|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.913367| 6.6387586|  0.1846534| 22.336345|
+|fixed    |cond      |NA       |(Intercept)                    | 17.113379| 1.1689889| 14.7144609| 19.399643|
+|fixed    |cond      |NA       |transmissionmanual             |  7.269073| 1.8365570|  3.5006106| 10.800207|
+|ran_pars |cond      |Residual |sd__Observation                |  5.044648| 0.6506777|  3.9783786|  6.482545|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.992310| 6.9772388|  0.1794762| 23.392327|
 
 
 :::
@@ -135,7 +141,7 @@ plot(pairwise.fit)
 :::
 
 ```{.r .cell-code}
-hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tramsmission has higher mpg
+hypothesis(pairwise.fit, "transmissionmanual>0") # testing whether manual transmission has higher mpg
 ```
 
 ::: {.cell-output .cell-output-stdout}
@@ -143,7 +149,7 @@ hypothesis(pairwise.fit, "transmissionmanual>0") # testing for whether manual tr
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) > 0     7.26      1.81     4.35     10.2        Inf
+1 (transmissionmanual) > 0     7.27      1.84     4.23    10.28        Inf
   Post.Prob Star
 1         1    *
 ---
@@ -158,7 +164,7 @@ Posterior probabilities of point hypotheses assume equal prior probabilities.
 :::
 
 
-As you can see, this analysis estimates that the manual transmission has a 7.2641994 higher mpg ($\pm$ 1.8109926) with a very high Bayes Factor (\infty{}) and posterior probability (1).
+As you can see, this analysis estimates that the manual transmission has a 7.2690725 higher mpg ($\pm$ 1.836557) with a very high Bayes Factor (\infty{}) and posterior probability (1).
 
 The posterior distribution for the effect of a manual transmission is here:
 
@@ -183,7 +189,7 @@ as_draws_df(pairwise.fit) %>%
 :::
 
 
-We didnt specify the model type (gausian is the default). We also used the default priors here, which were
+We didn't specify the model type (Gaussian is the default). We also used the default priors here, which were
 
 
 ::: {.cell}
@@ -197,12 +203,12 @@ prior_summary(pairwise.fit) %>% kable(caption="Default priors for a pairwise ana
 
 Table: Default priors for a pairwise analysis of mpg vs transmission in the mtcars data
 
-|prior                   |class     |coef               |group |resp |dpar |nlpar |lb |ub |source  |
-|:-----------------------|:---------|:------------------|:-----|:----|:----|:-----|:--|:--|:-------|
-|                        |b         |                   |      |     |     |      |   |   |default |
-|                        |b         |transmissionmanual |      |     |     |      |   |   |default |
-|student_t(3, 19.2, 5.4) |Intercept |                   |      |     |     |      |   |   |default |
-|student_t(3, 0, 5.4)    |sigma     |                   |      |     |     |      |0  |   |default |
+|prior                   |class     |coef               |group |resp |dpar |nlpar |lb |ub |tag |source  |
+|:-----------------------|:---------|:------------------|:-----|:----|:----|:-----|:--|:--|:---|:-------|
+|                        |b         |                   |      |     |     |      |   |   |    |default |
+|                        |b         |transmissionmanual |      |     |     |      |   |   |    |default |
+|student_t(3, 19.2, 5.4) |Intercept |                   |      |     |     |      |   |   |    |default |
+|student_t(3, 0, 5.4)    |sigma     |                   |      |     |     |      |0  |   |    |default |
 
 
 :::
@@ -213,43 +219,60 @@ This includes flat priors for the beta coefficients, student's *t* distributions
 
 ### How about an ANOVA
 
-Lets say we want to test across groups (rather than testing effects between groups)
-.  For that we can use the number of cylindars as a factor
+Let's say we want to test across groups (rather than testing effects between two groups). For that we can use the number of cylinders as a factor.
 
+**Important note on Bayes factors with default priors:** `bayes_factor()` uses bridge sampling to estimate marginal likelihoods, which requires *proper* (integrable) priors on every parameter. The default `brms` priors include flat (improper) priors on the beta coefficients — under those priors the marginal likelihood is undefined and any number `bayes_factor()` returns is unreliable. So before doing model comparison we need to set proper priors explicitly.
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-anova.fit <- brm(mpg~0+cylindars,data=mtcars.data, #zero makes sure each cylindar gets its own intercept
-                    sample_prior = TRUE)
-anova.fit.null <- brm(mpg~0,data=mtcars.data, #null model not including cylindars
-                    sample_prior = TRUE)
+anova.priors <- c(
+  prior(normal(20, 10), class = b),                # weakly informative on cylinder means
+  prior(student_t(3, 0, 5), class = sigma)
+)
+
+anova.fit <- brm(mpg ~ 0 + cylindars, data = mtcars.data,   # zero gives each cylinder its own intercept
+                 prior = anova.priors,
+                 sample_prior = TRUE,
+                 save_pars = save_pars(all = TRUE),         # required for bayes_factor()
+                 file = "fits/mtcars-anova",
+                 file_refit = "on_change")
+
+# Null model: a single intercept (no cylinder effect). Use the same proper prior
+# class so the marginal likelihood is well-defined.
+anova.fit.null <- brm(mpg ~ 1, data = mtcars.data,
+                      prior = c(prior(normal(20, 10), class = Intercept),
+                                prior(student_t(3, 0, 5), class = sigma)),
+                      sample_prior = TRUE,
+                      save_pars = save_pars(all = TRUE),
+                      file = "fits/mtcars-anova-null",
+                      file_refit = "on_change")
 ```
 :::
 
 
-The analysis here is a little bit different than before.  We can still plot the posterior distributions for each model but the relevant test is now to compare the model with the cylindars to a null model, without that term.
+The analysis here is a little different than before. We can still plot the posterior distributions for each model but the relevant test is now to compare the model with cylinders to a null model without that term.
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylindars")
+tidy(anova.fit) %>% kable(caption="Summary of model fit for mpg versus cylinders")
 ```
 
 ::: {.cell-output-display}
 
 
-Table: Summary of model fit for mpg versus cylindars
+Table: Summary of model fit for mpg versus cylinders
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |cylindars4                     | 26.671540|  1.009890| 24.6931994| 28.684420|
-|fixed    |cond      |NA       |cylindars6                     | 19.710334|  1.292718| 17.1888040| 22.281530|
-|fixed    |cond      |NA       |cylindars8                     | 15.107150|  0.902260| 13.3049123| 16.826756|
-|ran_pars |cond      |Residual |sd__Observation                |  3.338449|  0.454706|  2.5896345|  4.374084|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  6.021950|  7.654006|  0.1700044| 23.006449|
+|fixed    |cond      |NA       |cylindars4                     | 26.571554| 1.0218075| 24.4738104| 28.529332|
+|fixed    |cond      |NA       |cylindars6                     | 19.734955| 1.2593976| 17.3189086| 22.169466|
+|fixed    |cond      |NA       |cylindars8                     | 15.138110| 0.9067475| 13.3600901| 16.914190|
+|ran_pars |cond      |Residual |sd__Observation                |  3.333054| 0.4632648|  2.5615760|  4.380818|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.554511| 6.2958228|  0.1703158| 20.330537|
 
 
 :::
@@ -263,8 +286,8 @@ plot(anova.fit)
 :::
 
 ```{.r .cell-code}
-# extracts the bayes factor comparing the models
-bayes_factor(anova.fit,anova.fit.null) -> anova.bf 
+# extracts the bayes factor comparing the models (well-defined now that priors are proper)
+bayes_factor(anova.fit, anova.fit.null) -> anova.bf
 ```
 
 ::: {.cell-output .cell-output-stdout}
@@ -274,7 +297,6 @@ Iteration: 1
 Iteration: 2
 Iteration: 3
 Iteration: 4
-Iteration: 5
 Iteration: 1
 Iteration: 2
 Iteration: 3
@@ -309,7 +331,7 @@ as_draws_df(anova.fit) %>%
 :::
 
 
-In this case the Bayes Factor for the hypothesis that this term is relevant is 3.4878578\times 10^{28}.
+In this case the Bayes Factor for the hypothesis that the cylinder term is relevant is 8.7851778\times 10^{6}.
 
 We can still do post-hoc tests using the hypothesis command:
 
@@ -320,19 +342,19 @@ We can still do post-hoc tests using the hypothesis command:
 rbind(hypothesis(anova.fit, "cylindars4>cylindars6")$hypothesis,
       hypothesis(anova.fit, "cylindars4>cylindars8")$hypothesis,
       hypothesis(anova.fit, "cylindars6>cylindars8")$hypothesis) %>%
-  kable(caption="Pairwise hypothesis tests for cylindars on mpg")
+  kable(caption="Pairwise hypothesis tests for cylinders on mpg")
 ```
 
 ::: {.cell-output-display}
 
 
-Table: Pairwise hypothesis tests for cylindars on mpg
+Table: Pairwise hypothesis tests for cylinders on mpg
 
 |Hypothesis                    |  Estimate| Est.Error| CI.Lower|  CI.Upper| Evid.Ratio| Post.Prob|Star |
 |:-----------------------------|---------:|---------:|--------:|---------:|----------:|---------:|:----|
-|(cylindars4)-(cylindars6) > 0 |  6.961206|  1.613525| 4.318895|  9.640136|        Inf|   1.00000|*    |
-|(cylindars4)-(cylindars8) > 0 | 11.564389|  1.358335| 9.344448| 13.776835|        Inf|   1.00000|*    |
-|(cylindars6)-(cylindars8) > 0 |  4.603184|  1.565119| 2.070603|  7.158059|   265.6667|   0.99625|*    |
+|(cylindars4)-(cylindars6) > 0 |  6.836599|  1.604323| 4.131769|  9.397150|       3999|   0.99975|*    |
+|(cylindars4)-(cylindars8) > 0 | 11.433444|  1.362242| 9.188783| 13.678269|        Inf|   1.00000|*    |
+|(cylindars6)-(cylindars8) > 0 |  4.596845|  1.587968| 2.064742|  7.192442|        499|   0.99800|*    |
 
 
 :::
@@ -349,7 +371,9 @@ Lets start by testing if there is a relationship between two quantitative variab
 
 ```{.r .cell-code}
 linear.fit <- brm(mpg~wt,data=mtcars,
-                  sample_prior = TRUE)
+                  sample_prior = TRUE,
+                  file = "fits/mtcars-linear",
+                  file_refit = "on_change")
 ```
 :::
 
@@ -368,12 +392,12 @@ prior_summary(linear.fit) %>% kable(caption="Prior summary for effects of weight
 
 Table: Prior summary for effects of weight on mpg
 
-|prior                   |class     |coef |group |resp |dpar |nlpar |lb |ub |source  |
-|:-----------------------|:---------|:----|:-----|:----|:----|:-----|:--|:--|:-------|
-|                        |b         |     |      |     |     |      |   |   |default |
-|                        |b         |wt   |      |     |     |      |   |   |default |
-|student_t(3, 19.2, 5.4) |Intercept |     |      |     |     |      |   |   |default |
-|student_t(3, 0, 5.4)    |sigma     |     |      |     |     |      |0  |   |default |
+|prior                   |class     |coef |group |resp |dpar |nlpar |lb |ub |tag |source  |
+|:-----------------------|:---------|:----|:-----|:----|:----|:-----|:--|:--|:---|:-------|
+|                        |b         |     |      |     |     |      |   |   |    |default |
+|                        |b         |wt   |      |     |     |      |   |   |    |default |
+|student_t(3, 19.2, 5.4) |Intercept |     |      |     |     |      |   |   |    |default |
+|student_t(3, 0, 5.4)    |sigma     |     |      |     |     |      |0  |   |    |default |
 
 
 :::
@@ -389,10 +413,10 @@ Table: Summary of model fit for mpg versus weight
 
 |effect   |component |group    |term                           |  estimate| std.error|   conf.low| conf.high|
 |:--------|:---------|:--------|:------------------------------|---------:|---------:|----------:|---------:|
-|fixed    |cond      |NA       |(Intercept)                    | 37.257714| 1.9360071| 33.4151941| 40.982049|
-|fixed    |cond      |NA       |wt                             | -5.341900| 0.5792852| -6.4596890| -4.176700|
-|ran_pars |cond      |Residual |sd__Observation                |  3.160016| 0.4253177|  2.4736451|  4.126301|
-|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.960987| 6.6349369|  0.1906678| 22.410161|
+|fixed    |cond      |NA       |(Intercept)                    | 37.332230| 1.9906229| 33.3489093| 41.294963|
+|fixed    |cond      |NA       |wt                             | -5.358417| 0.5981328| -6.5391982| -4.204272|
+|ran_pars |cond      |Residual |sd__Observation                |  3.151748| 0.4136588|  2.4693176|  4.049447|
+|ran_pars |cond      |Residual |prior_sigma__NA.NA.prior_sigma |  5.955288| 6.6215206|  0.1628139| 21.955359|
 
 
 :::
@@ -414,7 +438,7 @@ hypothesis(linear.fit, "wt<0") # testing for whether weight has a negative effec
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0    -5.34      0.58     -6.3    -4.41        Inf         1    *
+1   (wt) < 0    -5.36       0.6    -6.32    -4.38        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -460,9 +484,9 @@ kable(bayes_R2(linear.fit),caption="Estimates for R2 between weight and mpg")
 
 Table: Estimates for R2 between weight and mpg
 
-|   |  Estimate| Est.Error|      Q2.5|    Q97.5|
-|:--|---------:|---------:|---------:|--------:|
-|R2 | 0.7417077| 0.0472553| 0.6189107| 0.797102|
+|   |  Estimate| Est.Error|      Q2.5|     Q97.5|
+|:--|---------:|---------:|---------:|---------:|
+|R2 | 0.7422678| 0.0472943| 0.6234056| 0.7982604|
 
 
 :::
@@ -487,7 +511,7 @@ ggplot(data=r2.probs, aes(x=R2)) +
 
 ## What is a Chi-Squared Equivalent
 
-First lets do an example with a standard $\chi^2$ test (and a Fisher's test since the counts are quite low) on whether there is a relationship bewteen engine type and transmission type.
+First let's do an example with a standard $\chi^2$ test (and a Fisher's test since the counts are quite low) on whether there is a relationship between engine type and transmission type.
 
 
 ::: {.cell}
@@ -542,9 +566,11 @@ Both agree, not much of a relationship here. For the brms modelling we need to m
 
 ```{.r .cell-code}
 # Fit the model
-counts.model <- brm(engine ~ transmission, 
-           data = mtcars.data, 
-           family = bernoulli())
+counts.model <- brm(engine ~ transmission,
+           data = mtcars.data,
+           family = bernoulli(),
+           file = "fits/mtcars-engine-transmission",
+           file_refit = "on_change")
 ```
 :::
 
@@ -563,11 +589,11 @@ prior_summary(counts.model) %>% kable(caption="Prior summary for effects of tran
 
 Table: Prior summary for effects of transmission on engine type
 
-|prior                |class     |coef               |group |resp |dpar |nlpar |lb |ub |source  |
-|:--------------------|:---------|:------------------|:-----|:----|:----|:-----|:--|:--|:-------|
-|                     |b         |                   |      |     |     |      |   |   |default |
-|                     |b         |transmissionmanual |      |     |     |      |   |   |default |
-|student_t(3, 0, 2.5) |Intercept |                   |      |     |     |      |   |   |default |
+|prior                |class     |coef               |group |resp |dpar |nlpar |lb |ub |tag |source  |
+|:--------------------|:---------|:------------------|:-----|:----|:----|:-----|:--|:--|:---|:-------|
+|                     |b         |                   |      |     |     |      |   |   |    |default |
+|                     |b         |transmissionmanual |      |     |     |      |   |   |    |default |
+|student_t(3, 0, 2.5) |Intercept |                   |      |     |     |      |   |   |    |default |
 
 
 :::
@@ -583,8 +609,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term               |   estimate| std.error|   conf.low| conf.high|
 |:------|:---------|:-----|:------------------|----------:|---------:|----------:|---------:|
-|fixed  |cond      |NA    |(Intercept)        |  0.5564512| 0.4845538| -0.3728695| 1.5250906|
-|fixed  |cond      |NA    |transmissionmanual | -0.7365043| 0.7455498| -2.2076540| 0.7021128|
+|fixed  |cond      |NA    |(Intercept)        |  0.5613834| 0.4767499| -0.3517906| 1.5203421|
+|fixed  |cond      |NA    |transmissionmanual | -0.7442098| 0.7650699| -2.2922495| 0.7335985|
 
 
 :::
@@ -598,7 +624,7 @@ plot(counts.model)
 :::
 
 ```{.r .cell-code}
-hypothesis(counts.model, "transmissionmanual<0") # testing for whether weight has a negative effect on mpg
+hypothesis(counts.model, "transmissionmanual<0") # testing whether manual transmission decreases the log-odds of a V-shaped engine
 ```
 
 ::: {.cell-output .cell-output-stdout}
@@ -606,9 +632,9 @@ hypothesis(counts.model, "transmissionmanual<0") # testing for whether weight ha
 ```
 Hypothesis Tests for class b:
                 Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-1 (transmissionmanual) < 0    -0.74      0.75    -1.99     0.45       5.05
+1 (transmissionmanual) < 0    -0.74      0.77    -2.04     0.48        5.3
   Post.Prob Star
-1      0.83     
+1      0.84     
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -636,22 +662,26 @@ as_draws_df(counts.model) %>%
 :::
 
 
-Now in this case there is moderate evidence for a negative relationship between transmnission and engine type ($\beta$=-0.7365043 $\pm$ 0.7455498) with a Bayes Factor of 5.0514372 and a Posterior Probability of 0.83475.
+Now in this case there is moderate evidence for a negative relationship between transmission and engine type ($\beta$=-0.7442098 $\pm$ 0.7650699) with a Bayes Factor of 5.2992126 and a Posterior Probability of 0.84125.
 
 ## What is a Binomial Regression Equivalent?
 
-Lets now look at the relationsbip between transmission type (binomial variable) and weight (continuous variable). Again we will use a bernouli distribution (which will use, by default a logit link function)
+Let's now look at the relationship between transmission type (binomial variable) and weight (continuous variable). Again we will use a Bernoulli distribution (which uses a logit link function by default).
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
 # Fit the model
-binomial.fit <- brm(transmission ~ wt, 
-           data = mtcars.data, 
-           family = bernoulli())
+binomial.fit <- brm(transmission ~ wt,
+           data = mtcars.data,
+           family = bernoulli(),
+           file = "fits/mtcars-binomial",
+           file_refit = "on_change")
 ```
 :::
+
+
 
 ::: {.cell}
 
@@ -664,11 +694,11 @@ prior_summary(binomial.fit) %>% kable(caption="Prior summary for effects of tran
 
 Table: Prior summary for effects of transmission on engine type
 
-|prior                |class     |coef |group |resp |dpar |nlpar |lb |ub |source  |
-|:--------------------|:---------|:----|:-----|:----|:----|:-----|:--|:--|:-------|
-|                     |b         |     |      |     |     |      |   |   |default |
-|                     |b         |wt   |      |     |     |      |   |   |default |
-|student_t(3, 0, 2.5) |Intercept |     |      |     |     |      |   |   |default |
+|prior                |class     |coef |group |resp |dpar |nlpar |lb |ub |tag |source  |
+|:--------------------|:---------|:----|:-----|:----|:----|:-----|:--|:--|:---|:-------|
+|                     |b         |     |      |     |     |      |   |   |    |default |
+|                     |b         |wt   |      |     |     |      |   |   |    |default |
+|student_t(3, 0, 2.5) |Intercept |     |      |     |     |      |   |   |    |default |
 
 
 :::
@@ -684,8 +714,8 @@ Table: Summary of model fit for transmission versus engine type
 
 |effect |component |group |term        |  estimate| std.error|  conf.low| conf.high|
 |:------|:---------|:-----|:-----------|---------:|---------:|---------:|---------:|
-|fixed  |cond      |NA    |(Intercept) | 14.822531|  5.646451|  6.143241| 27.985245|
-|fixed  |cond      |NA    |wt          | -4.899447|  1.776671| -8.932556| -2.160662|
+|fixed  |cond      |NA    |(Intercept) | 14.457099|  5.012188|  6.401645| 25.648173|
+|fixed  |cond      |NA    |wt          | -4.788294|  1.594304| -8.385464| -2.204216|
 
 
 :::
@@ -699,7 +729,7 @@ plot(binomial.fit)
 :::
 
 ```{.r .cell-code}
-hypothesis(binomial.fit, "wt<0") # testing for whether weight has a negative effect on mpg
+hypothesis(binomial.fit, "wt<0") # testing whether weight decreases the log-odds of a manual transmission
 ```
 
 ::: {.cell-output .cell-output-stdout}
@@ -707,7 +737,7 @@ hypothesis(binomial.fit, "wt<0") # testing for whether weight has a negative eff
 ```
 Hypothesis Tests for class b:
   Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio Post.Prob Star
-1   (wt) < 0     -4.9      1.78     -8.1    -2.51        Inf         1    *
+1   (wt) < 0    -4.79      1.59     -7.6    -2.51        Inf         1    *
 ---
 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
 '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -757,13 +787,13 @@ sessionInfo()
 ::: {.cell-output .cell-output-stdout}
 
 ```
-R version 4.4.1 (2024-06-14)
-Platform: x86_64-apple-darwin20
-Running under: macOS Sonoma 14.6.1
+R version 4.6.0 (2026-04-24)
+Platform: aarch64-apple-darwin23
+Running under: macOS Tahoe 26.4.1
 
 Matrix products: default
-BLAS:   /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRblas.0.dylib 
-LAPACK: /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -775,38 +805,39 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] tibble_3.2.1        tidyr_1.3.1         ggplot2_3.5.1      
-[4] broom.mixed_0.2.9.5 brms_2.21.0         Rcpp_1.0.12        
-[7] dplyr_1.1.4         knitr_1.48         
+[1] tibble_3.3.1        tidyr_1.3.2         ggplot2_4.0.3      
+[4] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
+[7] dplyr_1.2.1         knitr_1.51         
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.5         tensorA_0.36.2.1     xfun_0.45           
- [4] QuickJSR_1.3.1       processx_3.8.4       inline_0.3.19       
- [7] lattice_0.22-6       callr_3.7.6          vctrs_0.6.5         
-[10] tools_4.4.1          ps_1.7.7             generics_0.1.3      
-[13] stats4_4.4.1         parallel_4.4.1       fansi_1.0.6         
-[16] pkgconfig_2.0.3      Matrix_1.7-0         checkmate_2.3.2     
-[19] distributional_0.4.0 RcppParallel_5.1.8   lifecycle_1.0.4     
-[22] farver_2.1.2         compiler_4.4.1       stringr_1.5.1       
-[25] Brobdingnag_1.2-9    munsell_0.5.1        codetools_0.2-20    
-[28] htmltools_0.5.8.1    bayesplot_1.11.1     yaml_2.3.9          
-[31] pillar_1.9.0         furrr_0.3.1          StanHeaders_2.32.10 
-[34] bridgesampling_1.1-2 abind_1.4-5          parallelly_1.38.0   
-[37] nlme_3.1-164         posterior_1.6.0      rstan_2.32.6        
-[40] tidyselect_1.2.1     digest_0.6.36        mvtnorm_1.2-5       
-[43] stringi_1.8.4        future_1.34.0        reshape2_1.4.4      
-[46] purrr_1.0.2          listenv_0.9.1        labeling_0.4.3      
-[49] splines_4.4.1        forcats_1.0.0        fastmap_1.2.0       
-[52] grid_4.4.1           colorspace_2.1-0     cli_3.6.3           
-[55] magrittr_2.0.3       loo_2.8.0            pkgbuild_1.4.4      
-[58] utf8_1.2.4           broom_1.0.6          withr_3.0.0         
-[61] scales_1.3.0         backports_1.5.0      rmarkdown_2.27      
-[64] matrixStats_1.3.0    globals_0.16.3       gridExtra_2.3       
-[67] coda_0.19-4.1        evaluate_0.24.0      rstantools_2.4.0    
-[70] rlang_1.1.4          glue_1.7.0           jsonlite_1.8.8      
-[73] plyr_1.8.9           R6_2.5.1            
+ [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
+ [4] QuickJSR_1.9.2        processx_3.9.0        inline_0.3.21        
+ [7] lattice_0.22-9        callr_3.7.6           vctrs_0.7.3          
+[10] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
+[13] parallel_4.6.0        pkgconfig_2.0.3       Matrix_1.7-5         
+[16] checkmate_2.3.4       RColorBrewer_1.1-3    S7_0.2.2             
+[19] distributional_0.7.0  RcppParallel_5.1.11-2 lifecycle_1.0.5      
+[22] compiler_4.6.0        farver_2.1.2          stringr_1.6.0        
+[25] Brobdingnag_1.2-9     codetools_0.2-20      htmltools_0.5.9      
+[28] bayesplot_1.15.0      yaml_2.3.12           pillar_1.11.1        
+[31] furrr_0.4.0           StanHeaders_2.32.10   bridgesampling_1.2-1 
+[34] abind_1.4-8           nlme_3.1-169          parallelly_1.47.0    
+[37] posterior_1.7.0       rstan_2.32.7          tidyselect_1.2.1     
+[40] digest_0.6.39         mvtnorm_1.3-7         stringi_1.8.7        
+[43] future_1.70.0         reshape2_1.4.5        purrr_1.2.2          
+[46] listenv_0.10.1        labeling_0.4.3        splines_4.6.0        
+[49] forcats_1.0.1         fastmap_1.2.0         grid_4.6.0           
+[52] cli_3.6.6             magrittr_2.0.5        loo_2.9.0            
+[55] pkgbuild_1.4.8        broom_1.0.12          withr_3.0.2          
+[58] scales_1.4.0          backports_1.5.1       estimability_1.5.1   
+[61] rmarkdown_2.31        emmeans_2.0.3         matrixStats_1.5.0    
+[64] globals_0.19.1        gridExtra_2.3         coda_0.19-4.1        
+[67] evaluate_1.0.5        rstantools_2.6.0      rlang_1.2.0          
+[70] glue_1.8.1            rstudioapi_0.18.0     jsonlite_2.0.0       
+[73] plyr_1.8.9            R6_2.6.1             
 ```
 
 
 :::
 :::
+
