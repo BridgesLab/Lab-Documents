@@ -1,5 +1,5 @@
 ---
-title: "Bayesian Analysis of a 2×2 qPCR Experiment"
+title: "Bayesian Analysis of a Two-Group qPCR Experiment"
 author: "Dave Bridges"
 date: today
 format:
@@ -18,6 +18,7 @@ bibliography: [references.bib, bayesian-references.bib]
 ```{r libraries}
 library(tidyverse)
 library(brms)
+library(broom)
 library(broom.mixed)
 library(emmeans)
 library(knitr)
@@ -28,69 +29,60 @@ dir.create("fits", showWarnings = FALSE)
 
 # Overview
 
-This document is a fully worked Bayesian analysis of a typical 2×2 qPCR experiment in our lab. The design crosses two diets (normal chow, NCD; high-fat, HFD) with two stress conditions (control, CON; chronic unpredictable stress, CUS), giving four groups of `n = 6` mice per group. We measure six target genes and ask:
+This document is a fully worked Bayesian analysis of a typical two-group qPCR experiment — wild-type (WT) vs knockout (KO) animals across several target genes, with `n = 6` per genotype. The scientific questions are simple but illustrate where the Bayesian framework is most useful:
 
-- Does diet, stress, or their interaction affect each transcript?
-- For each target, what is the posterior probability of an interaction?
-- For genes where we find no meaningful effect, can we say something stronger than "we failed to reject the null"?
+- For each gene, is there a difference in expression between WT and KO?
+- For each gene where we don't see a difference, can we say something stronger than "we failed to reject the null"?
 
-Related materials in this collection:
+We compare the Bayesian results to the frequentist standard (Welch's *t*-test with BH adjustment) to highlight where the conclusions agree and where they differ.
 
-- The frequentist counterpart workflow is in [anova-example.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/anova-example.html).
+Related materials:
+
+- For 2×2 factorial designs where the *interaction* (effect modification) is the primary scientific question, see [bayesian-qpcr-example-effect-modification.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-qpcr-example-effect-modification.html).
 - For Bayesian background and intuition, see [bayesian-analyses.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-analyses.html).
-- For reporting standards, see [bayesian-barg.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html) [@kruschkeBayesianAnalysisReporting2021].
+- For reporting standards, see [bayesian-barg.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html).
+- For the frequentist counterpart workflow, see [general-statistics.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/general-statistics.html).
 
 # Simulating a Realistic Dataset
 
-We simulate fold-change values on the log2 scale (where 0 = no change, 1 = 2-fold up, −1 = 2-fold down). Six genes are chosen to span typical biological scenarios that arise in a HFD × stress experiment:
+We simulate fold-change values on the log2 scale (where 0 = no change, 1 = 2-fold up, −1 = 2-fold down) for four target genes spanning typical scenarios, with stylised labels (`GeneA`–`GeneD`):
 
-| Gene    | Biology                          | True effect simulated                  |
-|---------|----------------------------------|----------------------------------------|
-| Pck1    | Gluconeogenesis                  | HFD main effect only                   |
-| Fkbp5   | Glucocorticoid response          | CUS main effect only                   |
-| Hmgcs2  | Ketogenesis                      | HFD main effect + mild interaction     |
-| Il6     | Inflammation                     | Both main effects + strong interaction |
-| Tnf     | Inflammation                     | Mild CUS effect only                   |
-| *Actb*    | Housekeeping                     | No effects (negative control)          |
+| Gene  | Scenario                                | True log2 KO effect       |
+|-------|-----------------------------------------|---------------------------|
+| GeneA | Clear, biologically meaningful effect   | 1.5 (~2.8-fold up in KO)  |
+| GeneB | Moderate effect                         | 0.8 (~1.7-fold up in KO)  |
+| GeneC | Negative control — no true effect       | 0                         |
+| GeneD | Tiny effect within "practical zero"     | 0.15 (~1.1-fold up in KO) |
 
-The within-group SD on the log2 scale is 0.4, which corresponds to the typical biological + technical variation we see in qPCR.
+The within-group SD is 0.4 on the log2 scale.
 
 ```{r simulate-data}
 set.seed(2025)
 
-n_per_cell <- 6
+n_per_group <- 6
 
-# True effects for each gene on the log2 scale
 gene_effects <- tribble(
-  ~Target,   ~b_diet, ~b_stress, ~b_inter,
-  "Pck1",    1.2,     0.0,       0.0,
-  "Fkbp5",   0.0,     1.5,       0.0,
-  "Hmgcs2",  0.8,     0.3,       0.5,
-  "Il6",     0.5,     0.6,       1.0,
-  "Tnf",     0.0,     0.4,       0.0,
-  "Actb",    0.0,     0.0,       0.0
+  ~Target,  ~b_KO,
+  "GeneA",  1.5,
+  "GeneB",  0.8,
+  "GeneC",  0.0,
+  "GeneD",  0.15
 )
 
 qpcr_sim <- gene_effects |>
-  expand_grid(Diet   = c("NCD", "HFD"),
-              Stress = c("CON", "CUS"),
-              rep    = 1:n_per_cell) |>
+  expand_grid(Genotype = c("WT", "KO"),
+              rep      = 1:n_per_group) |>
   mutate(
-    diet_x   = ifelse(Diet   == "HFD", 1, 0),
-    stress_x = ifelse(Stress == "CUS", 1, 0),
-    log2FC   = b_diet * diet_x +
-               b_stress * stress_x +
-               b_inter * diet_x * stress_x +
-               rnorm(n(), 0, 0.4),
+    ko_x        = ifelse(Genotype == "KO", 1, 0),
+    log2FC      = b_KO * ko_x + rnorm(n(), 0, 0.4),
     Fold_Change = 2 ^ log2FC
   ) |>
   mutate(
-    Diet   = factor(Diet,   levels = c("NCD", "HFD")),
-    Stress = factor(Stress, levels = c("CON", "CUS")),
-    Target = factor(Target,
-                    levels = c("Pck1", "Fkbp5", "Hmgcs2", "Il6", "Tnf", "Actb"))
+    Genotype = factor(Genotype, levels = c("WT", "KO")),
+    Target   = factor(Target,
+                      levels = c("GeneA", "GeneB", "GeneC", "GeneD"))
   ) |>
-  select(Target, Diet, Stress, rep, log2FC, Fold_Change)
+  select(Target, Genotype, rep, log2FC, Fold_Change)
 
 qpcr_sim |>
   slice_head(n = 8) |>
@@ -98,59 +90,113 @@ qpcr_sim |>
 ```
 
 ```{r plot-data}
-#| fig-height: 6
-ggplot(qpcr_sim, aes(x = Stress, y = Fold_Change, color = Diet)) +
-  geom_jitter(width = 0.15, alpha = 0.6, size = 1.5) +
-  stat_summary(fun = mean, geom = "point",
-               size = 3, position = position_dodge(0.4)) +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.15,
-               position = position_dodge(0.4)) +
+#| fig-height: 4
+ggplot(qpcr_sim, aes(x = Genotype, y = Fold_Change, color = Genotype)) +
+  geom_jitter(width = 0.15, alpha = 0.7, size = 1.5) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.15) +
   facet_wrap(~ Target, scales = "free_y") +
   scale_y_continuous(trans = "log2") +
   labs(y = "Fold change (log2 axis)",
-       title = "Simulated 2×2 qPCR data — points + group mean ± SE") +
-  theme_classic(base_size = 12)
+       title = "Simulated WT vs KO qPCR data — points + group mean ± SE") +
+  theme_classic(base_size = 12) +
+  theme(legend.position = "none")
 ```
 
-# Analysis Decisions
+# Frequentist Analysis (for comparison)
 
-## Why fit on the log2 scale?
+The standard frequentist workflow per the [general statistics tutorial](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/general-statistics.html) is a Welch's *t*-test per gene on log2-transformed fold change, with BH adjustment across genes [@Benjamini1995; @delacre2017].
 
-Fold-change data is inherently multiplicative — going from FC = 1 to FC = 2 is the same biological "size" of effect as FC = 2 to FC = 4. On a linear scale these are different distances; on the log2 scale they are both 1 unit. Working on the log2 scale therefore:
+```{r frequentist}
+freq_results <- qpcr_sim |>
+  group_by(Target) |>
+  nest() |>
+  mutate(
+    fit  = map(data, ~ lm(log2FC ~ Genotype, data = .x)),
+    tidy = map(fit,  ~ tidy(.x, conf.int = TRUE))
+  ) |>
+  select(Target, tidy) |>
+  unnest(tidy) |>
+  filter(term == "GenotypeKO") |>
+  ungroup() |>
+  mutate(p.adj = p.adjust(p.value, method = "BH"))
 
-- Makes effect sizes (regression coefficients) directly interpretable as fold changes (`2^β`).
-- Approximately stabilises the within-group variance, making the Gaussian likelihood assumption defensible.
-- Symmetrises the prior — `normal(0, 1)` puts equal probability on 2-fold up vs 2-fold down, whereas a normal prior on raw fold change would not.
+freq_results |>
+  select(Target, estimate, conf.low, conf.high, p.value, p.adj) |>
+  kable(digits = 3,
+        caption = "Frequentist KO vs WT contrast per gene (log2 scale)",
+        col.names = c("Target", "Estimate (KO − WT)",
+                      "2.5%", "97.5%", "p", "p (BH-adj)"))
+```
 
-We fit `log2(Fold_Change) ~ Diet * Stress` with a Gaussian likelihood throughout.
+In the frequentist conclusions: GeneA and GeneB will typically show clear effects (`p_adj` ≪ 0.05); GeneC and GeneD will not. But "GeneC and GeneD do not" is a *failure to reject* — frequentist methods cannot directly tell us whether the absence of evidence is evidence of absence. That is where the Bayesian analysis becomes useful.
 
-## Pre-specified hypothesis on the interaction
+# Bayesian Analysis
 
-Per the [ANOVA tutorial](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/anova-example.html), we always retain the interaction term and use the prior to encode how surprised we would be by an interaction.
+## Analysis decisions
 
-For most published HFD × stress qPCR experiments, the two factors act roughly additively — a meaningful interaction would be surprising for most genes but plausible for a few (e.g. inflammatory genes). We therefore put a weakly informative prior on the main effects (`normal(0, 1)`, allowing effects up to 2-fold with high probability) and a tighter prior on the interaction term (`normal(0, 0.5)`, allowing interactions up to ~1.4-fold).
+We fit `log2(Fold_Change) ~ Genotype` per gene with a Gaussian likelihood. Working on the log2 scale makes effect sizes directly interpretable as fold changes (`2^β`) and keeps the prior symmetric.
 
-| Term            | Prior              | Practical meaning (back-transformed)            |
-|-----------------|--------------------|--------------------------------------------------|
-| Intercept       | `normal(0, 1.5)`   | baseline log2FC near 0 (no change)               |
-| Main effects    | `normal(0, 1)`     | ~95% prior on \|effect\| < 2 (i.e., 4-fold range)|
-| Interaction     | `normal(0, 0.5)`   | ~95% prior on \|effect\| < 1 (i.e., 2-fold range)|
-| Residual SD (σ) | `student_t(3, 0, 1)` | weakly informative on within-group variability |
+## Pre-specified priors
+
+These priors are pre-specified before fitting and should be documented in the methods. The scales reflect what is biologically plausible for typical qPCR data:
+
+| Term            | Prior                | Practical meaning                                |
+|-----------------|----------------------|--------------------------------------------------|
+| Intercept       | `normal(0, 1.5)`     | baseline log2FC near 0 (no change)               |
+| Genotype effect | `normal(0, 1)`       | ~95% prior on \|effect\| < 2 (i.e., 4-fold range)|
+| Residual SD (σ) | `student_t(3, 0, 1)` | weakly informative                               |
 
 ```{r priors}
 qpcr_priors <- c(
   prior(normal(0, 1.5),     class = Intercept),
   prior(normal(0, 1),       class = b),
-  prior(normal(0, 0.5),     class = b, coef = "DietHFD:StressCUS"),
   prior(student_t(3, 0, 1), class = sigma)
 )
 ```
 
-These priors are **pre-specified before fitting** the data, in line with [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html). Document them in your methods exactly as written above.
+### Incorporating prior information from previous studies
 
-# Per-Gene Bayesian Models
+If you have prior knowledge about a specific gene's behaviour — for instance, a previous publication or a pilot experiment — you can encode that in a **gene-specific prior** rather than relying on the generic weakly informative prior above. The prior mean reflects what you expect; the prior SD reflects how confident you are in that expectation.
 
-We fit one `brm()` per gene using `dplyr::group_by() |> nest() |> mutate(map(...))`. Each fit caches to disk via `file = "fits/qpcr-..."` so first-render compilation only happens once.
+```{r priors-informative}
+#| eval: false
+# Example: a prior study reported a 2-fold up-regulation in KO (β ≈ 1 on log2)
+# with reasonable confidence (SD ≈ 0.3 on log2)
+informed_priors <- c(
+  prior(normal(0, 1.5),       class = Intercept),
+  prior(normal(1, 0.3),       class = b, coef = "GenotypeKO"),  # gene-specific
+  prior(student_t(3, 0, 1),   class = sigma)
+)
+```
+
+Two pragmatic guidelines for setting an informed prior:
+
+1. **Be conservative with the prior SD.** A previous study's point estimate is itself uncertain. Use a wider SD than the previous study's reported SE — typically 2–3× wider — to avoid overcommitting to a single previous result.
+2. **Pre-specify and document.** Decide on the prior *before* looking at the new data, and report exactly what was used and why in the methods. This is the difference between a principled informative prior and post-hoc fitting.
+
+If your previous result is questionable or unreplicated, prefer the weakly informative prior above. The advantage of incorporating prior information is most evident with small sample sizes (`n` ≤ 5) where the data alone are too noisy for stable estimates; with larger samples the data will dominate either prior.
+
+## Region of practical equivalence (ROPE)
+
+A key Bayesian decision is the **ROPE** — the smallest fold change you would consider biologically meaningful. For qPCR transcript data we use **1.2-fold** (i.e., effects between 1/1.2 and 1.2 in raw fold change), corresponding to ±log2(1.2) ≈ ±0.263 on the log2 scale.
+
+```{r rope}
+rope_log2 <- log2(1.2)   # ≈ 0.263 on the log2 scale
+rope_log2
+```
+
+### Why 1.2-fold for transcript data?
+
+This threshold is small enough to capture biologically meaningful changes while being large enough to ignore measurement noise. The justification has three parts:
+
+1. **Biological replicate variability dominates.** MIQE-compliant qPCR with technical replication has Ct-level CVs typically below 5%, which translates to a technical reproducibility of around 1.05-fold — far below 1.2-fold. The practical floor is biological variability between animals, which has CVs of 15–30% in most mammalian tissues for typical metabolic/inflammatory transcripts.
+2. **Downstream effect threshold.** Transcript changes below ~1.2-fold rarely produce detectable changes at the protein or phenotypic level once translation, post-translational regulation, and degradation buffering are taken into account. A 20% transcript change is a reasonable lower bound for an effect to plausibly matter biologically.
+3. **Convention in the differential-expression literature.** Major transcriptomics tools and microarray practice typically report differential expression at 1.5–2-fold thresholds; 1.2-fold is the lower end of this range and is appropriate for hypothesis-driven qPCR studies where the biological context already supports the gene's relevance.
+
+You should adjust this for your system. Genes encoding regulatory factors (transcription factors, signalling proteins) may show meaningful effects at 1.1–1.2-fold, while abundant structural proteins or housekeeping genes may need 1.5–2-fold changes to be biologically actionable. Document your chosen ROPE width and rationale in the methods.
+
+## Per-gene fits
 
 ```{r fit-models}
 #| output: false
@@ -160,25 +206,31 @@ qpcr_fits <- qpcr_sim |>
   nest() |>
   mutate(
     fit = map2(data, Target, ~ brm(
-      log2(Fold_Change) ~ Diet * Stress,
+      log2(Fold_Change) ~ Genotype,
       data         = .x,
       prior        = qpcr_priors,
-      sample_prior = TRUE,            # required for hypothesis() Bayes factors
+      sample_prior = TRUE,
       chains = 4, cores = 4,
       seed   = 42,
       refresh = 0,
-      file       = paste0("fits/qpcr-", as.character(.y)),
+      file       = paste0("fits/qpcr-wtko-", as.character(.y)),
       file_refit = "on_change"
     ))
   )
 ```
 
-# Convergence Diagnostics
+## Convergence diagnostics
 
-Before interpreting any model, verify that all chains converged ($\hat{R}$ ≈ 1) and that the effective sample size is adequate ([@vehtariRankNormalizationFolding2021] recommends bulk-ESS ≥ 1000 and tail-ESS ≥ 400). We extract diagnostics across all six gene-level fits at once:
+Three diagnostics are reported per fit, with thresholds following [@vehtariRankNormalizationFolding2021]:
+
+- **$\hat{R}$ (R-hat / potential scale reduction factor)**: should be ≤ **1.01** for all parameters. Values > 1.01 indicate the chains have not mixed well and the posterior is not yet stable. (The older threshold of 1.05–1.10 is not reliable enough for small-sample biological data.)
+- **Bulk-ESS**: effective sample size for posterior central tendency (medians, means). Should be **≥ 1000** for stable estimates.
+- **Tail-ESS**: effective sample size for tail quantiles (used in 95% credible intervals). Should be **≥ 400**.
+
+If any model fails these thresholds, re-fit with more iterations (`iter = 4000` or higher) before interpreting the results.
 
 ```{r diagnostics}
-qpcr_fits |>
+diag_summary <- qpcr_fits |>
   mutate(diag = map(fit, ~ {
     rh <- rhat(.x)
     s  <- summary(.x)$fixed
@@ -189,215 +241,148 @@ qpcr_fits |>
     )
   })) |>
   select(Target, diag) |>
-  unnest(diag) |>
+  unnest(diag)
+
+diag_summary |>
   kable(digits = 3,
         caption = "Convergence diagnostics across all gene fits",
         col.names = c("Target", "Max R̂", "Min bulk-ESS", "Min tail-ESS"))
 ```
 
-If any model has $\hat{R}$ > 1.01 or ESS below threshold, increase iterations (`iter = 4000`) or reconsider priors before proceeding.
+# Posterior Summaries
 
-# Interaction Analysis
+For each gene we extract:
 
-The pre-specified scientific question is whether the Diet × Stress interaction is non-zero for each gene. We extract the posterior summary plus a Savage-Dickey Bayes factor for the null and the posterior probability of direction.
+- The posterior median + 95% credible interval of the KO − WT effect on the log2 scale
+- `P(in ROPE)`: the probability the effect is within ±log2(1.2) — *positive evidence for absence* of a meaningful effect
+- `P(outside ROPE)`: the probability the effect is meaningfully different from zero
+- **`BF₁`**: a Savage-Dickey Bayes factor for the **alternative** hypothesis (effect ≠ 0). Values > 3 favour the existence of an effect; > 10 are strong evidence; > 30 are very strong. This is the Bayesian analogue of "the data support a non-zero effect."
+- `BF₀ = 1/BF₁`: the Bayes factor for the null. Values > 3 favour no effect.
 
-```{r interactions}
-interaction_results <- qpcr_fits |>
+We report both directions explicitly so it's clear which way the evidence points. For most readers `BF₁` (evidence *for* an effect) is the more natural quantity.
+
+```{r posterior-summary}
+posterior_results <- qpcr_fits |>
   mutate(summary = map(fit, ~ {
-    draws <- as_draws_df(.x) |> pull(`b_DietHFD:StressCUS`)
-    h     <- hypothesis(.x, "DietHFD:StressCUS = 0")
+    draws <- as_draws_df(.x) |> pull(b_GenotypeKO)
+    h     <- hypothesis(.x, "GenotypeKO = 0")
+    BF_null <- h$hypothesis$Evid.Ratio
     tibble(
       median        = median(draws),
       ci_lower      = quantile(draws, 0.025),
       ci_upper      = quantile(draws, 0.975),
-      P_positive    = mean(draws > 0),
-      BF_null       = h$hypothesis$Evid.Ratio,
-      P_null        = h$hypothesis$Post.Prob
+      P_in_ROPE     = mean(abs(draws) <  rope_log2),
+      P_outside_ROPE = mean(abs(draws) >= rope_log2),
+      BF_null       = BF_null,
+      BF_alt        = 1 / BF_null
     )
   })) |>
   select(Target, summary) |>
   unnest(summary)
 
-interaction_results |>
-  arrange(BF_null) |>
+posterior_results |>
   kable(digits = 3,
-        caption = "Posterior summary of the Diet × Stress interaction per gene",
-        col.names = c("Target", "Median (log2)", "2.5%", "97.5%",
-                      "P(β > 0)", "BF₀ (null vs alt)", "P(null | data)"))
+        caption = "Posterior summaries of KO − WT effect (log2 scale)",
+        col.names = c("Target", "Median", "2.5%", "97.5%",
+                      "P(in ROPE)", "P(outside ROPE)",
+                      "BF₀ (null)", "BF₁ (alt)"))
 ```
 
-How to read this table:
+## Posterior densities
 
-- **Median (log2) and 95% CI**: the interaction effect size on the log2 scale. Exponentiate (`2^median`) for a multiplicative fold-change interpretation.
-- **P(β > 0)**: probability of direction. Values near 0.5 → no preferred direction; values near 0 or 1 → strong directional support.
-- **BF₀**: Savage-Dickey Bayes factor for the null hypothesis vs. the prior alternative. Values > 3 favour the null; < 1/3 favour the alternative; near 1 are inconclusive.
-- **P(null)**: posterior probability of no interaction at the default 0.5 prior model probability.
-
-## Visualising the interaction posteriors
-
-```{r plot-interaction-posteriors}
-#| fig-height: 5
+```{r plot-posteriors}
+#| fig-height: 4
 all_draws <- qpcr_fits |>
-  mutate(draws = map(fit, ~ as_draws_df(.x) |>
-                            select(`b_DietHFD:StressCUS`))) |>
+  mutate(draws = map(fit, ~ as_draws_df(.x) |> select(b_GenotypeKO))) |>
   select(Target, draws) |>
-  unnest(draws) |>
-  rename(interaction = `b_DietHFD:StressCUS`)
+  unnest(draws)
 
-ggplot(all_draws, aes(x = interaction, fill = Target)) +
+ggplot(all_draws, aes(x = b_GenotypeKO, fill = Target)) +
   geom_density(alpha = 0.6, color = NA) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey30") +
+  geom_vline(xintercept = 0,           linetype = "dashed", color = "grey30") +
+  geom_vline(xintercept =  rope_log2,  linetype = "dotted", color = "red") +
+  geom_vline(xintercept = -rope_log2,  linetype = "dotted", color = "red") +
   facet_wrap(~ Target, scales = "free_y") +
-  labs(x = "Diet × Stress interaction (log2 scale)",
+  labs(x = "KO − WT effect (log2 scale)",
        y = "Posterior density",
-       title = "Posterior of the interaction coefficient by gene") +
+       title = "Posterior of the KO − WT effect by gene",
+       subtitle = "Dashed = zero; dotted red = ROPE (±log2(1.2))") +
   theme_classic(base_size = 12) +
   guides(fill = "none")
 ```
 
-In our simulated truth, only Hmgcs2 (mild) and Il6 (strong) have non-zero interactions. The posteriors should reflect that — the other four genes' posteriors should be concentrated around zero.
+# Comparing Frequentist and Bayesian Conclusions
 
-# Cell Means and Main Effects via emmeans
+```{r side-by-side}
+combined <- left_join(
+  freq_results       |> select(Target, p.adj_freq = p.adj),
+  posterior_results  |> select(Target, P_in_ROPE, P_outside_ROPE, BF_alt),
+  by = "Target"
+) |>
+  mutate(
+    freq_decision = ifelse(p.adj_freq < 0.05,
+                           "Reject null", "Fail to reject"),
+    bayes_decision = case_when(
+      P_outside_ROPE > 0.95 ~ "Effect supported",
+      P_in_ROPE      > 0.95 ~ "Practically zero",
+      TRUE                  ~ "Inconclusive"
+    )
+  )
 
-For genes whose interaction posterior is concentrated near zero, the **marginal main effects** (averaging over levels of the other factor) are the most informative summary. For genes where the interaction is meaningful, **simple effects** (effect of one factor *within* each level of the other) are more informative. `emmeans` works directly on `brmsfit` objects with the same syntax as for `lm()` and returns posterior summaries with HPD credible intervals [@lenth2016; @emmeans].
-
-## Cell means per gene (back-transformed to fold change)
-
-```{r cell-means}
-cell_means <- qpcr_fits |>
-  mutate(emm = map(fit, ~ emmeans(.x, ~ Diet * Stress) |>
-                          as_tibble())) |>
-  select(Target, emm) |>
-  unnest(emm) |>
-  mutate(across(c(emmean, lower.HPD, upper.HPD), ~ 2 ^ .x))
-
-cell_means |>
-  kable(digits = 2,
-        caption = "Posterior cell means with 95% HPD intervals (back-transformed to fold change)",
-        col.names = c("Target", "Diet", "Stress",
-                      "Mean FC", "Lower HPD", "Upper HPD"))
-```
-
-## Marginal main effects
-
-```{r marginal-effects}
-diet_effects <- qpcr_fits |>
-  mutate(emm = map(fit, ~ emmeans(.x, ~ Diet) |>
-                          pairs() |>
-                          as_tibble())) |>
-  select(Target, emm) |>
-  unnest(emm) |>
-  mutate(factor = "Diet")
-
-stress_effects <- qpcr_fits |>
-  mutate(emm = map(fit, ~ emmeans(.x, ~ Stress) |>
-                          pairs() |>
-                          as_tibble())) |>
-  select(Target, emm) |>
-  unnest(emm) |>
-  mutate(factor = "Stress")
-
-bind_rows(diet_effects, stress_effects) |>
-  select(Target, factor, contrast, estimate, lower.HPD, upper.HPD) |>
+combined |>
+  select(Target, p.adj_freq, freq_decision,
+         BF_alt, P_in_ROPE, bayes_decision) |>
   kable(digits = 3,
-        caption = "Marginal main-effect contrasts (log2 scale; HPD intervals)")
+        caption = "Frequentist vs. Bayesian conclusions per gene",
+        col.names = c("Target", "p (BH-adj)", "Frequentist",
+                      "BF₁ (alt)", "P(in ROPE)", "Bayesian"))
 ```
 
-The estimate column is on the log2 scale — `estimate = 1` means a 2-fold change for the marginal contrast. Pck1 should show a large Diet contrast and zero Stress contrast; Fkbp5 the reverse; *Actb* should show neither.
+What this typically shows:
 
-## Simple effects (for genes with a meaningful interaction)
-
-When the interaction posterior is concentrated away from zero, the marginal main effect is misleading — the effect of one factor genuinely depends on the level of the other. Report simple effects in that case:
-
-```{r simple-effects}
-# Restrict to genes where the interaction is meaningful — using the
-# pre-specified threshold P(null | data) < 0.2 as illustration
-genes_with_interaction <- interaction_results |>
-  filter(P_null < 0.2) |>
-  pull(Target)
-
-simple_effects <- qpcr_fits |>
-  filter(Target %in% genes_with_interaction) |>
-  mutate(emm = map(fit, ~ emmeans(.x, ~ Diet | Stress) |>
-                          pairs() |>
-                          as_tibble())) |>
-  select(Target, emm) |>
-  unnest(emm)
-
-simple_effects |>
-  kable(digits = 3,
-        caption = "Simple effects: HFD vs NCD within each stress condition (log2 scale)")
-```
-
-# Multiple Targets and Bayesian Inference
-
-The frequentist workflow applies Benjamini-Hochberg adjustment across multiple targets to control the false discovery rate [@Benjamini1995]. In the Bayesian framework the situation is more nuanced:
-
-- Each gene's posterior is a complete probabilistic statement about that gene and does not "inflate Type I error" in the way that p-values do when multiple tests are performed.
-- The prior already provides regularisation: the tighter `normal(0, 0.5)` prior on the interaction shrinks small apparent interactions toward zero across all genes.
-- However, when reporting "discoveries" — genes where the interaction posterior excludes zero with high probability — the *expected number of false claims* still grows with the number of genes tested.
-
-Two pragmatic options:
-
-1. **Use a stricter posterior threshold.** For a single planned comparison you might call an interaction "supported" if `P(null) < 0.1`. Across many genes, tighten this — for instance `P(null) < 0.05` or require `BF₀ < 0.1`. Document this threshold before fitting.
-
-2. **Use a hierarchical model with partial pooling.** Fit `log2(Fold_Change) ~ Diet * Stress + (Diet * Stress | Target)` with a multilevel structure across genes. This shrinks gene-level estimates toward the lab-wide average and provides automatic FDR-like behaviour without an explicit correction step. This is the more principled solution but adds model complexity; we will cover it in a follow-up document.
+- **GeneA, GeneB**: Both methods agree — clear effect supported. Small `p_adj`, posterior outside ROPE.
+- **GeneC** (true null): Frequentist says "fail to reject" — uninformative. Bayesian says `P(in ROPE)` is high — *positive evidence for the absence* of a biologically meaningful effect. This is the strongest selling point of the Bayesian framework for small-n studies.
+- **GeneD** (tiny effect within ROPE): Both methods may say "no effect," but the Bayesian analysis explicitly characterises it as practically zero rather than ambiguously non-significant.
 
 # Interpreting Near-Null Results
 
-A genuine strength of the Bayesian framework — and the reason this approach is worth the extra effort for small-n biological studies — is that it can make *constructive* statements about the absence of an effect. Frequentist NHST cannot directly do this; "we failed to reject the null" only says the data did not provide enough evidence against it.
+Frequentist methods cannot distinguish "no detectable effect because there is none" from "no detectable effect because the study is underpowered." The Bayesian framework can, by quantifying the posterior probability that the effect is biologically negligible.
 
-For a gene like *Actb* (housekeeping; no true effect) we expect the interaction posterior to be tightly concentrated near zero. We can quantify how concentrated by computing the posterior probability that the interaction is "practically zero" — within ±0.26 on the log2 scale (less than ~1.2-fold change), say. This corresponds to a region of practical equivalence (ROPE) of [−0.26, +0.26].
+For GeneC (true null) and GeneD (true effect within the ROPE), `P(in ROPE)` should be high — typically > 0.9. This statement is far more informative than the frequentist "we did not reject the null" because it directly supports the conclusion that knockout does not affect this gene by a biologically meaningful amount, instead of leaving open the possibility that more data would change the answer.
 
-```{r near-null}
-practical_zero <- log2(1.2)   # log2 units; ~1.2-fold change
-
-near_null <- qpcr_fits |>
-  mutate(post = map(fit, ~ as_draws_df(.x) |>
-                            pull(`b_DietHFD:StressCUS`))) |>
-  mutate(P_in_ROPE = map_dbl(post, ~ mean(abs(.x) < practical_zero))) |>
-  select(Target, P_in_ROPE)
-
-near_null |>
-  arrange(desc(P_in_ROPE)) |>
-  kable(digits = 3,
-        caption = "Posterior probability that |interaction| < 0.26 log2 (i.e., < 1.2-fold change)")
-```
-
-Genes near the top of this table are ones where the data provide *positive evidence for the absence* of a meaningful interaction. For *Actb* (true null) and the other simulated null-interaction genes, this probability should be high (often > 0.9) — a much more useful scientific statement than "we did not reject the null."
-
-The choice of the ROPE width (0.26 log2 = 1.2-fold here) should be substantive: pick the smallest interaction magnitude that would be biologically meaningful for your system, and document it in your methods.
+This kind of analysis is increasingly important for studies that need to *establish* the absence of an off-target effect, validate a control condition, or rule out a redundant pathway — questions where frequentist NHST simply cannot give a positive answer.
 
 # BARG Reporting Checklist for This Analysis
 
-A paper reporting this analysis would include the following, organised per [@kruschkeBayesianAnalysisReporting2021]:
+Following [BARG](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-barg.html) [@kruschkeBayesianAnalysisReporting2021]:
 
 | Element | What to report |
 |---|---|
-| **Justification for Bayesian approach** | "We used Bayesian regression to obtain posterior distributions of effect sizes, to quantify evidence both for and against the interaction term, and to make positive statements about practical equivalence to zero in null-effect cases." |
+| **Justification for Bayesian approach** | "We used Bayesian regression to obtain posterior distributions of the KO − WT effect and to make positive statements about practical equivalence to zero in apparent null cases." |
 | **Likelihood family** | "Gaussian likelihood on log2-transformed fold change." |
-| **Pre-specified priors** | List each prior with rationale (see Priors table above). State explicitly that priors were finalised before fitting. |
-| **Software and versions** | brms `r packageVersion("brms")` [@brms; @brms-r-journal], R `r getRversion()` [@r-core], emmeans `r packageVersion("emmeans")` [@lenth2016]. |
+| **Pre-specified priors** | List each prior with rationale. State explicitly that priors were finalised before fitting. |
+| **ROPE definition** | "We defined a region of practical equivalence as ±log2(1.2) on the log2 scale (effects between 1/1.2 and 1.2-fold change considered biologically negligible)." |
+| **Software and versions** | brms `r packageVersion("brms")` [@brms; @brms-r-journal], R `r getRversion()` [@r-core]. |
 | **Convergence ($\hat{R}$, ESS)** | Report the maximum $\hat{R}$ and minimum bulk/tail-ESS across all gene fits. |
-| **Posterior predictive checks** | Run `pp_check(fit)` per gene and include as a supplementary figure. |
-| **Posterior summaries** | Median + 95% HPD per gene for each parameter of interest (interaction, main effects, cell means). |
-| **Hypothesis-specific BFs and posterior probabilities** | For the interaction term per gene; report BF and P(null). |
-| **ROPE / practical equivalence** | If using "near-null" interpretation, state the ROPE width and rationale. |
-| **Multiple-target threshold** | If a stricter threshold is used across many genes, document it with rationale. |
-| **Sensitivity analysis** | If a different reasonable prior changes the conclusion for a gene, report both fits in the supplement. |
+| **Posterior predictive checks** | Run `pp_check(fit)` per gene and include as supplementary figure. |
+| **Posterior summaries** | Median + 95% credible interval per gene. |
+| **ROPE-based decisions** | `P(in ROPE)` and `P(outside ROPE)` per gene. |
+| **Bayes factors** | Per gene, optionally. |
 
-A sample results paragraph for a manuscript:
+A sample results paragraph (with the real values from this analysis substituted inline):
 
->**Results.** We fit a Bayesian linear regression of `log2(Fold_Change) ~ Diet * Stress` per target gene with weakly informative pre-specified priors (intercept `normal(0, 1.5)`; main effects `normal(0, 1)`; interaction `normal(0, 0.5)`; residual SD `student_t(3, 0, 1)`) and a Gaussian likelihood, using brms. All chains converged (max $\hat{R}$ = X.XX, min bulk-ESS = X, min tail-ESS = X). For each target we report the posterior median and 95% credible interval of the Diet × Stress interaction along with a Savage-Dickey Bayes factor and the posterior probability that the interaction lies within a region of practical equivalence (ROPE) of ±0.26 on the log2 scale. Genes with `P(null | data) > 0.9` and `P(|interaction| < 0.26 | data) > 0.9` were classified as showing positive evidence for the absence of a biologically meaningful interaction. Cell means and marginal main effects were extracted from the same fits via emmeans.
+>**Results.** We fit Bayesian linear regression of `log2(Fold_Change) ~ Genotype` per target gene with weakly informative pre-specified priors (intercept `normal(0, 1.5)`; genotype effect `normal(0, 1)`; residual SD `student_t(3, 0, 1)`) and a Gaussian likelihood, using brms. All chains converged (max $\hat{R}$ = `r round(max(diag_summary$max_rhat), 3)`; min bulk-ESS = `r min(diag_summary$min_bulk)`; min tail-ESS = `r min(diag_summary$min_tail)`). For each target we report the posterior median and 95% credible interval of the KO − WT effect on the log2 scale, along with a Savage-Dickey Bayes factor for the alternative hypothesis (effect ≠ 0) and the probability the effect lies within a region of practical equivalence (ROPE) of ±log2(1.2). For GeneA and GeneB, more than 95% of the posterior fell outside the ROPE, with BF₁ values strongly favouring the alternative, supporting a real KO effect. For GeneC and GeneD, more than 95% of the posterior fell *within* the ROPE, providing positive evidence for the absence of a biologically meaningful KO effect.
 
-# Adapting This Workflow to Your Data
+# Adapting This to Your Data
 
-To use this template on a real qPCR dataset:
+To use this template:
 
-1. Replace the simulated `qpcr_sim` with your own data. The required columns are `Target` (factor; gene name), `Diet` (factor with reference level NCD), `Stress` (factor with reference level CON), and `Fold_Change` (numeric; ΔΔCt-derived fold change relative to a reference group).
-2. Confirm the priors are appropriate. The prior scales (`normal(0, 1)` on main effects, `normal(0, 0.5)` on the interaction) assume biologically meaningful effects of order 1× to 4× fold change. Adjust if your system typically shows much larger or smaller effects.
-3. Decide on the ROPE width. The default `practical_zero <- 0.26` corresponds to "anything within ±1.2-fold change is biologically uninteresting." Adjust based on what change is meaningful in your system.
-4. Decide your reporting threshold. The default `P(null) < 0.2` for "interaction supported" is loose for a single comparison; tighten to `P(null) < 0.05` or `BF₀ < 0.1` when reporting many targets.
+1. Replace `qpcr_sim` with your data. Required columns: `Target` (factor; gene name), `Genotype` (factor with reference level WT), `Fold_Change` (numeric; ΔΔCt-derived).
+2. Confirm priors are appropriate for your system. The `normal(0, 1)` prior on the genotype effect assumes biologically meaningful effects of order 1× to 4× fold change; adjust if your system typically shows much larger or smaller effects.
+3. Decide on the ROPE width. Pick the smallest fold change that would be biologically meaningful for your system; the default ±log2(1.2) is a reasonable starting point.
+4. Tighten the decision threshold (e.g. `P(in ROPE) > 0.95` instead of 0.9) when reporting many targets.
+
+For factorial designs where the *interaction* between two factors is the primary scientific question, see [bayesian-qpcr-example-effect-modification.html](https://bridgeslab.github.io/Lab-Documents/Experimental%20Policies/bayesian-qpcr-example-effect-modification.html).
 
 # References
 
