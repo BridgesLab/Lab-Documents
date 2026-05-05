@@ -186,7 +186,7 @@ qpcr_fits <- qpcr_sim |>
 
 # Convergence Diagnostics
 
-Before interpreting any model, verify that all chains converged ($\hat{R}$ ≈ 1) and that the effective sample size is adequate ([@vehtariRankNormalizationFolding2021] recommends bulk-ESS ≥ 1000 and tail-ESS ≥ 400). We extract diagnostics across all six gene-level fits at once:
+Before interpreting any model, verify that all chains converged ($\hat{R}$ ≈ 1) and that the effective sample size is adequate [@vehtariRankNormalizationFolding2021] recommends bulk-ESS ≥ 1000 and tail-ESS ≥ 400). We extract diagnostics across all six gene-level fits at once:
 
 ```{r diagnostics}
 qpcr_fits |>
