@@ -244,6 +244,22 @@ In this case the values are off the scale high so it's best to report as greater
 
 >The Bayes Factor for the hypothesis that higher vehicle weight is associated with a higher probability of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
 
+The best way to characterize your posterior probabilities (depending on your use) are probably these three terms:
+
+- **Median estimate and 95% credible interval** of your posterior density
+- **Probability of direction:** the posterior probability that the estimate is there is an effect in some direction (positive or negative).  Sometimes abbreviated as *pd*.
+- **ROPE:** The region of practical equivalence, or probability of negligible effect.  This region is defined as $\pm0.1 \times SD$ for continuous variables and $OR=\pm 0.18$ for a logistic regression.  This can be manually defined using `rope_range`.  These defaults were described in @kruschke2015doing.
+
+All three parameters can be calculated using the `bayestestR` package.
+
+```{r posterior-summary}
+library(bayestestR)
+describe_posterior(binomial.fit,
+                   test=c("pd","rope")) |>
+  kable(caption="Posterior summary for binomial fit", digits=3)
+```
+
+
 
 ## Summary
 

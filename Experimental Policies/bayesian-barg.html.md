@@ -409,6 +409,40 @@ In this case the values are off the scale high so it's best to report as greater
 
 >The Bayes Factor for the hypothesis that higher vehicle weight is associated with a higher probability of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
 
+The best way to characterize your posterior probabilities (depending on your use) are probably these three terms:
+
+- **Median estimate and 95% credible interval** of your posterior density
+- **Probability of direction:** the posterior probability that the estimate is there is an effect in some direction (positive or negative).  Sometimes abbreviated as *pd*.
+- **ROPE:** The region of practical equivalence, or probability of negligible effect.  This region is defined as $\pm0.1 \times SD$ for continuous variables and $OR=\pm 0.18$ for a logistic regression.  This can be manually defined using `rope_range`.  These defaults were described in @kruschke2015doing.
+
+All three parameters can be calculated using the `bayestestR` package.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+library(bayestestR)
+describe_posterior(binomial.fit,
+                   test=c("pd","rope")) |>
+  kable(caption="Posterior summary for binomial fit", digits=3)
+```
+
+::: {.cell-output-display}
+
+
+Table: Posterior summary for binomial fit
+
+|Parameter   | Median|   CI| CI_low| CI_high| pd| ROPE_CI| ROPE_low| ROPE_high| ROPE_Percentage|  Rhat|      ESS|
+|:-----------|------:|----:|------:|-------:|--:|-------:|--------:|---------:|---------------:|-----:|--------:|
+|b_Intercept | 12.833| 0.95|  5.753|  23.154|  1|    0.95|   -0.181|     0.181|               0| 1.001| 1938.815|
+|b_wt        | -4.301| 0.95| -7.622|  -2.062|  1|    0.95|   -0.181|     0.181|               0| 1.002| 1766.969|
+
+
+:::
+:::
+
+
+
 
 ## Summary
 
@@ -450,7 +484,7 @@ sessionInfo()
 ```
 R version 4.6.0 (2026-04-24)
 Platform: aarch64-apple-darwin23
-Running under: macOS Tahoe 26.4.1
+Running under: macOS Tahoe 26.5
 
 Matrix products: default
 BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
@@ -466,37 +500,38 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] cowplot_1.2.0       ggplot2_4.0.3       broom.mixed_0.2.9.7
-[4] brms_2.23.0         Rcpp_1.1.1-1.1      dplyr_1.2.1        
-[7] knitr_1.51          tinytex_0.59       
+[1] bayestestR_0.17.0   cowplot_1.2.0       ggplot2_4.0.3      
+[4] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
+[7] dplyr_1.2.1         knitr_1.51          tinytex_0.59       
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6          tensorA_0.36.2.1      xfun_0.57            
- [4] QuickJSR_1.9.2        processx_3.9.0        inline_0.3.21        
- [7] lattice_0.22-9        callr_3.7.6           vctrs_0.7.3          
-[10] tools_4.6.0           generics_0.1.4        stats4_4.6.0         
-[13] parallel_4.6.0        tibble_3.3.1          pkgconfig_2.0.3      
-[16] Matrix_1.7-5          checkmate_2.3.4       RColorBrewer_1.1-3   
-[19] S7_0.2.2              distributional_0.7.0  RcppParallel_5.1.11-2
-[22] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
-[25] stringr_1.6.0         Brobdingnag_1.2-9     codetools_0.2-20     
-[28] htmltools_0.5.9       bayesplot_1.15.0      yaml_2.3.12          
-[31] furrr_0.4.0           tidyr_1.3.2           pillar_1.11.1        
-[34] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
-[37] parallelly_1.47.0     nlme_3.1-169          posterior_1.7.0      
-[40] rstan_2.32.7          tidyselect_1.2.1      digest_0.6.39        
-[43] future_1.70.0         mvtnorm_1.3-7         stringi_1.8.7        
-[46] listenv_0.10.1        reshape2_1.4.5        purrr_1.2.2          
-[49] splines_4.6.0         forcats_1.0.1         labeling_0.4.3       
-[52] fastmap_1.2.0         grid_4.6.0            cli_3.6.6            
-[55] magrittr_2.0.5        loo_2.9.0             pkgbuild_1.4.8       
-[58] broom_1.0.12          withr_3.0.2           scales_1.4.0         
-[61] backports_1.5.1       estimability_1.5.1    rmarkdown_2.31       
-[64] globals_0.19.1        matrixStats_1.5.0     emmeans_2.0.3        
-[67] gridExtra_2.3         coda_0.19-4.1         evaluate_1.0.5       
-[70] rstantools_2.6.0      rlang_1.2.0           glue_1.8.1           
-[73] rstudioapi_0.18.0     jsonlite_2.0.0        R6_2.6.1             
-[76] plyr_1.8.9           
+ [1] tidyselect_1.2.1      farver_2.1.2          loo_2.9.0            
+ [4] S7_0.2.2              fastmap_1.2.0         tensorA_0.36.2.1     
+ [7] digest_0.6.39         estimability_1.5.1    lifecycle_1.0.5      
+[10] StanHeaders_2.32.10   magrittr_2.0.5        posterior_1.7.0      
+[13] compiler_4.6.0        rlang_1.2.0           tools_4.6.0          
+[16] yaml_2.3.12           labeling_0.4.3        bridgesampling_1.2-1 
+[19] htmlwidgets_1.6.4     pkgbuild_1.4.8        plyr_1.8.9           
+[22] RColorBrewer_1.1-3    abind_1.4-8           withr_3.0.2          
+[25] purrr_1.2.2           datawizard_1.3.1      grid_4.6.0           
+[28] stats4_4.6.0          future_1.70.0         inline_0.3.21        
+[31] emmeans_2.0.3         globals_0.19.1        scales_1.4.0         
+[34] insight_1.5.0         cli_3.6.6             mvtnorm_1.3-7        
+[37] rmarkdown_2.31        reformulas_0.4.4      generics_0.1.4       
+[40] otel_0.2.0            RcppParallel_5.1.11-2 rstudioapi_0.18.0    
+[43] reshape2_1.4.5        rstan_2.32.7          stringr_1.6.0        
+[46] splines_4.6.0         bayesplot_1.15.0      parallel_4.6.0       
+[49] matrixStats_1.5.0     vctrs_0.7.3           Matrix_1.7-5         
+[52] jsonlite_2.0.0        listenv_0.10.1        tidyr_1.3.2          
+[55] glue_1.8.1            parallelly_1.47.0     codetools_0.2-20     
+[58] distributional_0.7.0  stringi_1.8.7         gtable_0.3.6         
+[61] QuickJSR_1.9.2        tibble_3.3.1          pillar_1.11.1        
+[64] furrr_0.4.0           htmltools_0.5.9       Brobdingnag_1.2-9    
+[67] R6_2.6.1              Rdpack_2.6.6          evaluate_1.0.5       
+[70] lattice_0.22-9        rbibutils_2.4.1       backports_1.5.1      
+[73] broom_1.0.12          rstantools_2.6.0      coda_0.19-4.1        
+[76] gridExtra_2.3         nlme_3.1-169          checkmate_2.3.4      
+[79] xfun_0.57             forcats_1.0.1         pkgconfig_2.0.3      
 ```
 
 
