@@ -760,7 +760,7 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>In this case the values are off the scale high so it’s best to report as greater than a large number rather than infinity and zero. Note that since the model predicts P(manual), <code>wt &lt; 0</code> corresponds to weight <em>decreasing</em> the probability of a manual transmission (equivalently, <em>increasing</em> the probability of an automatic transmission) — the same direction reported in the binomial regression example.</p>
+<p>In this case the values are off the scale high so it’s best to report as greater than a large number rather than infinity and zero. Note that since the model predicts P(manual), <code>wt &lt; 0</code> corresponds to weight <em>decreasing</em> the probability of a manual transmission (equivalently, <em>increasing</em> the probability of an automatic transmission) – the same direction reported in the binomial regression example. This method reports a Savage-Dickey Bayes factor <span class="citation" data-cites="Wagenmakers2010">(<a href="#ref-Wagenmakers2010" role="doc-biblioref">Wagenmakers et al. 2010</a>)</span>, which quantifies the relative evidence (how much the data multiply the prior odds) in favor of one hypothesis over the other.</p>
 <blockquote class="blockquote">
 <p>The Bayes Factor for the hypothesis that higher vehicle weight is associated with a higher probability of an automatic transmission is &gt;1,000,000 with a posterior probability of &gt;0.999.</p>
 </blockquote>
@@ -929,6 +929,9 @@ Kruschke, John K. 2021. <span>“Bayesian <span>Analysis Reporting Guidelines</s
 </div>
 <div id="ref-r-core" class="csl-entry" role="listitem">
 R Core Team. 2024. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-Wagenmakers2010" class="csl-entry" role="listitem">
+Wagenmakers, Eric-Jan, Tom Lodewyckx, Himanshu Kuriyal, and Raoul Grasman. 2010. <span>“Bayesian Hypothesis Testing for Psychologists: A Tutorial on the Savage–Dickey Method.”</span> <em>Cognitive Psychology</em> 60 (3): 158–89. <a href="https://doi.org/10.1016/j.cogpsych.2009.12.001">https://doi.org/10.1016/j.cogpsych.2009.12.001</a>.
 </div>
 </div>
 </section>

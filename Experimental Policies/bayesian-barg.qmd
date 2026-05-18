@@ -240,7 +240,7 @@ hypothesis(binomial.fit, "wt<0")$hypothesis %>%
   kable(caption="Hypothesis test for effects of weight on automatic transmission", digits=3)
 ```
 
-In this case the values are off the scale high so it's best to report as greater than a large number rather than infinity and zero. Note that since the model predicts P(manual), `wt < 0` corresponds to weight *decreasing* the probability of a manual transmission (equivalently, *increasing* the probability of an automatic transmission) — the same direction reported in the binomial regression example.
+In this case the values are off the scale high so it's best to report as greater than a large number rather than infinity and zero. Note that since the model predicts P(manual), `wt < 0` corresponds to weight *decreasing* the probability of a manual transmission (equivalently, *increasing* the probability of an automatic transmission) -- the same direction reported in the binomial regression example.  This method reports a Savage-Dickey Bayes factor [@Wagenmakers2010], which quantifies the relative evidence (how much the data multiply the prior odds) in favor of one hypothesis over the other.
 
 >The Bayes Factor for the hypothesis that higher vehicle weight is associated with a higher probability of an automatic transmission is >1,000,000 with a posterior probability of >0.999.
 
