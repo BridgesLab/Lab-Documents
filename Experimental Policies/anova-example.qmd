@@ -125,10 +125,24 @@ Use a two-way ANOVA when two categorical predictors may jointly affect your outc
 
 ### For a 2×2 Design, Always Fit the Full Interaction Model
 
+Note the default for R is dummy (treatment) coding, but Type III tests require sum-to-zero coding or the main effects will be incorrect. In this case rather than flipping the contrasts *globally* with `options(contrasts = ...)`, which would silently change the coding for every model fit later in the session, including the `brms` models below and the coefficient names they rely on here we set the coding only on a dedicated fit via `lm()`'s `contrasts` argument. The contrasts must be set when the model is **fit**, because `car::Anova()` reads the coding stored in the fit, not the global option at call time.  As a general rule, is probably better to set this globally in your script.
+
 ```{r two-way-fit}
+# Default treatment-coded fit, reused for all emmeans follow-up below.
 balloon.lm <- lm(size ~ color * shape, data = balloon.data)
 
-car::Anova(balloon.lm, type = "III") |>
+# Type III tests require sum-to-zero coding (contr.sum). Apply it ONLY to this
+# dedicated fit via lm()'s `contrasts` argument rather than changing the global
+# option(). This keeps R's default treatment coding everywhere else, so the
+# downstream emmeans and brms models — and the coefficient names referenced in
+# the Bayesian section (e.g. colorgreen:shapesquare) — stay valid.
+balloon.lm.type3 <- lm(
+  size ~ color * shape,
+  data      = balloon.data,
+  contrasts = list(color = "contr.sum", shape = "contr.sum")
+)
+
+car::Anova(balloon.lm.type3, type = "III") |>
   tidy() |>
   kable(digits = 3, caption = "Type III ANOVA table")
 ```
@@ -208,11 +222,11 @@ emmeans(balloon.lm, ~ shape | color) |>
 | Marginal main effects | Average effect of A across levels of B | `emmeans(fit, ~ A) |> pairs()` |
 | Simple effects | Effect of A within each level of B | `emmeans(fit, ~ A | B) |> pairs()` |
 
-Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.
+Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout with no refitting.
 
 ### Multiple Testing Across Many Outcomes
 
-If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
+If you test the same design across many outcomes (*e.g.* multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
 
 ```{r multiple-testing}
 # Collect marginal contrasts for both factors into one table, then adjust together
@@ -318,9 +332,9 @@ The interaction coefficients receive a much tighter autoscaled prior, while the 
 ```{r brms-skeptical}
 #| output: false
 priors_skeptical <- c(
-  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                       # main effects ~1 SD
-  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),     # tight on interaction
-  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),       # tight on interaction
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                                  # main effects
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),  # interaction
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),    # interaction
   prior(student_t(3, 0, 2.5), class = sigma)
 )
 

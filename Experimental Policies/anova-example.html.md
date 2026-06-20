@@ -274,13 +274,27 @@ Use a two-way ANOVA when two categorical predictors may jointly affect your outc
 
 ### For a 2×2 Design, Always Fit the Full Interaction Model
 
+Note the default for R is dummy (treatment) coding, but Type III tests require sum-to-zero coding or the main effects will be incorrect. In this case rather than flipping the contrasts *globally* with `options(contrasts = ...)`, which would silently change the coding for every model fit later in the session, including the `brms` models below and the coefficient names they rely on here we set the coding only on a dedicated fit via `lm()`'s `contrasts` argument. The contrasts must be set when the model is **fit**, because `car::Anova()` reads the coding stored in the fit, not the global option at call time.  As a general rule, is probably better to set this globally in your script.
+
 
 ::: {.cell}
 
 ```{.r .cell-code}
+# Default treatment-coded fit, reused for all emmeans follow-up below.
 balloon.lm <- lm(size ~ color * shape, data = balloon.data)
 
-car::Anova(balloon.lm, type = "III") |>
+# Type III tests require sum-to-zero coding (contr.sum). Apply it ONLY to this
+# dedicated fit via lm()'s `contrasts` argument rather than changing the global
+# option(). This keeps R's default treatment coding everywhere else, so the
+# downstream emmeans and brms models — and the coefficient names referenced in
+# the Bayesian section (e.g. colorgreen:shapesquare) — stay valid.
+balloon.lm.type3 <- lm(
+  size ~ color * shape,
+  data      = balloon.data,
+  contrasts = list(color = "contr.sum", shape = "contr.sum")
+)
+
+car::Anova(balloon.lm.type3, type = "III") |>
   tidy() |>
   kable(digits = 3, caption = "Type III ANOVA table")
 ```
@@ -292,9 +306,9 @@ Table: Type III ANOVA table
 
 |term        |   sumsq| df| statistic| p.value|
 |:-----------|-------:|--:|---------:|-------:|
-|(Intercept) | 244.919|  1|    38.052|   0.000|
-|color       |  13.125|  2|     1.020|   0.381|
-|shape       |   7.154|  1|     1.111|   0.306|
+|(Intercept) | 932.337|  1|   144.854|   0.000|
+|color       |   5.570|  2|     0.433|   0.655|
+|shape       |   0.483|  1|     0.075|   0.787|
 |color:shape |   7.820|  2|     0.608|   0.556|
 |Residuals   | 115.855| 18|        NA|      NA|
 
@@ -471,11 +485,11 @@ Table: Simple effects: shape within each color (Tukey-adjusted)
 | Marginal main effects | Average effect of A across levels of B | `emmeans(fit, ~ A) |> pairs()` |
 | Simple effects | Effect of A within each level of B | `emmeans(fit, ~ A | B) |> pairs()` |
 
-Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout — no refitting.
+Always report the interaction test and marginal main effects. If the interaction is large or scientifically meaningful, additionally report simple effects. Use the same model throughout with no refitting.
 
 ### Multiple Testing Across Many Outcomes
 
-If you test the same design across many outcomes (e.g. multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
+If you test the same design across many outcomes (*e.g.* multiple genes or proteins), adjust p-values across outcomes using the Benjamini-Hochberg false discovery rate to control the proportion of false positives. The key is to collect all the contrasts you care about into a single table *before* adjusting, so the correction spans the full set of tests.
 
 
 ::: {.cell}
@@ -665,9 +679,9 @@ The interaction coefficients receive a much tighter autoscaled prior, while the 
 
 ```{.r .cell-code}
 priors_skeptical <- c(
-  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                       # main effects ~1 SD
-  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),     # tight on interaction
-  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),       # tight on interaction
+  prior_string(sprintf("normal(0, %.4f)", 1 * sd_y),    class = "b"),                                                  # main effects
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorgreen:shapesquare"),  # interaction
+  prior_string(sprintf("normal(0, %.4f)", 0.25 * sd_y), class = "b", coef = "colorred:shapesquare"),    # interaction
   prior(student_t(3, 0, 2.5), class = sigma)
 )
 
@@ -1076,7 +1090,7 @@ Table: Kruskal-Wallis test (one-way non-parametric alternative)
 ```
 R version 4.6.0 (2026-04-24)
 Platform: aarch64-apple-darwin23
-Running under: macOS Tahoe 26.4.1
+Running under: macOS Tahoe 26.5.1
 
 Matrix products: default
 BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
@@ -1093,36 +1107,38 @@ attached base packages:
 
 other attached packages:
  [1] broom.mixed_0.2.9.7 brms_2.23.0         Rcpp_1.1.1-1.1     
- [4] knitr_1.51          broom_1.0.12        car_3.1-5          
+ [4] knitr_1.51          broom_1.0.13        car_3.1-5          
  [7] carData_3.0-6       emmeans_2.0.3       lubridate_1.9.5    
 [10] forcats_1.0.1       stringr_1.6.0       dplyr_1.2.1        
 [13] purrr_1.2.2         readr_2.2.0         tidyr_1.3.2        
 [16] tibble_3.3.1        ggplot2_4.0.3       tidyverse_2.0.0    
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.6          tensorA_0.36.2.1      QuickJSR_1.9.2       
- [4] xfun_0.57             inline_0.3.21         lattice_0.22-9       
- [7] tzdb_0.5.0            vctrs_0.7.3           tools_4.6.0          
-[10] generics_0.1.4        stats4_4.6.0          parallel_4.6.0       
-[13] pkgconfig_2.0.3       Matrix_1.7-5          checkmate_2.3.4      
-[16] RColorBrewer_1.1-3    S7_0.2.2              distributional_0.7.0 
-[19] RcppParallel_5.1.11-2 lifecycle_1.0.5       compiler_4.6.0       
-[22] farver_2.1.2          Brobdingnag_1.2-9     codetools_0.2-20     
-[25] htmltools_0.5.9       bayesplot_1.15.0      yaml_2.3.12          
-[28] Formula_1.2-5         furrr_0.4.0           pillar_1.11.1        
-[31] StanHeaders_2.32.10   bridgesampling_1.2-1  abind_1.4-8          
-[34] parallelly_1.47.0     nlme_3.1-169          rstan_2.32.7         
-[37] posterior_1.7.0       tidyselect_1.2.1      digest_0.6.39        
-[40] future_1.70.0         mvtnorm_1.3-7         stringi_1.8.7        
-[43] listenv_0.10.1        splines_4.6.0         fastmap_1.2.0        
-[46] grid_4.6.0            cli_3.6.6             magrittr_2.0.5       
-[49] loo_2.9.0             pkgbuild_1.4.8        withr_3.0.2          
-[52] scales_1.4.0          backports_1.5.1       estimability_1.5.1   
-[55] timechange_0.4.0      rmarkdown_2.31        globals_0.19.1       
-[58] matrixStats_1.5.0     gridExtra_2.3         hms_1.1.4            
-[61] coda_0.19-4.1         evaluate_1.0.5        rstantools_2.6.0     
-[64] rlang_1.2.0           glue_1.8.1            rstudioapi_0.18.0    
-[67] jsonlite_2.0.0        R6_2.6.1             
+ [1] tidyselect_1.2.1      farver_2.1.2          loo_2.9.0            
+ [4] S7_0.2.2              fastmap_1.2.0         tensorA_0.36.2.1     
+ [7] digest_0.6.39         timechange_0.4.0      estimability_1.5.1   
+[10] lifecycle_1.0.5       StanHeaders_2.32.10   magrittr_2.0.5       
+[13] posterior_1.7.0       compiler_4.6.0        rlang_1.2.0          
+[16] tools_4.6.0           yaml_2.3.12           bridgesampling_1.2-1 
+[19] htmlwidgets_1.6.4     curl_7.1.0            pkgbuild_1.4.8       
+[22] RColorBrewer_1.1-3    abind_1.4-8           withr_3.0.2          
+[25] grid_4.6.0            stats4_4.6.0          xtable_1.8-8         
+[28] future_1.70.0         inline_0.3.21         globals_0.19.1       
+[31] scales_1.4.0          cli_3.6.6             mvtnorm_1.3-7        
+[34] rmarkdown_2.31        generics_0.1.4        otel_0.2.0           
+[37] RcppParallel_5.1.11-2 rstudioapi_0.18.0     tzdb_0.5.0           
+[40] rstan_2.32.7          splines_4.6.0         bayesplot_1.15.0     
+[43] parallel_4.6.0        matrixStats_1.5.0     vctrs_0.7.3          
+[46] V8_8.2.0              Matrix_1.7-5          jsonlite_2.0.0       
+[49] hms_1.1.4             Formula_1.2-5         listenv_0.10.1       
+[52] glue_1.8.1            parallelly_1.47.0     codetools_0.2-20     
+[55] distributional_0.7.0  stringi_1.8.7         gtable_0.3.6         
+[58] QuickJSR_1.10.0       pillar_1.11.1         furrr_0.4.0          
+[61] htmltools_0.5.9       Brobdingnag_1.2-9     R6_2.6.1             
+[64] evaluate_1.0.5        lattice_0.22-9        backports_1.5.1      
+[67] rstantools_2.6.0      coda_0.19-4.1         gridExtra_2.3        
+[70] nlme_3.1-169          checkmate_2.3.4       xfun_0.57            
+[73] pkgconfig_2.0.3      
 ```
 
 
